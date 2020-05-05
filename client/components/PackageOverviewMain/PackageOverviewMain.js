@@ -43,10 +43,10 @@ const PackageOverviewMain = function(props) {
 				<div className="readme">{readme}</div>
 			</Section>
 			<Section title="Files">
-				<NonIdealState icon="circle" title="No Files yet" />
+				{!files.length && <NonIdealState icon="circle" title="No Files yet" />}
 			</Section>
 			<Section title="Assertions">
-				<NonIdealState icon="circle" title="No Assertions yet" />
+				{!assertions.length && <NonIdealState icon="circle" title="No Assertions yet" />}
 			</Section>
 		</div>
 	);

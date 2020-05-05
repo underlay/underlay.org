@@ -17,9 +17,7 @@ const Organization = function(props) {
 	const contentSwitch = {
 		overview: {
 			main: <NamespaceOverviewMain packages={packages} />,
-			side: (
-				<NamespaceOverviewSide discussions={discussions} people={organizationData.people} />
-			),
+			side: <NamespaceOverviewSide discussions={discussions} people={people} />,
 		},
 	};
 	const activeContent = contentSwitch[mode] || {};
