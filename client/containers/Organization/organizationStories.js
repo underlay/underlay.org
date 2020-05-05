@@ -8,7 +8,7 @@ import {
 	packagesData,
 	discussionsData,
 	usersData,
-} from 'stories/data';
+} from 'utils/data';
 
 storiesOf('containers', module).add('Organization', () => (
 	<App

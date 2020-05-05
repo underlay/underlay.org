@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import App from 'containers/App/App';
-import { locationData, loginData, packagesData, usersData } from 'stories/data';
+import { locationData, loginData, packagesData, usersData } from 'utils/data';
 
 storiesOf('containers', module).add('Package', () => (
 	<App

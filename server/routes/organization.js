@@ -4,7 +4,7 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { organizationsData, packagesData, discussionsData, usersData } from 'stories/data';
+import { organizationsData, packagesData, discussionsData, usersData } from 'utils/data';
 
 app.get(['/org/:slug', '/org/:slug/:mode'], async (req, res, next) => {
 	try {
