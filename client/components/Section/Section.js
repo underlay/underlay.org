@@ -19,7 +19,7 @@ const Section = function(props) {
 	const { title, useMargin, children } = props;
 	return (
 		<div className={classNames('section-component', useMargin && 'margin')}>
-			<div className="title">{title}</div>
+			<div className="section-title">{title}</div>
 			{children}
 		</div>
 	);

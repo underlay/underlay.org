@@ -22,7 +22,7 @@ const ScopeHeader = function(props) {
 	return (
 		<div className="scope-header-component clearfix">
 			<Icon className="type-icon" icon={type} iconSize={28} />
-			{avatar && <Avatar avatar={avatar} width={85} />}
+			{avatar && <Avatar avatar={avatar} width={100} />}
 			<div className="title">{title}</div>
 			<div className="details top">{detailsTop}</div>
 			<div className="details">{detailsBottom}</div>

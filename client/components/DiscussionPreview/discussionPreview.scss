@@ -1,0 +1,16 @@
+.discussion-preview-component {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	&:hover {
+		text-decoration: none;
+		color: inherit;
+		.title {
+			text-decoration: underline;
+		}
+	}
+	.number {
+		margin-right: 15px;
+		font-family: Courier, monospaced;
+	}
+}

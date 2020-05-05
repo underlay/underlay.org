@@ -1,6 +1,6 @@
 import React from 'react';
 import { GridWrapper, Avatar } from 'components';
-import { Button} from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
 
 require('./header.scss');

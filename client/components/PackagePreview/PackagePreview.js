@@ -6,7 +6,6 @@ import { Icon } from 'components';
 require('./packagePreview.scss');
 
 const propTypes = {
-	title: PropTypes.string.isRequired,
 	slug: PropTypes.string.isRequired,
 	description: PropTypes.string,
 	numMessages: PropTypes.number,
@@ -21,14 +20,14 @@ const defaultProps = {
 	numVersions: 0,
 };
 
-const Section = function(props) {
-	const { title, slug, description, numMessages, numFiles, numVersions } = props;
+const PackagePreview = function(props) {
+	const { slug, description, numMessages, numFiles, numVersions } = props;
 	const { locationData } = usePageContext();
 	const { slug: ownerSlug } = locationData;
 	return (
 		<a href={`/${ownerSlug}/${slug}`} className="package-preview-component">
 			<Icon icon="package" iconSize={20} />
-			<div className="title ellipsis">{title}</div>
+			<div className="title ellipsis">{slug}</div>
 			<div className="description">{description}</div>
 			<div className="details">
 				<span>
@@ -45,6 +44,6 @@ const Section = function(props) {
 	);
 };
 
-Section.propTypes = propTypes;
-Section.defaultProps = defaultProps;
-export default Section;
+PackagePreview.propTypes = propTypes;
+PackagePreview.defaultProps = defaultProps;
+export default PackagePreview;
