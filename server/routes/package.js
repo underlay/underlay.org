@@ -20,7 +20,7 @@ app.get(['/package/:slug', '/package/:slug/:mode'], async (req, res, next) => {
 			...packageData,
 			packages: packagesData,
 			discussions: discussionsData,
-			people: usersData,
+			contributors: usersData,
 		};
 		return renderToNodeStream(
 			res,

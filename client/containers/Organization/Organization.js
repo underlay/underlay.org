@@ -26,7 +26,7 @@ const Organization = function(props) {
 		<StandardFrame
 			className="organization-container"
 			scopeHeaderProps={{
-				type: 'user',
+				type: 'org',
 				title: title,
 				avatar: avatar,
 				detailsTop: slug,

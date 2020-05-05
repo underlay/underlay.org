@@ -23,12 +23,13 @@ const NamespaceOverviewSide = function(props) {
 				<Section title="People">
 					{people.map((person) => {
 						return (
-							<Avatar
-								key={person.slug}
-								avatar={person.avatar}
-								initials={person.initials}
-								width={35}
-							/>
+							<a href={`/user/${person.slug}`} key={person.slug}>
+								<Avatar
+									avatar={person.avatar}
+									initials={person.initials}
+									width={35}
+								/>
+							</a>
 						);
 					})}
 				</Section>

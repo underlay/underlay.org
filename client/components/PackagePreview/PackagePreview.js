@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { usePageContext } from 'client/utils/hooks';
+// import { usePageContext } from 'client/utils/hooks';
 import { Icon } from 'components';
 
 require('./packagePreview.scss');
@@ -22,10 +22,10 @@ const defaultProps = {
 
 const PackagePreview = function(props) {
 	const { slug, description, numMessages, numFiles, numVersions } = props;
-	const { locationData } = usePageContext();
-	const { slug: ownerSlug } = locationData;
+	// const { locationData } = usePageContext();
+	// const { slug: ownerSlug } = locationData;
 	return (
-		<a href={`/${ownerSlug}/${slug}`} className="package-preview-component">
+		<a href={`/package/${slug}`} className="package-preview-component">
 			<Icon icon="package" iconSize={20} />
 			<div className="title ellipsis">{slug}</div>
 			<div className="description">{description}</div>

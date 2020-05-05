@@ -20,7 +20,7 @@ app.get(['/org/:slug', '/org/:slug/:mode'], async (req, res, next) => {
 			...organizationData,
 			packages: packagesData,
 			discussions: discussionsData,
-			people: usersData,
+			people: usersData.slice(0, 3),
 		};
 		return renderToNodeStream(
 			res,

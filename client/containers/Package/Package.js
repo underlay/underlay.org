@@ -26,7 +26,7 @@ const Package = function(props) {
 		<StandardFrame
 			className="package-container"
 			scopeHeaderProps={{
-				type: 'user',
+				type: 'package',
 				title: title,
 				avatar: avatar,
 				detailsTop: slug,
