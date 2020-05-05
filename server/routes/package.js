@@ -4,30 +4,35 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { usersData, packagesData, discussionsData } from 'stories/data';
+import { packagesData, discussionsData, usersData } from 'stories/data';
 
-app.get(['/user/:slug', '/user/:slug/:mode'], async (req, res, next) => {
+app.get(['/package/:slug', '/package/:slug/:mode'], async (req, res, next) => {
 	try {
 		const initialData = await getInitialData(req);
-		let userData = usersData.find((user) => user.slug === req.params.slug);
-		if (!userData) {
-			throw new Error('User Not Found');
+		let packageData = packagesData.find((pkg) => pkg.slug === req.params.slug);
+		if (!packageData) {
+			throw new Error('Package Not Found');
 		}
 		if (!req.params.mode) {
 			initialData.locationData.params.mode = 'overview';
 		}
-		userData = { ...userData, packages: packagesData, discussions: discussionsData };
+		packageData = {
+			...packageData,
+			packages: packagesData,
+			discussions: discussionsData,
+			people: usersData,
+		};
 		return renderToNodeStream(
 			res,
 			<Html
-				chunkName="User"
+				chunkName="Package"
 				initialData={initialData}
-				viewData={{ userData: userData }}
+				viewData={{ packageData: packageData }}
 				headerComponents={generateMetaComponents({
 					initialData: initialData,
-					title: `${userData.fullName} · R1`,
-					description: userData.bio,
-					image: userData.avatar,
+					title: `${packageData.title} · R1`,
+					description: packageData.bio,
+					image: packageData.avatar,
 				})}
 			/>,
 		);

@@ -1,0 +1,25 @@
+.package-overview-side-component {
+	display: flex;
+	flex-wrap: wrap;
+	.section-component {
+		flex: 1 0 auto;
+		width: 100%;
+		margin-bottom: 25px !important;
+		&.stat {
+			width: 50%;
+			flex: 1 1 auto;
+			span {
+				font-weight: 600;
+				font-size: 18px;
+			}
+		}
+	}
+	.download {
+		background: white;
+		border: 1px solid #ccc;
+		border-radius: 2px;
+		padding: 5px 15px;
+		font-family: Courier, monospaced;
+		white-space: pre;
+	}
+}

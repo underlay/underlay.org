@@ -38,7 +38,7 @@ Navigate to `localhost:9876`
 
 ## Containers vs Components
 
-The client side code of PubPub does follow a
+The client side code follows a
 [Container/Component](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0) split
 as is common in React-based sites. The structure and difference between the two in this repo is not
 exactly as described in the preceeding article. For this repo, the following describes how

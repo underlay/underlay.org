@@ -10,7 +10,7 @@ storiesOf('components', module).add('PackagePreview', () => (
 	<div>
 		<div style={wrapperStyle}>
 			<PackagePreview
-				title="Query"
+				slug="Query"
 				description="This is a package"
 				numMessages={14}
 				numFiles={1}
@@ -19,7 +19,7 @@ storiesOf('components', module).add('PackagePreview', () => (
 		</div>
 		<div style={wrapperStyle}>
 			<PackagePreview
-				title="This is a package title that is really long, and while it doesn't make sense to have it be this long, we want to make sure it will ellipsize itself"
+				slug="This is a package title that is really long, and while it doesn't make sense to have it be this long, we want to make sure it will ellipsize itself"
 				description="This is a package with a really long description. And it keeps going, and we know it keeps going because we're the ones who are typing it here every so carefully."
 				numMessages={14}
 				numFiles={1}

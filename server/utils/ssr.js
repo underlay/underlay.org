@@ -35,9 +35,6 @@ export const generateMetaComponents = ({
 	const avatar = image || `${hostname}/static/logo.png`;
 	const titleWithContext = contextTitle ? `${title} · ${contextTitle}` : title;
 	let outputComponents = [];
-	if (!initialData.locationData.isBasePubPub) {
-		outputComponents = [...outputComponents];
-	}
 
 	if (title) {
 		outputComponents = [
@@ -197,8 +194,8 @@ export const generateMetaComponents = ({
 			...outputComponents,
 			<meta key="pa1" property="article:published_time" content={publishedAt} />,
 			<meta key="pa2" name="citation_publication_date" content={googleScholarPublishedAt} />,
-			<meta key="pub1" name="citation_publisher" content="PubPub" />,
-			<meta key="pub2" property="dc.publisher" content="PubPub" />,
+			<meta key="pub1" name="citation_publisher" content="R1" />,
+			<meta key="pub2" property="dc.publisher" content="R1" />,
 		];
 	}
 
@@ -234,7 +231,7 @@ export const generateMetaComponents = ({
 		...outputComponents,
 		<meta key="misc1" property="fb:app_id" content="924988584221879" />,
 		<meta key="misc2" name="twitter:card" content="summary" />,
-		<meta key="misc3" name="twitter:site" content="@pubpub" />,
+		<meta key="misc3" name="twitter:site" content="@kfutures" />,
 	];
 
 	return outputComponents;

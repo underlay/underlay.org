@@ -7,7 +7,7 @@ storiesOf('containers', module).add('User', () => (
 	<App
 		chunkName="User"
 		initialData={{
-			locationData: { ...locationData, params: { ...locationData.params, mode: 'packages' } },
+			locationData: { ...locationData, params: { ...locationData.params, mode: 'overview' } },
 			loginData: loginData,
 		}}
 		viewData={{

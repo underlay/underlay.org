@@ -13,3 +13,9 @@ export { default as ScopeHeader } from './ScopeHeader/ScopeHeader';
 export { default as ScopeNav } from './ScopeNav/ScopeNav';
 export { default as Section } from './Section/Section';
 export { default as StandardFrame } from './StandardFrame/StandardFrame';
+
+/* Since these components wrap other components, they need to be defined later */
+export { default as NamespaceOverviewMain } from './NamespaceOverviewMain/NamespaceOverviewMain';
+export { default as NamespaceOverviewSide } from './NamespaceOverviewSide/NamespaceOverviewSide';
+export { default as PackageOverviewMain } from './PackageOverviewMain/PackageOverviewMain';
+export { default as PackageOverviewSide } from './PackageOverviewSide/PackageOverviewSide';

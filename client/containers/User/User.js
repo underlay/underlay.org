@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Intent, Tag } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
-import { StandardFrame, Section, PackageList, DiscussionList } from 'components';
+import { StandardFrame, NamespaceOverviewMain, NamespaceOverviewSide } from 'components';
 
 const propTypes = {
 	userData: PropTypes.object.isRequired,
@@ -10,20 +10,14 @@ const propTypes = {
 
 const User = function(props) {
 	const { userData } = props;
-	const { fullName, avatar, slug, packages, discussions } = userData;
+	const { fullName, avatar, slug, packages, discussions, initials } = userData;
 	const { locationData } = usePageContext();
 	const { mode } = locationData.params;
 
 	const contentSwitch = {
-		packages: {
-			main: <PackageList packages={packages} />,
-			side: (
-				<React.Fragment>
-					<Section title="Recent Discussions">
-						<DiscussionList discussions={discussions} />
-					</Section>
-				</React.Fragment>
-			),
+		overview: {
+			main: <NamespaceOverviewMain packages={packages} />,
+			side: <NamespaceOverviewSide discussions={discussions} />,
 		},
 	};
 	const activeContent = contentSwitch[mode] || {};
@@ -35,6 +29,7 @@ const User = function(props) {
 				type: 'user',
 				title: fullName,
 				avatar: avatar,
+				initials: initials,
 				detailsTop: slug,
 				detailsBottom: (
 					<Tag minimal intent={Intent.SUCCESS}>
@@ -44,7 +39,7 @@ const User = function(props) {
 			}}
 			scopeNavProps={{
 				navItems: [
-					{ slug: 'packages', title: 'Packages' },
+					{ slug: 'overview', title: 'Overview' },
 					{ slug: 'query', title: 'Query' },
 					{ slug: 'discussions', title: 'Discussions' },
 				],

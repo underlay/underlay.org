@@ -11,7 +11,7 @@ storiesOf('components', module).add('ScopeNav', () => (
 		<div style={wrapperStyle}>
 			<ScopeNav
 				navItems={[
-					{ slug: 'content', title: 'Content' },
+					{ slug: 'overview', title: 'Overview' },
 					{ slug: 'query', title: 'Query' },
 				]}
 			/>
@@ -20,8 +20,8 @@ storiesOf('components', module).add('ScopeNav', () => (
 			<ScopeNav
 				navItems={[
 					{
-						slug: 'content',
-						title: 'Content',
+						slug: 'overview',
+						title: 'Overview',
 						children: [
 							{ slug: 'overview', title: 'Overview' },
 							{ slug: 'assertions', title: 'Assertions' },

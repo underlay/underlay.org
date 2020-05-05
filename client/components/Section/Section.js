@@ -7,18 +7,20 @@ require('./section.scss');
 const propTypes = {
 	title: PropTypes.string.isRequired,
 	useMargin: PropTypes.bool,
+	className: PropTypes.string,
 	children: PropTypes.node,
 };
 
 const defaultProps = {
 	useMargin: false,
+	className: '',
 	children: null,
 };
 
 const Section = function(props) {
-	const { title, useMargin, children } = props;
+	const { title, useMargin, children, className } = props;
 	return (
-		<div className={classNames('section-component', useMargin && 'margin')}>
+		<div className={classNames('section-component', useMargin && 'margin', className)}>
 			<div className="section-title">{title}</div>
 			{children}
 		</div>

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Intent, Tag } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
-import { StandardFrame, Section, PackageList, DiscussionList } from 'components';
+import { StandardFrame, NamespaceOverviewMain, NamespaceOverviewSide } from 'components';
 
 const propTypes = {
 	organizationData: PropTypes.object.isRequired,
@@ -10,19 +10,15 @@ const propTypes = {
 
 const Organization = function(props) {
 	const { organizationData } = props;
-	const { title, avatar, slug, packages, discussions } = organizationData;
+	const { title, avatar, slug, packages, discussions, people } = organizationData;
 	const { locationData } = usePageContext();
 	const { mode } = locationData.params;
 
 	const contentSwitch = {
-		packages: {
-			main: <PackageList packages={packages} />,
+		overview: {
+			main: <NamespaceOverviewMain packages={packages} />,
 			side: (
-				<React.Fragment>
-					<Section title="Recent Discussions">
-						<DiscussionList discussions={discussions} />
-					</Section>
-				</React.Fragment>
+				<NamespaceOverviewSide discussions={discussions} people={organizationData.people} />
 			),
 		},
 	};
@@ -44,7 +40,7 @@ const Organization = function(props) {
 			}}
 			scopeNavProps={{
 				navItems: [
-					{ slug: 'packages', title: 'Packages' },
+					{ slug: 'overview', title: 'Overview' },
 					{ slug: 'query', title: 'Query' },
 					{ slug: 'people', title: 'People' },
 					{ slug: 'discussions', title: 'Discussions' },

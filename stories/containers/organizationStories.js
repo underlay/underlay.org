@@ -7,13 +7,14 @@ import {
 	organizationsData,
 	packagesData,
 	discussionsData,
+	usersData,
 } from 'stories/data';
 
 storiesOf('containers', module).add('Organization', () => (
 	<App
 		chunkName="Organization"
 		initialData={{
-			locationData: { ...locationData, params: { ...locationData.params, mode: 'packages' } },
+			locationData: { ...locationData, params: { ...locationData.params, mode: 'overview' } },
 			loginData: loginData,
 		}}
 		viewData={{
@@ -21,6 +22,7 @@ storiesOf('containers', module).add('Organization', () => (
 				...organizationsData[0],
 				packages: packagesData,
 				discussions: discussionsData,
+				people: usersData,
 			},
 		}}
 	/>

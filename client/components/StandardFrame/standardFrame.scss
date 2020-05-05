@@ -1,22 +1,30 @@
 @import 'client/styles/variables.scss';
 .standard-frame-component {
-    	.body {
-    		margin-left: $scope-margin-left;
-    	}
-    	.scope-nav-component {
-    		margin-top: 50px;
-    	}
-    	.content {
-    		display: flex;
-    		margin: 50px 0px 100px;
-    		.main {
-    			flex: 1 1 auto;
-    		}
-    		.side {
-    			flex: 1 1 auto;
-    			max-width: 350px;
-    			margin-left: 100px;
-    		}
-    	}
-    
+	.body {
+		margin-left: $scope-margin-left;
+	}
+	.scope-nav-component {
+		margin-top: 50px;
+	}
+	.content {
+		display: flex;
+		margin: 50px 0px 100px;
+		.main {
+			flex: 1 1 auto;
+			.section-component {
+				margin-bottom: 50px;
+			}
+		}
+		.side {
+			flex: 1 1 auto;
+			max-width: 350px;
+			margin-left: 100px;
+			.avatar-component {
+				margin: 0px 10px 10px 0px;
+			}
+			.section-component {
+				margin-bottom: 50px;
+			}
+		}
+	}
 }
