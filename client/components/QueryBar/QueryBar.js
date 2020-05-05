@@ -8,7 +8,7 @@ const QueryBar = function() {
 	return (
 		<div className="query-bar-component">
 			<InputGroup
-				placeholder="Query it..."
+				placeholder="Enter your query..."
 				rightElement={
 					<Button title="Query!" minimal icon={<Icon icon="rocket" iconSize={20} />} />
 				}
