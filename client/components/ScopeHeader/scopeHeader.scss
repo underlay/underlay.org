@@ -1,0 +1,33 @@
+@import 'client/styles/variables.scss';
+
+.scope-header-component {
+	margin-left: $scope-margin-left;
+	position: relative;
+
+	.type-icon {
+		position: absolute;
+		left: -42px;
+	}
+	.avatar-component {
+		float: left;
+		margin-right: 20px;
+	}
+	.title {
+		font-weight: 600;
+		font-size: 28px;
+		line-height: 28px;
+		margin-bottom: 7px;
+		position: relative;
+		top: -5px;
+	}
+	.details {
+		font-size: 16px;
+		&.top {
+			margin-bottom: 7px;	
+		}
+		.bp3-tag {
+			margin-right: 1em;
+		}
+	}
+
+}

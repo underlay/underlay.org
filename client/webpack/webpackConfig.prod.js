@@ -16,6 +16,7 @@ module.exports = {
 		alias: {
 			utils: resolve(__dirname, '../../utils'),
 			server: resolve(__dirname, '../../server'),
+			stories: resolve(__dirname, '../../stories'),
 			client: resolve(__dirname, '../../client'),
 			containers: resolve(__dirname, '../../client/containers'),
 			components: resolve(__dirname, '../../client/components'),

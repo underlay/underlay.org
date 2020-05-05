@@ -8,11 +8,14 @@
     },
     "settings": {
       "import/resolver": {
+        "node": {
+            "paths": ["client"]
+        },
         "alias": {
             "map": [
                 ["utils", "./utils"],
                 ["server", "./server"],
-                ["data", "./stories/data"],
+                ["stories", "./stories"],
                 ["client", "./client"],
                 ["containers", "./client/containers"],
                 ["components", "./client/components"]

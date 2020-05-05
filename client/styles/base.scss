@@ -9,7 +9,7 @@
 // Set global styles
 // ****************************
 body {
-	background-color: #fff;
+	background: #ede9e4;
 	margin: 0;
 	padding: 0;
 	width: 100vw;
@@ -90,7 +90,7 @@ a {
 	overflow: hidden;
 }
 
-.global--one-line-ellipsis {
+.ellipsis {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;

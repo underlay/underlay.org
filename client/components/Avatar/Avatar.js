@@ -11,8 +11,6 @@ const propTypes = {
 	instanceNumber: PropTypes.number,
 	borderColor: PropTypes.string,
 	borderWidth: PropTypes.string,
-	doesOverlap: PropTypes.bool, // Boolean on whether a lisst of avatars will be overlapping
-	isBlock: PropTypes.bool,
 	className: PropTypes.string,
 };
 
@@ -22,23 +20,11 @@ const defaultProps = {
 	instanceNumber: undefined,
 	borderColor: undefined,
 	borderWidth: undefined,
-	doesOverlap: false,
-	isBlock: false,
 	className: '',
 };
 
 const Avatar = function(props) {
-	const {
-		initials,
-		avatar,
-		instanceNumber,
-		borderColor,
-		borderWidth,
-		width,
-		doesOverlap,
-		isBlock,
-		className,
-	} = props;
+	const { initials, avatar, instanceNumber, borderColor, borderWidth, width, className } = props;
 
 	const avatarStyle = {
 		width: width,
@@ -46,15 +32,12 @@ const Avatar = function(props) {
 		height: width,
 		borderColor: borderColor,
 		borderWidth: borderColor ? borderWidth || Math.floor(width / 50) + 1 : 0,
-		fontSize: isBlock ? Math.floor(width / 1.5) : Math.floor(width / 2.5),
-		backgroundColor: 'red',
+		fontSize: Math.floor(width / 2),
+		backgroundColor: '#D3C9BD',
 		zIndex: instanceNumber ? -1 * instanceNumber : 'initial',
-		borderRadius: isBlock ? '2px' : '50%',
+		borderRadius: '3px',
 	};
 
-	if (doesOverlap) {
-		avatarStyle.marginRight = `${width * 0.45 * -1}px`;
-	}
 	if (avatar) {
 		avatarStyle.backgroundImage = `url("${avatar}")`;
 	}

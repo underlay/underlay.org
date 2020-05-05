@@ -1,0 +1,16 @@
+@import 'client/styles/variables.scss';
+.section-component {
+	.title {
+		text-transform: uppercase;
+		font-weight: 600;
+		color: #888;
+		letter-spacing: 1px;
+		margin-bottom: 15px;
+	}
+	&.margin {
+		margin-left: 15px;
+		.title {
+			margin-left: -15px;
+		}
+	}
+}

@@ -35,7 +35,7 @@ module.exports = ({ config }) => {
 	});
 
 	config.resolve.modules = [resolve(__dirname, '../client'), 'node_modules'];
-	config.resolve.alias['data'] = resolve(__dirname, '../stories/data');
+	config.resolve.alias['stories'] = resolve(__dirname, '../stories');
 	config.resolve.alias['utils'] = resolve(__dirname, '../utils'),
 	config.resolve.alias['server'] = resolve(__dirname, '../server'),
 	config.resolve.alias['client'] = resolve(__dirname, '../client'),
