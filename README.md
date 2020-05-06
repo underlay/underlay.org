@@ -39,15 +39,15 @@ Navigate to `localhost:9876`
 ## Containers vs Components
 
 The client side code follows a
-[Container/Component](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0) split
-as is common in React-based sites. The structure and difference between the two in this repo is not
+[Container/Component](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0) split,
+as is common in React-based sites.  The structure and difference between the two in this repo is not
 exactly as described in the preceeding article. For this repo, the following describes how
 containers and components are differentiated:
 
 ### Containers
 
 -   Associated with a specific URL route
--   One a single container is used on a given URL route
+-   Only a single container is used on a given URL route
 -   Calls hydrateWrapper() to initialize React bindings after using server-side renered HTML for
     immediate display.
 -   Holds the ground truth data for a given view. Often the ground truth data is passed into
@@ -58,9 +58,9 @@ containers and components are differentiated:
 
 -   All other non-container components :)
 -   Many components are used within a given URL route
--   Can store it's own state if needed for UX functionality - but should always update the ground
+-   Can store its own state if needed for UX functionality - but should always update the ground
     truth data held in its parent container.
--   Can make it's own API requests when the functionality and layout of the pertaining request is
+-   Can make its own API requests when the functionality and layout of the pertaining request is
     contained within the single component. Though if this request influences the ground truth data,
     the component should be passed an updating function that allows it to update the ground truth
     data held in the container.
