@@ -13,7 +13,7 @@ const Header = function() {
 			<GridWrapper columnClassName="header-content">
 				<div className="title">
 					<a href="/">
-						<img src="/static/logo.png" alt="R1 Logo" />
+						<img src="/static/r1-trw.png" alt="R1 Logo" />
 					</a>
 					<a className="ul-link hoverline" href="https://www.underlay.org">
 						underlay.org
