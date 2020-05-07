@@ -34,7 +34,8 @@ export const handleErrors = (req, res, next) => {
 		if (
 			err.message === 'Page Not Found' ||
 			err.message === 'Package Not Found' ||
-			err.message === 'User Not Found'
+			err.message === 'User Not Found' ||
+			err.message === 'Namespace Not Found'
 		) {
 			return next();
 		}

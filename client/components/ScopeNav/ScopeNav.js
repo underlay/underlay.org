@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AnchorButton } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
+import { buildUrl } from 'utils/urls';
 
 require('./scopeNav.scss');
 
@@ -13,7 +14,7 @@ const propTypes = {
 const ScopeNav = function(props) {
 	const { navItems } = props;
 	const { locationData } = usePageContext();
-	const { slug, mode, subMode } = locationData.params;
+	const { namespaceSlug, packageSlug, mode, subMode } = locationData.params;
 	const activeModeData = navItems.find((item) => item.slug === mode);
 	const activeChildren = activeModeData.children;
 	return (
@@ -28,7 +29,11 @@ const ScopeNav = function(props) {
 							minimal
 							large
 							key={modeSlug}
-							href={`/${slug}/${modeSlug}`}
+							href={buildUrl({
+								namespaceSlug: namespaceSlug,
+								packageSlug: packageSlug,
+								mode: modeSlug,
+							})}
 							text={title}
 						/>
 					);
@@ -46,7 +51,12 @@ const ScopeNav = function(props) {
 								minimal
 								small
 								key={subModeSlug}
-								href={`/${slug}/${modeSlug}/${subModeSlug}`}
+								href={buildUrl({
+									namespaceSlug: namespaceSlug,
+									packageSlug: packageSlug,
+									mode: modeSlug,
+									subMode: subModeSlug,
+								})}
 								text={title}
 							/>
 						);

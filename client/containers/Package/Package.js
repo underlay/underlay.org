@@ -10,7 +10,7 @@ const propTypes = {
 
 const Package = function(props) {
 	const { packageData } = props;
-	const { title, avatar, slug, contributors } = packageData;
+	const { title, avatar, slug, contributors, namespaceData } = packageData;
 	const { locationData } = usePageContext();
 	const { mode } = locationData.params;
 
@@ -27,7 +27,7 @@ const Package = function(props) {
 			className="package-container"
 			scopeHeaderProps={{
 				type: 'package',
-				title: title,
+				title: `${namespaceData.slug}/${title}`,
 				avatar: avatar,
 				detailsTop: slug,
 				detailsBottom: (

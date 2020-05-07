@@ -7,6 +7,7 @@ import enforce from 'express-sslify';
 import noSlash from 'no-slash';
 import { HTTPStatusError } from 'server/utils/errors';
 
+require('server/models');
 require('server/utils/serverModuleOverwrite');
 
 /* ---------------------- */

@@ -7,19 +7,22 @@ const Landing = function() {
 			<GridWrapper>
 				<h1>Sample Links</h1>
 				<p>
-					<a href="/user/mar">User 1</a>
+					<a href="/mar">User 1</a>
 				</p>
 				<p>
-					<a href="/user/foo">User 2</a>
+					<a href="/foo">User 2</a>
 				</p>
 				<p>
-					<a href="/org/arnold-foundation">Org 1</a>
+					<a href="/arnold-foundation">Org 1</a>
 				</p>
 				<p>
-					<a href="/org/futures">Org 2</a>
+					<a href="/futures">Org 2</a>
 				</p>
 				<p>
-					<a href="/package/biography">Package</a>
+					<a href="/foo/biography">Package 1</a>
+				</p>
+				<p>
+					<a href="/arnold-foundation/filmography">Package 2</a>
 				</p>
 			</GridWrapper>
 		</div>

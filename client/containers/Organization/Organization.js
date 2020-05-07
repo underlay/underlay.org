@@ -10,14 +10,14 @@ const propTypes = {
 
 const Organization = function(props) {
 	const { organizationData } = props;
-	const { title, avatar, slug, packages, discussions, people } = organizationData;
+	const { title, avatar, slug, packages, discussions, members } = organizationData;
 	const { locationData } = usePageContext();
 	const { mode } = locationData.params;
 
 	const contentSwitch = {
 		overview: {
 			main: <NamespaceOverviewMain packages={packages} />,
-			side: <NamespaceOverviewSide discussions={discussions} people={people} />,
+			side: <NamespaceOverviewSide discussions={discussions} members={members} />,
 		},
 	};
 	const activeContent = contentSwitch[mode] || {};

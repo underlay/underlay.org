@@ -4,29 +4,29 @@ import { Section, Avatar, DiscussionList } from 'components';
 
 const propTypes = {
 	discussions: PropTypes.array.isRequired,
-	people: PropTypes.array,
+	members: PropTypes.array,
 };
 
 const defaultProps = {
-	people: [],
+	members: [],
 };
 
 const NamespaceOverviewSide = function(props) {
-	const { discussions, people } = props;
+	const { discussions, members } = props;
 
 	return (
 		<React.Fragment>
 			<Section title="Recent Discussions">
 				<DiscussionList discussions={discussions} />
 			</Section>
-			{!!people.length && (
+			{!!members.length && (
 				<Section title="People">
-					{people.map((person) => {
+					{members.map((member) => {
 						return (
-							<a href={`/user/${person.slug}`} key={person.slug}>
+							<a href={`/${member.user.slug}`} key={member.user.slug}>
 								<Avatar
-									avatar={person.avatar}
-									initials={person.initials}
+									avatar={member.user.avatar}
+									initials={member.user.initials}
 									width={35}
 								/>
 							</a>
