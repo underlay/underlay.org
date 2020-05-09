@@ -3,7 +3,7 @@ export default (sequelize, dataTypes) => {
 		'Package',
 		{
 			id: sequelize.idType,
-			slug: sequelize.slugType,
+			slug: { ...sequelize.slugType },
 			description: { type: dataTypes.TEXT },
 			/* Set by Associations */
 			userId: { type: dataTypes.UUID },

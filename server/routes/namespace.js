@@ -4,27 +4,7 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { User, Organization, Member, Discussion, Package } from 'server/models';
-
-export const findNamespace = (slug) => {
-	const userData = User.findOne({
-		where: { slug: slug },
-		include: [
-			{ model: Package, as: 'packages' },
-			{ model: Discussion, as: 'discussions' },
-		],
-	});
-	const organizationData = Organization.findOne({
-		where: { slug: slug },
-		include: [
-			{ model: Member, as: 'members', include: [{ model: User, as: 'user' }] },
-			{ model: Package, as: 'packages' },
-			{ model: Discussion, as: 'discussions' },
-		],
-	});
-
-	return Promise.all([userData, organizationData]);
-};
+import { findNamespace } from 'server/utils/namespace';
 
 const renderUserView = (res, initialData, userData) => {
 	return renderToNodeStream(
@@ -67,6 +47,10 @@ app.get(
 			const initialData = await getInitialData(req);
 			if (!req.params.mode) {
 				initialData.locationData.params.mode = 'overview';
+			}
+			const validModes = ['overview', 'discussions', 'members', 'packages', 'query'];
+			if (!validModes.includes(req.params.mode)) {
+				throw new Error('Namespace Not Found');
 			}
 			const [userData, organizationData] = await findNamespace(req.params.namespaceSlug);
 			if (!userData && !organizationData) {

@@ -6,13 +6,14 @@ import compression from 'compression';
 import enforce from 'express-sslify';
 import noSlash from 'no-slash';
 import { HTTPStatusError } from 'server/utils/errors';
+import { buildModels } from 'server/models';
 
-require('server/models');
 require('server/utils/serverModuleOverwrite');
 
 /* ---------------------- */
 /* Initialize express app */
 /* ---------------------- */
+buildModels();
 const app = express();
 export default app;
 

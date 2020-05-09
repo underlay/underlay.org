@@ -6,7 +6,7 @@ require('./scopeHeader.scss');
 
 const propTypes = {
 	type: PropTypes.string.isRequired,
-	title: PropTypes.string.isRequired,
+	title: PropTypes.node.isRequired,
 	detailsTop: PropTypes.node,
 	detailsBottom: PropTypes.node,
 	avatar: PropTypes.string,

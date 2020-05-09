@@ -5,6 +5,7 @@ export default (sequelize, dataTypes) => {
 			id: sequelize.idType,
 			slug: { ...sequelize.slugType },
 			fullName: { type: dataTypes.TEXT, allowNull: false },
+			initials: { type: dataTypes.TEXT, allowNull: false },
 			avatar: { type: dataTypes.TEXT },
 		},
 		{

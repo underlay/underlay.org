@@ -5,7 +5,7 @@ require('./discussionPreview.scss');
 
 const propTypes = {
 	title: PropTypes.string.isRequired,
-	number: PropTypes.string.isRequired,
+	number: PropTypes.number.isRequired,
 };
 
 const DiscussionPreview = function(props) {

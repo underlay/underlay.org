@@ -1,4 +1,4 @@
-import { Member, User, Organization, Package, Discussion, Assertion } from 'server/models';
+import { buildModels } from 'server/models';
 import {
 	users,
 	organizations,
@@ -9,6 +9,7 @@ import {
 } from './fillDemoData';
 
 const run = async () => {
+	const { Member, User, Organization, Package, Discussion, Assertion } = await buildModels();
 	const userObjects = await User.bulkCreate(users);
 	const organizationObjects = await Organization.bulkCreate(organizations);
 	const packagesData = await Package.bulkCreate(buildPackages(userObjects, organizationObjects));

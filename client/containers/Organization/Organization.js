@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Intent, Tag } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
+import { buildUrl } from 'utils/urls';
 import { StandardFrame, NamespaceOverviewMain, NamespaceOverviewSide } from 'components';
 
 const propTypes = {
@@ -27,7 +28,11 @@ const Organization = function(props) {
 			className="organization-container"
 			scopeHeaderProps={{
 				type: 'org',
-				title: title,
+				title: (
+					<a href={buildUrl({ namespaceSlug: slug })} className="hoverline">
+						{title}
+					</a>
+				),
 				avatar: avatar,
 				detailsTop: slug,
 				detailsBottom: (
@@ -41,7 +46,14 @@ const Organization = function(props) {
 					{ slug: 'overview', title: 'Overview' },
 					{ slug: 'query', title: 'Query' },
 					{ slug: 'people', title: 'People' },
-					{ slug: 'discussions', title: 'Discussions' },
+					{
+						slug: 'discussions',
+						title: 'Discussions',
+						children: [
+							{ slug: 'open', title: 'Open' },
+							{ slug: 'closed', title: 'Closed' },
+						],
+					},
 				],
 			}}
 			content={main}

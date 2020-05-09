@@ -4,28 +4,7 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { usersData, organizationsData, packagesData, discussionsData } from 'utils/data';
-
-export const findNamespace = (slug) => {
-	let organizationData = organizationsData.find((org) => org.slug === slug);
-	if (organizationData) {
-		organizationData = {
-			...organizationData,
-			packages: packagesData,
-			discussions: discussionsData,
-			people: usersData.slice(0, 3),
-		};
-	}
-	let userData = usersData.find((user) => user.slug === slug);
-	if (userData) {
-		userData = {
-			...userData,
-			packages: packagesData,
-			discussions: discussionsData,
-		};
-	}
-	return [userData, organizationData];
-};
+import { buildModels } from 'server/models';
 
 app.get(
 	[
@@ -34,25 +13,35 @@ app.get(
 		'/:namespaceSlug/:packageSlug/:mode/:subMode',
 	],
 	async (req, res, next) => {
+		const { Package, Discussion, Assertion, User, Organization } = await buildModels();
 		try {
 			const initialData = await getInitialData(req);
-			const [userData, organizationData] = findNamespace(req.params.namespaceSlug);
-			if (!userData && !organizationData) {
-				throw new Error('Namespace Not Found');
-			}
-			let packageData = packagesData.find((pkg) => pkg.slug === req.params.packageSlug);
+			let packageData = await Package.findOne({
+				where: { slug: req.params.packageSlug },
+				include: [
+					{ model: Discussion, as: 'discussions' },
+					{
+						model: Assertion,
+						as: 'assertions',
+						include: [{ model: User, as: 'user' }],
+					},
+					{ model: User, as: 'user' },
+					{ model: Organization, as: 'organization' },
+				],
+			});
 			if (!packageData) {
+				throw new Error('Package Not Found');
+			}
+			const namespaceData = packageData.user || packageData.organization;
+			if (namespaceData.slug !== req.params.namespaceSlug) {
 				throw new Error('Package Not Found');
 			}
 			if (!req.params.mode) {
 				initialData.locationData.params.mode = 'overview';
 			}
 			packageData = {
-				...packageData,
-				packages: packagesData,
-				discussions: discussionsData,
-				contributors: usersData,
-				namespaceData: userData || organizationData,
+				...packageData.toJSON(),
+				namespaceData: namespaceData,
 			};
 			return renderToNodeStream(
 				res,
