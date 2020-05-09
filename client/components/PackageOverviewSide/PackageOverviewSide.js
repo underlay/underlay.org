@@ -51,7 +51,7 @@ const PackageOverviewSide = function(props) {
 				<Section title="Contributors">
 					{contributors.map((person) => {
 						return (
-							<a href={`/user/${person.slug}`} key={person.slug}>
+							<a href={`/${person.slug}`} key={person.slug}>
 								<Avatar
 									avatar={person.avatar}
 									initials={person.initials}

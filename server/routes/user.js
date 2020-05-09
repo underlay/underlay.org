@@ -4,19 +4,25 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { usersData, packagesData, discussionsData } from 'utils/data';
+import { buildModels } from 'server/models';
 
 app.get(['/user/:slug', '/user/:slug/:mode'], async (req, res, next) => {
+	const { User, Package, Discussion } = await buildModels();
 	try {
 		const initialData = await getInitialData(req);
-		let userData = usersData.find((user) => user.slug === req.params.slug);
+		const userData = User.findOne({
+			where: { slug: req.params.slug },
+			include: [
+				{ model: Package, as: 'packages' },
+				{ model: Discussion, as: 'discussions' },
+			],
+		});
 		if (!userData) {
 			throw new Error('User Not Found');
 		}
 		if (!req.params.mode) {
 			initialData.locationData.params.mode = 'overview';
 		}
-		userData = { ...userData, packages: packagesData, discussions: discussionsData };
 		return renderToNodeStream(
 			res,
 			<Html

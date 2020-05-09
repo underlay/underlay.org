@@ -28,11 +28,11 @@
 		z-index: 1;
 		position: relative;
 	}
+	.title {
+		position: relative;
+		left: -10px;
+	}
 	img {
 		width: 35px;
-	}
-	.ul-link {
-		color: inherit;
-		margin-left: 1em;
 	}
 }

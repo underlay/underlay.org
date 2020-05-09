@@ -12,8 +12,8 @@ const DiscussionList = function(props) {
 	const { discussions } = props;
 	return (
 		<div className="discussion-list-component">
-			{discussions.map((pkg) => {
-				return <DiscussionPreview key={pkg.slug} {...pkg} />;
+			{discussions.map((disc) => {
+				return <DiscussionPreview key={disc.id} {...disc} />;
 			})}
 		</div>
 	);

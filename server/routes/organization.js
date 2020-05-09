@@ -4,24 +4,28 @@ import app from 'server/server';
 import { renderToNodeStream, generateMetaComponents } from 'server/utils/ssr';
 import { handleErrors } from 'server/utils/errors';
 import { getInitialData } from 'server/utils/initData';
-import { organizationsData, packagesData, discussionsData, usersData } from 'utils/data';
+import { buildModels } from 'server/models';
 
 app.get(['/org/:slug', '/org/:slug/:mode'], async (req, res, next) => {
+	const { Organization, Member, Package, User, Discussion } = await buildModels();
 	try {
 		const initialData = await getInitialData(req);
-		let organizationData = organizationsData.find((org) => org.slug === req.params.slug);
+		const organizationData = Organization.findOne({
+			where: { slug: req.params.slug },
+			include: [
+				{ model: Member, as: 'members', include: [{ model: User, as: 'user' }] },
+				{ model: Package, as: 'packages' },
+				{ model: Discussion, as: 'discussions' },
+			],
+		});
+
 		if (!organizationData) {
 			throw new Error('Organization Not Found');
 		}
 		if (!req.params.mode) {
 			initialData.locationData.params.mode = 'overview';
 		}
-		organizationData = {
-			...organizationData,
-			packages: packagesData,
-			discussions: discussionsData,
-			people: usersData.slice(0, 3),
-		};
+
 		return renderToNodeStream(
 			res,
 			<Html

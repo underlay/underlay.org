@@ -1,6 +1,6 @@
 import React from 'react';
 import { GridWrapper, Avatar } from 'components';
-import { Button } from '@blueprintjs/core';
+import { Button, AnchorButton } from '@blueprintjs/core';
 import { usePageContext } from 'client/utils/hooks';
 
 require('./header.scss');
@@ -11,14 +11,10 @@ const Header = function() {
 	return (
 		<div className="header-component">
 			<GridWrapper columnClassName="header-content">
-				<div className="title">
-					<a href="/">
-						<img src="/static/r1-trw.png" alt="R1 Logo" />
-					</a>
-					<a className="ul-link hoverline" href="https://www.underlay.org">
-						underlay.org
-					</a>
-				</div>
+				<AnchorButton className="title " href="/" minimal>
+					<img src="/static/r1-trw.png" alt="R1 Logo" />
+					.underlay.org
+				</AnchorButton>
 				<div className="buttons">
 					<Button icon="plus" rightIcon="caret-down" minimal />
 					<Button

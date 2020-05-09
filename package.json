@@ -21,7 +21,8 @@
 		"install-git-hooks": "rm -f ./.git/hooks/* && cp ./.githooks/* ./.git/hooks && chmod +x ./.git/hooks/*",
 		"postinstall": "npm run build-prod",
 		"start": "npm run build-dev-once && concurrently --kill-others \"npm run api-dev\" \"npm run build-dev\"",
-		"storybook": "start-storybook -p 9001 -c .storybook -s ./"
+		"storybook": "start-storybook -p 9001 -c .storybook -s ./",
+		"tools": "NODE_PATH=./client:./ node --max-old-space-size=12000 ./tools"
 	},
 	"dependencies": {
 		"@babel/core": "^7.4.4",
@@ -79,6 +80,7 @@
 		"node-sass": "^4.13.0",
 		"nodemon": "^1.18.10",
 		"normalize.css": "^8.0.1",
+		"pg": "^7.10.0",
 		"popper.js": "^1.15.0",
 		"postcss-loader": "^3.0.0",
 		"prettier": "^1.19.1",
