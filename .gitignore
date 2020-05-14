@@ -6,7 +6,7 @@ node_modules
 *.swp
 *.swo
 npm-debug.log
-config.js
+server/config.js
 dist
 .node-version
 .vscode
