@@ -15,7 +15,6 @@ type Props = {
 const defaultProps = {
 	iconSize: 16,
 	color: "#343434",
-	className: null,
 	ariaHidden: false,
 	ariaLabel: "",
 };

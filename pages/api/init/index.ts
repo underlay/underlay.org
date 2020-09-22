@@ -11,15 +11,22 @@ export type User = {
 };
 
 export type InitData = {
-	user: User;
-	accessToken: string;
-	expires: Date;
+	user?: User;
+	accessToken?: string;
+	expires?: Date;
 };
 
-export const getInitData = async (req: IncomingMessage): Promise<InitData> => {
+export const getInitData = async (req: IncomingMessage | undefined): Promise<InitData> => {
 	const session = await getSession({ req });
-	console.log(session);
-	return session;
+	const initData = {
+		user: session?.user,
+		accessToken: session?.accessToken,
+		expires: session?.expires,
+	};
+	// next-auth Session value does not update to reflect the different session
+	// callback we provide in [...nextauth].js
+	// @ts-ignore
+	return initData;
 };
 
 const route = async (req: NextApiRequest, res: NextApiResponse) => {

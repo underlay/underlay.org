@@ -13,22 +13,17 @@
 		"build": "next build",
 		"start": "next start -p ${PORT:-3000}",
 		"storybook": "start-storybook -p 6006",
-		"build-storybook": "build-storybook"
+		"build-storybook": "build-storybook",
+		"type-check": "tsc"
 	},
 	"dependencies": {
 		"@atlaskit/avatar": "^20.0.4",
-		"@atlaskit/breadcrumbs": "^10.0.5",
-		"@atlaskit/button": "^14.0.4",
+		"@atlaskit/button": "^15.0.0",
 		"@atlaskit/css-reset": "^6.0.1",
 		"@atlaskit/dropdown-menu": "^10.0.4",
 		"@atlaskit/form": "^8.1.4",
-		"@atlaskit/select": "^13.0.0",
-		"@atlaskit/spinner": "^15.0.3",
 		"@atlaskit/textfield": "^4.0.5",
-		"@blueprintjs/core": "^3.31.0",
-		"@blueprintjs/icons": "^3.20.1",
 		"@prisma/client": "^2.7.1",
-		"@storybook/preset-scss": "^1.0.2",
 		"classnames": "^2.2.6",
 		"next": "^9.5.3",
 		"next-auth": "^3.1.0",
@@ -36,24 +31,23 @@
 		"pg": "^8.3.3",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
-		"sass": "^1.26.10",
 		"strip-indent": "^3.0.0",
-		"styled-components": "^5.2.0",
-		"uuid": "^8.3.0"
+		"styled-components": "^5.2.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.11.6",
 		"@prisma/cli": "^2.7.1",
 		"@storybook/addon-actions": "^6.0.21",
 		"@storybook/addon-essentials": "^6.0.21",
 		"@storybook/addon-links": "^6.0.21",
+		"@storybook/preset-scss": "^1.0.2",
 		"@storybook/react": "^6.0.21",
+		"@types/classnames": "^2.2.10",
+		"@types/next-auth": "^3.1.6",
 		"@types/node": "^14.10.2",
 		"@types/react": "^16.9.49",
 		"@types/react-dom": "^16.9.8",
-		"babel-loader": "^8.1.0",
 		"core-js": "^3.6.5",
-		"react-is": "^16.13.1",
+		"sass": "^1.26.10",
 		"typescript": "^4.0.2"
 	}
 }

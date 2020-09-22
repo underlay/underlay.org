@@ -28,7 +28,7 @@ const Header = () => {
 					<Button appearance="subtle" iconAfter={<Icon icon="edit" />}>
 						<Avatar
 							children={() => {
-								return "T";
+								return user?.email[0];
 							}}
 						/>
 					</Button>

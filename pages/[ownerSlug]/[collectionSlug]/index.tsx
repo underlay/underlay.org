@@ -5,13 +5,7 @@
 // import { Button } from '@blueprintjs/core';
 import Button from "@atlaskit/button"
 
-type Props = {
-	id: string;
-	fish: number;
-};
-
-const Collection = (props: Props) => {
-	const { id } = props;
+const Collection = () => {
 	return (
 		<div>
 			In Collection Page
