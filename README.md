@@ -11,10 +11,10 @@ npm install
 ## To Run Dev Mode
 
 ```
-npm start
+npm run dev
 ```
 
-Navigate to `localhost:9876`
+Navigate to `localhost:3000`
 
 ## Storybook
 
@@ -24,46 +24,18 @@ To build and test components, we use Storybook. To run:
 npm run storybook
 ```
 
-Navigate to `localhost:9001`
+Navigate to `localhost:6006`
 
 ## To Build and Run Production Version
 
 ```
-npm run prod
+npm run build
+npm start
 ```
 
-Navigate to `localhost:9876`
+Navigate to `localhost:3000`
 
 # Code Practices
-
-## Containers vs Components
-
-The client side code follows a
-[Container/Component](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0) split,
-as is common in React-based sites.  The structure and difference between the two in this repo is not
-exactly as described in the preceeding article. For this repo, the following describes how
-containers and components are differentiated:
-
-### Containers
-
--   Associated with a specific URL route
--   Only a single container is used on a given URL route
--   Calls hydrateWrapper() to initialize React bindings after using server-side renered HTML for
-    immediate display.
--   Holds the ground truth data for a given view. Often the ground truth data is passed into
-    containers as props through hydrateWrapper(), but in cases where the ground truth data is being
-    changed, the container will hold ground truth data in it's state.
-
-### Components
-
--   All other non-container components :)
--   Many components are used within a given URL route
--   Can store its own state if needed for UX functionality - but should always update the ground
-    truth data held in its parent container.
--   Can make its own API requests when the functionality and layout of the pertaining request is
-    contained within the single component. Though if this request influences the ground truth data,
-    the component should be passed an updating function that allows it to update the ground truth
-    data held in the container.
 
 ## Commits
 

@@ -1,6 +1,0 @@
-require('./package'); // Route: '/[orgslug]*'
-// require('./user'); // Route: '/*'
-// require('./organization'); // Route: '/*'
-require('./landing'); // Route: '/'
-require('./namespace'); // Route: '/'
-require('./noMatch'); // Route: '/*'

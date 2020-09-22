@@ -1,0 +1,48 @@
+body {
+	background: #ede9e4;
+	margin: 0;
+	padding: 0;
+	max-width: 100vw;
+	overflow-x: hidden;
+	color: #000;
+}
+.app {
+	max-width: 1024px;
+	padding: 0em 0.5em;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	#main-content {
+		z-index: 1;
+		outline: none;
+		flex-grow: 1;
+	}
+}
+
+a {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+p {
+	font-size: 16px;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+
+.hoverline {
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
+.ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

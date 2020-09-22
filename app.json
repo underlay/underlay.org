@@ -1,8 +1,6 @@
 {
 	"addons": ["papertrail:choklad"],
-	"buildpacks": [
-		{ "url": "heroku/nodejs" }
-	],
+	"buildpacks": [{ "url": "heroku/nodejs" }],
 	"env": {
 		"ERROR_PAGE_URL": {
 			"value": "https://s3.amazonaws.com/assets.pubpub.org/_site/error.html"
@@ -12,6 +10,6 @@
 		"web": {
 			"quantity": 1,
 			"size": "standard-1X"
-		},
+		}
 	}
 }

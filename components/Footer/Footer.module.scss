@@ -1,0 +1,27 @@
+.footer {
+	padding: 2.5em 1em;
+	text-align: center;
+	.link {
+		color: inherit;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+		opacity: 0.8;
+		&:hover {
+			opacity: 1;
+			&:before {
+				content: '✨';
+				padding-right: 1em;
+			}
+			&:after {
+				content: '✨';
+				padding-left: 1em;
+			}
+		}
+	}
+	.logo {
+		height: 17px;
+		margin: 0em 5px;
+	}
+}
