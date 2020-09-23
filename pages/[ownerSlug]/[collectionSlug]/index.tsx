@@ -3,13 +3,12 @@
 // import { PrismaClient } from '@prisma/client';
 // const prisma = new PrismaClient();
 // import { Button } from '@blueprintjs/core';
-import Button from "@atlaskit/button"
 
 const Collection = () => {
 	return (
 		<div>
 			In Collection Page
-			<Button />
+			
 		</div>
 	);
 };

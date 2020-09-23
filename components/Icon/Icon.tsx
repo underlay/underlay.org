@@ -1,44 +1,43 @@
-import React, {FC} from "react";
+import React from "react";
 import classNames from "classnames";
 
 import customIcons, { IconKey } from "./customIcons";
 
 type Props = {
 	icon: IconKey;
-	iconSize?: number;
+	size?: number;
 	color?: string;
 	className?: string;
 	ariaHidden?: boolean;
 	ariaLabel?: string;
 };
 
-const defaultProps = {
-	iconSize: 16,
-	color: "#343434",
-	ariaHidden: false,
-	ariaLabel: "",
-};
-
-const Icon: FC<Props> = (props) => {
-	const viewbox = customIcons[props.icon].viewboxDefault;
+const Icon: React.FC<Props> = ({
+	icon,
+	size = 16,
+	color = "#343434",
+	className,
+	ariaHidden = false,
+	ariaLabel = "",
+}) => {
+	const viewbox = customIcons[icon].viewboxDefault;
 	return (
 		<span
-			className={classNames("bp3-icon", props.className)}
-			data-icon={props.icon.toLowerCase().replace(/_/gi, "-")}
-			aria-label={props.ariaLabel}
-			aria-hidden={props.ariaHidden}
+			className={classNames("bp3-icon", className)}
+			data-icon={icon.toLowerCase().replace(/_/gi, "-")}
+			aria-label={ariaLabel}
+			aria-hidden={ariaHidden}
 		>
 			<svg
-				width={`${props.iconSize}px`}
-				height={`${props.iconSize}px`}
+				width={`${size}px`}
+				height={`${size}px`}
 				viewBox={`0 0 ${viewbox} ${viewbox}`}
-				fill={props.color}
+				fill={color}
 			>
-				{customIcons[props.icon].path}
+				{customIcons[icon].path}
 			</svg>
 		</span>
 	);
 };
 
-Icon.defaultProps = defaultProps;
 export default Icon;

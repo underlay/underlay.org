@@ -7,7 +7,7 @@ import Button from "@atlaskit/button";
 import DropdownMenu, { DropdownItem, DropdownItemGroup } from "@atlaskit/dropdown-menu";
 // import Select from '@atlaskit/select';
 // import { Button } from "@blueprintjs/core";
-import Icon from "components/Icon/Icon";
+import Icon from "components/Icon";
 
 const Owner = () => {
 	return (

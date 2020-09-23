@@ -4,8 +4,8 @@ import "@atlaskit/css-reset";
 
 import { InitData, getInitData } from "pages/api/init";
 import { PageContext } from "utils/client/hooks";
-import Header from "components/Header/Header";
-import Footer from "components/Footer/Footer";
+import Header from "components/Header";
+import Footer from "components/Footer";
 
 import "./app.scss";
 

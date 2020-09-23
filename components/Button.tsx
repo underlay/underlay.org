@@ -1,5 +1,5 @@
 import React from "react";
-import AtlasButton, { ButtonProps, Theme } from "@atlaskit/button";
+import { CustomThemeButton, ButtonProps } from "@atlaskit/button";
 
 const customTheme = (currentTheme: any, themeProps: any) => {
 	const { buttonStyles, spinnerStyles } = currentTheme(themeProps);
@@ -11,11 +11,9 @@ const customTheme = (currentTheme: any, themeProps: any) => {
 	};
 };
 
-const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
+const Button: React.FC<ButtonProps> = (props) => {
 	return (
-		<Theme.Provider value={customTheme}>
-			<AtlasButton {...props} />
-		</Theme.Provider>
+		<CustomThemeButton {...props} theme={customTheme} />
 	);
 };
 

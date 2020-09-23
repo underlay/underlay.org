@@ -17,7 +17,6 @@
 		"type-check": "tsc"
 	},
 	"dependencies": {
-		"@atlaskit/avatar": "^20.0.4",
 		"@atlaskit/button": "^15.0.0",
 		"@atlaskit/css-reset": "^6.0.1",
 		"@atlaskit/dropdown-menu": "^10.0.4",

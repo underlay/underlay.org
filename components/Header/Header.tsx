@@ -1,9 +1,9 @@
 import React from "react";
-import Avatar from "@atlaskit/avatar";
 
 import { usePageContext } from "utils/client/hooks";
 import Button from "components/Button";
-import Icon from "components/Icon/Icon";
+import Avatar from "components/Avatar";
+import Icon from "components/Icon";
 
 import styles from "./Header.module.scss";
 
@@ -20,18 +20,24 @@ const Header = () => {
 				<div>
 					<Button appearance="subtle">
 						<Avatar
+							width={24}
 							children={() => {
 								return "+";
 							}}
 						/>
 					</Button>
-					<Button appearance="subtle" iconAfter={<Icon icon="edit" />}>
-						<Avatar
-							children={() => {
-								return user?.email[0];
-							}}
-						/>
-					</Button>
+					<Button
+						appearance="subtle"
+						iconBefore={
+							<Avatar
+								width={24}
+								children={() => {
+									return user?.email[0];
+								}}
+							/>
+						}
+						iconAfter={<Icon icon="edit" />}
+					/>
 				</div>
 			</div>
 		</nav>
