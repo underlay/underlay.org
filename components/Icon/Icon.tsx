@@ -23,7 +23,7 @@ const Icon: React.FC<Props> = ({
 	const viewbox = customIcons[icon].viewboxDefault;
 	return (
 		<span
-			className={classNames("bp3-icon", className)}
+			className={className}
 			data-icon={icon.toLowerCase().replace(/_/gi, "-")}
 			aria-label={ariaLabel}
 			aria-hidden={ariaHidden}

@@ -1,0 +1,31 @@
+.preview {
+	text-decoration: none;
+	color: inherit;
+	&:hover {
+		text-decoration: none;
+		color: inherit;
+		box-shadow: inset 0px 0px 0px 1px black;
+	}
+	display: block;
+	position: relative;
+	border: 1px solid #888888;
+	border-radius: 2px;
+	padding: 15px;
+	.icon {
+		position: absolute;
+		
+	}
+	.title {
+		margin-left: 25px;
+		font-weight: bold;
+		font-size: 16px;
+		margin-bottom: 10px;
+	}
+	.details {
+		margin-top: 25px;
+		opacity: 0.6;
+		span {
+			margin-right: 2em;
+		}
+	}
+}
