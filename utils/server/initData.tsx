@@ -19,6 +19,8 @@ export type InitData = {
 		query: {
 			profileSlug?: string;
 			collectionSlug?: string;
+			mode?: string;
+			subMode?: string;
 		};
 		pathname?: string;
 	};

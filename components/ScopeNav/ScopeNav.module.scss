@@ -1,0 +1,50 @@
+.scopeNav {
+	margin-top: 50px;
+	.primary {
+		border-bottom: 1px solid #acacac;
+		.button {
+			padding: 5px 20px;
+			position: relative;
+			&:hover,
+			&:active {
+				background: transparent;
+				&:after {
+					content: '';
+					position: absolute;
+					width: 100%;
+					bottom: -1px;
+					top: calc(100% - 2px);
+					background: #aaa;
+				}
+			}
+			&.active {
+				&:after {
+					content: '';
+					position: absolute;
+					width: 100%;
+					bottom: -1px;
+					top: calc(100% - 2px);
+					background: black;
+				}
+			}
+		}
+	}
+	.secondary {
+		background: #ece4db;
+		border: 1px solid #c6c2c2;
+		border-top-width: 0px;
+		padding: 10px;
+		.button {
+			padding: 0px 10px;
+			&:hover {
+				background: #dfd8ce;
+			}
+			&:active {
+				background: #d3ccc2;
+			}
+			&.active {
+				background: #cac2b6;
+			}
+		}
+	}
+}

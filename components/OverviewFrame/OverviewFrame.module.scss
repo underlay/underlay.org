@@ -1,0 +1,18 @@
+@import "pages/variables.scss";
+.overviewFrame {
+	.body {
+		margin-left: $scope-margin-left;
+	}
+	.content {
+		display: flex;
+		margin: 50px 0px 100px;
+		.main {
+			flex: 1 1 auto;
+		}
+		.side {
+			flex: 1 1 auto;
+			max-width: 350px;
+			margin-left: 100px;
+		}
+	}
+}

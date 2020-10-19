@@ -6,6 +6,8 @@ const customTheme = (currentTheme: any, themeProps: any) => {
 	return {
 		buttonStyles: {
 			...buttonStyles,
+			color: "#182026",
+			fontWeight: "400",
 		},
 		spinnerStyles,
 	};

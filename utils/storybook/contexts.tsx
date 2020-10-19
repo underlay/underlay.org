@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { PageContext } from "utils/client/hooks";
 
 const loggedIn = {
@@ -8,25 +8,23 @@ const loggedIn = {
 			name: "Test Person",
 			email: "g@hi.com",
 			slug: "test",
-			avatar: "https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8" 
+			avatar:
+				"https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8",
 		},
 		accessToken: "123abc",
 		expires: new Date(),
 	},
 	locationData: {
 		query: {
-			profileSlug: 'fakeprofile',
-			collectionSlug: 'fakecoll',
+			profileSlug: "fakeprofile",
+			collectionSlug: "fakecoll",
+			mode: "overview",
+			subMode: "assertions",
 		},
 		pathname: "/fakePath",
-	}
-
+	},
 };
 
-export const LoggedInContext = (storyFn:any) => {
-	return (
-		<PageContext.Provider value={loggedIn}>
-			{storyFn()}
-		</PageContext.Provider>
-	);
+export const LoggedInContext = (storyFn: any) => {
+	return <PageContext.Provider value={loggedIn}>{storyFn()}</PageContext.Provider>;
 };
