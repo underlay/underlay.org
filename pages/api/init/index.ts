@@ -16,6 +16,10 @@ export type InitData = {
 	expires?: Date;
 };
 
+/* 
+getInitData is called by either getInitialProps in app.tsx (i.e. each page load)
+or on api calls that need user account info. The former 
+*/
 export const getInitData = async (req: IncomingMessage | undefined): Promise<InitData> => {
 	const session = await getSession({ req });
 	const initData = {
@@ -31,6 +35,7 @@ export const getInitData = async (req: IncomingMessage | undefined): Promise<Ini
 
 const route = async (req: NextApiRequest, res: NextApiResponse) => {
 	const initData = await getInitData(req);
+	// TODO: seems like passing query around is the key for location
 	res.status(200).json(initData);
 };
 

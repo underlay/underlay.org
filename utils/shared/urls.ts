@@ -1,14 +1,14 @@
 type urlInputs = {
-	namespaceSlug?: string;
-	packageSlug?: string;
+	profileSlug?: string;
+	collectionSlug?: string;
 	mode?: string;
 	subMode?: string;
 };
 
-export const buildUrl = ({ namespaceSlug, packageSlug, mode, subMode }: urlInputs): string => {
-	const namespaceString = namespaceSlug ? `/${namespaceSlug}` : "";
-	const packageString = packageSlug ? `/${packageSlug}` : "";
+export const buildUrl = ({ profileSlug, collectionSlug, mode, subMode }: urlInputs): string => {
+	const profileString = profileSlug ? `/${profileSlug}` : "";
+	const collectionString = collectionSlug ? `/${collectionSlug}` : "";
 	const modeString = mode ? `/${mode}` : "";
 	const subModeString = subMode ? `/${subMode}` : "";
-	return `${namespaceString}${packageString}${modeString}${subModeString}`;
+	return `${profileString}${collectionString}${modeString}${subModeString}`;
 };

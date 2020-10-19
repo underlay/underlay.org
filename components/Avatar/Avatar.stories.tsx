@@ -11,7 +11,7 @@ export default {
 export const Primary: React.FC<{}> = () => (
 	<div>
 		<Avatar initial="T" />
-		<Avatar src="https://assets.pubpub.org/mflaxicd/11505393046254.jpg" />
+		<Avatar src="https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8" />
 		<Avatar initial="T" width={64} />
 	</div>
 );

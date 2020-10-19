@@ -14,7 +14,7 @@ type Props = {
 	numVersions?: number;
 };
 
-const PackagePreview: React.FC<Props> = function ({
+const CollectionPreview: React.FC<Props> = function ({
 	slug,
 	description,
 	numAssertions,
@@ -22,18 +22,17 @@ const PackagePreview: React.FC<Props> = function ({
 	numVersions,
 }) {
 	const { locationData } = usePageContext();
-	// const locationData = {params: { namespaceSlug: "cat" }};
-	const { namespaceSlug } = locationData.params;
+	const { profileSlug } = locationData.query;
 
 	return (
 		<a
 			href={buildUrl({
-				namespaceSlug: namespaceSlug,
-				packageSlug: slug,
+				profileSlug: profileSlug,
+				collectionSlug: slug,
 			})}
 			className={styles.preview}
 		>
-			<Icon className={styles.icon} icon="package" size={20} />
+			<Icon className={styles.icon} icon="collection" size={20} />
 			<div className={`${styles.title} ellipsis hoverline`}>{slug}</div>
 			<div className={styles.description}>{description}</div>
 			<div className={styles.details}>
@@ -51,4 +50,4 @@ const PackagePreview: React.FC<Props> = function ({
 	);
 };
 
-export default PackagePreview;
+export default CollectionPreview;

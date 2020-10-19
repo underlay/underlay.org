@@ -8,7 +8,8 @@ import Icon from "components/Icon";
 import styles from "./Header.module.scss";
 
 const Header = () => {
-	const { user } = usePageContext();
+	const { sessionData }= usePageContext();
+	const user = sessionData?.user;
 	return (
 		<nav className={styles.header}>
 			<div className={styles.content}>
@@ -18,23 +19,10 @@ const Header = () => {
 					</Button>
 				</div>
 				<div>
-					<Button appearance="subtle">
-						<Avatar
-							width={24}
-							children={() => {
-								return "+";
-							}}
-						/>
-					</Button>
 					<Button
 						appearance="subtle"
 						iconBefore={
-							<Avatar
-								width={24}
-								children={() => {
-									return user?.email[0];
-								}}
-							/>
+							<Avatar width={24} initial={user?.name[0]} src={user?.avatar} />
 						}
 						iconAfter={<Icon icon="edit" />}
 					/>

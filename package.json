@@ -17,12 +17,12 @@
 		"type-check": "tsc"
 	},
 	"dependencies": {
-		"@atlaskit/button": "^15.0.0",
-		"@atlaskit/css-reset": "^6.0.1",
-		"@atlaskit/dropdown-menu": "^10.0.4",
-		"@atlaskit/form": "^8.1.4",
-		"@atlaskit/textfield": "^4.0.5",
-		"@prisma/client": "^2.7.1",
+		"@atlaskit/button": "^15.1.1",
+		"@atlaskit/css-reset": "^6.0.4",
+		"@atlaskit/dropdown-menu": "^10.1.1",
+		"@atlaskit/form": "^8.1.6",
+		"@atlaskit/textfield": "^4.0.9",
+		"@prisma/client": "^2.9.0",
 		"classnames": "^2.2.6",
 		"next": "^9.5.3",
 		"next-auth": "^3.1.0",
@@ -34,8 +34,8 @@
 		"styled-components": "^5.2.0"
 	},
 	"devDependencies": {
-		"@prisma/cli": "^2.7.1",
-		"@storybook/addon-actions": "^6.0.21",
+		"@prisma/cli": "^2.9.0",
+		"@storybook/addon-actions": "^6.0.26",
 		"@storybook/addon-essentials": "^6.0.21",
 		"@storybook/addon-links": "^6.0.21",
 		"@storybook/preset-scss": "^1.0.2",

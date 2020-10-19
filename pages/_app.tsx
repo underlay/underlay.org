@@ -2,7 +2,7 @@ import { AppProps, AppContext } from "next/app";
 import Head from "next/head";
 import "@atlaskit/css-reset";
 
-import { InitData, getInitData } from "pages/api/init";
+import { InitData, getInitData } from "utils/server/initData";
 import { PageContext } from "utils/client/hooks";
 import Header from "components/Header";
 import Footer from "components/Footer";
@@ -12,6 +12,7 @@ import "./app.scss";
 type ExpandedAppProps = AppProps & { initData: InitData };
 
 const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
+	console.log(initData);
 	return (
 		<PageContext.Provider value={initData}>
 			<div className="app">
@@ -29,7 +30,7 @@ const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
 };
 
 Main.getInitialProps = async (appContext: AppContext) => {
-	const initData = await getInitData(appContext.ctx.req);
+	const initData = await getInitData(appContext.ctx);
 	return { initData: initData };
 };
 
