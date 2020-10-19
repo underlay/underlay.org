@@ -1,0 +1,32 @@
+@import 'pages/variables.scss';
+
+.scopeHeader {
+	margin-left: $scope-margin-left;
+	position: relative;
+
+	.typeIcon {
+		position: absolute;
+		left: -42px;
+	}
+	.avatarComponent {
+		float: left;
+		margin-right: 20px;
+	}
+	.title {
+		font-weight: 600;
+		font-size: 28px;
+		line-height: 28px;
+		margin-bottom: 7px;
+		position: relative;
+		top: -5px;
+		a {
+			color: inherit;
+		}
+	}
+	.details {
+		font-size: 16px;
+		&.top {
+			margin-bottom: 7px;	
+		}
+	}
+}

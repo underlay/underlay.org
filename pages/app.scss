@@ -1,4 +1,6 @@
 @import '~normalize-css';
+@import './variables.scss';
+@import './typography.scss';
 
 body {
 	background: #ede9e4;
@@ -7,6 +9,7 @@ body {
 	max-width: 100vw;
 	overflow-x: hidden;
 	color: #000;
+	font-size: 16px;
 }
 .app {
 	max-width: 1024px;
@@ -25,10 +28,6 @@ body {
 a {
 	text-decoration: underline;
 	cursor: pointer;
-}
-
-p {
-	font-size: 16px;
 }
 
 .capitalize {
