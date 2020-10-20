@@ -13,7 +13,6 @@ type Props = {
 };
 
 const Profile: React.FC<Props> = function ({ organizationData }) {
-	// const { organizationData } = props;
 	const { title, avatar, slug, collections, discussions, members } = organizationData;
 	const { locationData } = usePageContext();
 	const { mode } = locationData.query;
@@ -68,5 +67,11 @@ const Profile: React.FC<Props> = function ({ organizationData }) {
 export default Profile;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	return { props: { organizationData: { fish: 5 } } };
+	const val = await new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(10);
+		}, 100);
+	});
+	return { props: { organizationData: { fish: val } } };
+	// return { props: { serverSideNotFound: true } };
 };

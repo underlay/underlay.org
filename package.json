@@ -25,7 +25,7 @@
 		"@atlaskit/textfield": "^4.0.9",
 		"@prisma/client": "^2.9.0",
 		"classnames": "^2.2.6",
-		"next": "^9.5.3",
+		"next": "^9.5.5",
 		"next-auth": "^3.1.0",
 		"normalize-css": "^2.3.1",
 		"pg": "^8.3.3",

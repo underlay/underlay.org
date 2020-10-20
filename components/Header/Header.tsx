@@ -3,12 +3,11 @@ import React from "react";
 import { usePageContext } from "utils/client/hooks";
 import Button from "components/Button";
 import Avatar from "components/Avatar";
-import Icon from "components/Icon";
 
 import styles from "./Header.module.scss";
 
 const Header = () => {
-	const { sessionData }= usePageContext();
+	const { sessionData } = usePageContext();
 	const user = sessionData?.user;
 	return (
 		<nav className={styles.header}>
@@ -20,12 +19,16 @@ const Header = () => {
 				</div>
 				<div>
 					<Button
+						href={user ? undefined : "/login"}
 						appearance="subtle"
 						iconBefore={
-							<Avatar width={24} initial={user?.email?.[0]} src={user?.avatar} />
+							user ? (
+								<Avatar width={24} initial={user.email[0]} src={user.avatar} />
+							) : undefined
 						}
-						iconAfter={<Icon icon="edit" />}
-					/>
+					>
+						{user ? undefined : "Login"}
+					</Button>
 				</div>
 			</div>
 		</nav>

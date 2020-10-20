@@ -8,6 +8,8 @@ Underlay Registry #1
 npm install
 ```
 
+You will also need to generate an .env.local file. For Underlay team members, check our password sharing infrastructure for credentials.
+
 ## To Run Dev Mode
 
 ```

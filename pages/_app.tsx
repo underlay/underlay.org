@@ -12,7 +12,9 @@ import "./app.scss";
 type ExpandedAppProps = AppProps & { initData: InitData };
 
 const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
-	console.log(initData);
+	const contentComponent = pageProps && pageProps.serverSideNotFound
+		? <h1>404 Not Found</h1>
+		: <Component {...pageProps} />	
 	return (
 		<PageContext.Provider value={initData}>
 			<div className="app">
@@ -21,7 +23,7 @@ const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
 				</Head>
 				<Header />
 				<div id="main-content" tabIndex={-1}>
-					<Component {...pageProps} />
+					{contentComponent}
 				</div>
 				<Footer />
 			</div>
