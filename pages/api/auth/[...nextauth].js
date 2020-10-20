@@ -59,6 +59,9 @@ const options = {
 			VerificationRequest: "verificationRequest",
 		},
 	}),
+	pages: {
+		verifyRequest: '/login?requested=true',
+	},
 	callbacks: {
 		session: async (session, user) => {
 			return Promise.resolve({

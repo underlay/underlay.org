@@ -22,7 +22,7 @@ const Header = () => {
 					<Button
 						appearance="subtle"
 						iconBefore={
-							<Avatar width={24} initial={user?.name[0]} src={user?.avatar} />
+							<Avatar width={24} initial={user?.email?.[0]} src={user?.avatar} />
 						}
 						iconAfter={<Icon icon="edit" />}
 					/>

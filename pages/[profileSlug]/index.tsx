@@ -1,44 +1,72 @@
-// import { GetServerSideProps } from "next";
-// import { getInitData } from "pages/api/init";
+import { GetServerSideProps } from "next";
 // import { PrismaClient } from '@prisma/client';
 // const prisma = new PrismaClient();
 import React from "react";
-import Button from "@atlaskit/button";
-import DropdownMenu, { DropdownItem, DropdownItemGroup } from "@atlaskit/dropdown-menu";
-// import Select from '@atlaskit/select';
-// import { Button } from "@blueprintjs/core";
-import Icon from "components/Icon";
 
-const Owner = () => {
+import OverviewFrame from "components/OverviewFrame";
+import { Main, Side } from "components/ProfileOverview";
+import { usePageContext } from "utils/client/hooks";
+import { buildUrl } from "utils/shared/urls";
+
+type Props = {
+	organizationData: {};
+};
+
+const Profile: React.FC<Props> = function ({ organizationData }) {
+	// const { organizationData } = props;
+	const { title, avatar, slug, collections, discussions, members } = organizationData;
+	const { locationData } = usePageContext();
+	const { mode } = locationData.query;
+
+	const contentSwitch = {
+		overview: {
+			main: <Main collections={collections} />,
+			side: <Side discussions={discussions} members={members} />,
+		},
+	};
+	const activeContent = contentSwitch[mode] || {};
+	const { main, side } = activeContent;
 	return (
-		<div>
-			In Owner Page
-			<DropdownMenu trigger="Cities in Australia" triggerType="button">
-				<DropdownItemGroup>
-					<DropdownItem>Sydney</DropdownItem>
-					<DropdownItem>Melbourne</DropdownItem>
-					<DropdownItem>Adelaide</DropdownItem>
-					<DropdownItem>Perth</DropdownItem>
-				</DropdownItemGroup>
-				<DropdownItemGroup>
-					<DropdownItem>Sydney</DropdownItem>
-					<DropdownItem>Melbourne</DropdownItem>
-					<DropdownItem>Adelaide</DropdownItem>
-					<DropdownItem>Perth</DropdownItem>
-					<DropdownItem>Brisbane</DropdownItem>
-					<DropdownItem>Canberra</DropdownItem>
-					<DropdownItem>Hobart</DropdownItem>
-					<DropdownItem>Darwin</DropdownItem>
-				</DropdownItemGroup>
-			</DropdownMenu>
-			<Button iconBefore={<Icon icon="edit" />} />
-		</div>
+		<OverviewFrame
+			className="organization-container"
+			scopeHeaderProps={{
+				type: "org",
+				title: (
+					<a href={buildUrl({ profileSlug: slug })} className="hoverline">
+						{title}
+					</a>
+				),
+				avatar: avatar,
+				detailsTop: slug,
+				// detailsBottom: (
+				// 	<Tag minimal intent={Intent.SUCCESS}>
+				// 		Verified: arnold.org
+				// 	</Tag>
+				// ),
+			}}
+			scopeNavProps={{
+				navItems: [
+					{ slug: "overview", title: "Overview" },
+					{ slug: "query", title: "Query" },
+					{ slug: "people", title: "People" },
+					{
+						slug: "discussions",
+						title: "Discussions",
+						children: [
+							{ slug: "open", title: "Open" },
+							{ slug: "closed", title: "Closed" },
+						],
+					},
+				],
+			}}
+			content={main}
+			sideContent={side}
+		/>
 	);
 };
 
-export default Owner;
+export default Profile;
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-// 	const initData = await getInitData(context.req);
-// 	return { props: { initData: initData } };
-// };
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	return { props: { organizationData: { fish: 5 } } };
+};
