@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react/types-6-0";
 import Tag from "@atlaskit/tag/simple-tag";
 
 import OverviewFrame from "./OverviewFrame";
+import Section from "components/Section";
 
 export default {
 	title: "Components/OverviewFrame",
@@ -35,7 +36,25 @@ export const Primary: React.FC<{}> = () => (
 				},
 			],
 		}}
-		content={<div style={{ background: "rgba(0,0,0,0.1", padding: "5em 2em" }}>Main</div>}
-		sideContent={<div style={{ background: "rgba(0,0,0,0.2", padding: "5em 2em" }}>Side</div>}
+		content={
+			<div>
+				<Section title="Query 1" useMargin={true}>
+					This is my content
+				</Section>
+				<Section title="Query 2" useMargin={true}>
+					This is my content
+				</Section>
+			</div>
+		}
+		sideContent={
+			<div>
+				<Section title="Query 3" isSide={true}>
+					This is my content
+				</Section>
+				<Section title="Query 4" isSide={true}>
+					This is my content
+				</Section>
+			</div>
+		}
 	/>
 );

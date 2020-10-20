@@ -13,8 +13,8 @@ type Props = {
 
 const Section: React.FC<Props> = function ({
 	title,
-	useMargin = "false",
-	isSide = "false",
+	useMargin = false,
+	isSide = false,
 	className = "",
 	children = null,
 }) {

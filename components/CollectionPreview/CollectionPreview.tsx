@@ -1,4 +1,5 @@
 import React from "react";
+import classNames from "classnames";
 
 import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
@@ -6,7 +7,7 @@ import Icon from "components/Icon";
 
 import styles from "./CollectionPreview.module.scss";
 
-type Props = {
+export type Collection = {
 	slug: string;
 	description?: string;
 	numAssertions?: number;
@@ -14,12 +15,16 @@ type Props = {
 	numVersions?: number;
 };
 
+type classProp = { className?: string };
+type Props = classProp & Collection;
+
 const CollectionPreview: React.FC<Props> = function ({
 	slug,
 	description,
 	numAssertions,
 	numFiles,
 	numVersions,
+	className = "",
 }) {
 	const { locationData } = usePageContext();
 	const { profileSlug } = locationData.query;
@@ -30,7 +35,7 @@ const CollectionPreview: React.FC<Props> = function ({
 				profileSlug: profileSlug,
 				collectionSlug: slug,
 			})}
-			className={styles.preview}
+			className={classNames(styles.preview, className)}
 		>
 			<Icon className={styles.icon} icon="collection" size={20} />
 			<div className={`${styles.title} ellipsis hoverline`}>{slug}</div>
