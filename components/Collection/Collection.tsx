@@ -1,3 +1,4 @@
+import React from "react";
 // import { GetServerSideProps } from "next";
 // import { getInitData } from "pages/api/init";
 // import { PrismaClient } from '@prisma/client';

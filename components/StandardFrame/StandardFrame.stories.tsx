@@ -2,16 +2,16 @@ import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
 import Tag from "@atlaskit/tag/simple-tag";
 
-import OverviewFrame from "./OverviewFrame";
+import StandardFrame from "./StandardFrame";
 import Section from "components/Section";
 
 export default {
-	title: "Components/OverviewFrame",
-	component: OverviewFrame,
+	title: "Components/StandardFrame",
+	component: StandardFrame,
 } as Meta;
 
 export const Primary: React.FC<{}> = () => (
-	<OverviewFrame
+	<StandardFrame
 		className="organization-container"
 		scopeHeaderProps={{
 			type: "org",

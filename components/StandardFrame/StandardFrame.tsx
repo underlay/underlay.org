@@ -4,7 +4,7 @@ import classNames from "classnames";
 import ScopeHeader, { Props as ScopeHeaderProps } from "components/ScopeHeader";
 import ScopeNav, { Props as ScopeNavProps } from "components/ScopeNav";
 
-import styles from "./OverviewFrame.module.scss";
+import styles from "./StandardFrame.module.scss";
 
 type Props = {
 	scopeHeaderProps: ScopeHeaderProps;
@@ -22,7 +22,7 @@ const StandardFrame: React.FC<Props> = function ({
 	className = "",
 }) {
 	return (
-		<div className={classNames(styles.overviewFrame, className)}>
+		<div className={classNames(styles.standardFrame, className)}>
 			<ScopeHeader {...scopeHeaderProps} />
 
 			<div className={styles.body}>
