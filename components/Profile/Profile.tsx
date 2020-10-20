@@ -14,7 +14,7 @@ type Props = {
 
 const Profile: React.FC<Props> = function ({ organizationData }) {
 	console.log(organizationData);
-	return <h1>Profile Component</h1>
+	return <h1>Profile Component!</h1>
 	// const { title, avatar, slug, collections, discussions, members } = organizationData;
 	// const { locationData } = usePageContext();
 	// const { mode } = locationData.query;
