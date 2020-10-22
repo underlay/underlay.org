@@ -1,7 +1,8 @@
 import React from "react";
 import classNames from "classnames";
+import { Avatar } from "evergreen-ui";
 
-import { Avatar, Section } from "components";
+import { Section } from "components";
 
 import styles from "./Side.module.scss";
 
@@ -45,7 +46,12 @@ const Side: React.FC<Props> = function ({ contributors }) {
 					{contributors.map((person) => {
 						return (
 							<a href={`/${person.slug}`} key={person.slug}>
-								<Avatar src={person.avatar} initial={person.initial} width={35} />
+								<Avatar
+									src={person.avatar}
+									name={person.initial}
+									size={35}
+									borderRadius="3px"
+								/>
 							</a>
 						);
 					})}

@@ -1,4 +1,4 @@
-import { LoggedInContext } from "utils/storybook/contexts";
+import { LoggedInContext, ThemedContext } from "utils/storybook/contexts";
 import "pages/app.scss";
 
 export const parameters = {
@@ -8,4 +8,4 @@ export const parameters = {
 	},
 };
 
-export const decorators = [LoggedInContext];
+export const decorators = [ThemedContext, LoggedInContext];

@@ -1,8 +1,8 @@
 import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
-import Tag from "@atlaskit/tag/simple-tag";
+import { Badge } from "evergreen-ui";
 
-import ScopeHeader from "./ScopeHeader";
+import { ScopeHeader } from "components";
 
 export default {
 	title: "Components/ScopeHeader",
@@ -10,7 +10,7 @@ export default {
 } as Meta;
 
 const wrapperStyle = {
-	margin: "1em",
+	margin: "3em 0em",
 };
 
 export const Primary: React.FC<{}> = () => (
@@ -22,9 +22,9 @@ export const Primary: React.FC<{}> = () => (
 				detailsTop="3.2.0  ·  Updated 12 years ago"
 				detailsBottom={
 					<React.Fragment>
-						<Tag text="People" />
-						<Tag text="schema.org" />
-						<Tag text="actors" />
+						<Badge>People</Badge>
+						<Badge>schema.org</Badge>
+						<Badge>actors</Badge>
 					</React.Fragment>
 				}
 				avatar={undefined}
@@ -35,7 +35,7 @@ export const Primary: React.FC<{}> = () => (
 				type="user"
 				title="Megan Jorg III"
 				detailsTop="megan-jorg"
-				detailsBottom={<Tag color="greenLight" text="Verified: @mjorg" />}
+				detailsBottom={<Badge color="green">Verified: @mjorg</Badge>}
 				avatar="https://images.unsplash.com/photo-1548142813-c348350df52b?&w=100&h=100&fit=crop"
 			/>
 		</div>
@@ -44,7 +44,7 @@ export const Primary: React.FC<{}> = () => (
 				type="org"
 				title="Arnold Foundation"
 				detailsTop="arnold-foundation"
-				detailsBottom={<Tag color="greenLight" text="Verified: arnold.org" />}
+				detailsBottom={<Badge color="green">Verified: arnold.org</Badge>}
 				avatar="https://images.unsplash.com/photo-1516876437184-593fda40c7ce?&w=100&h=100&fit=crop"
 			/>
 		</div>

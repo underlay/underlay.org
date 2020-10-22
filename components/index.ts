@@ -1,5 +1,3 @@
-export { default as Avatar } from "./Avatar/Avatar";
-export { default as Button } from "./Button/Button";
 export { default as Collection } from "./Collection/Collection";
 export { default as CollectionList } from "./CollectionList/CollectionList";
 export { default as CollectionPreview } from "./CollectionPreview/CollectionPreview";

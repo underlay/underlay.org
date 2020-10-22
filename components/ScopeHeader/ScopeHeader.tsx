@@ -1,7 +1,8 @@
 import React from "react";
 import classNames from "classnames";
+import { Avatar } from "evergreen-ui";
 
-import { Avatar, Icon } from "components";
+import { Icon } from "components";
 
 import styles from "./ScopeHeader.module.scss";
 
@@ -29,9 +30,10 @@ const ScopeHeader: React.FC<Props> = function ({
 			{showAvatar && (
 				<Avatar
 					className={styles.avatarComponent}
+					name={initial}
 					src={avatar}
-					width={100}
-					initial={initial}
+					size={100}
+					borderRadius="3px"
 				/>
 			)}
 			<div className={styles.title}>{title}</div>

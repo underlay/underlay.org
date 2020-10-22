@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
+import { Button } from "evergreen-ui";
 
-import { Button } from "components";
 import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
@@ -36,8 +36,9 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 					return (
 						<Button
 							className={classNames(styles.button, isActive && styles.active)}
-							appearance="subtle"
+							appearance="minimal"
 							key={modeSlug}
+							is="a"
 							href={buildUrl({
 								profileSlug: profileSlug,
 								collectionSlug: collectionSlug,
@@ -58,9 +59,10 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 						return (
 							<Button
 								className={classNames(styles.button, isActive && styles.active)}
-								appearance="subtle"
-								spacing="compact"
+								appearance="minimal"
+								height={24}
 								key={subModeSlug}
+								is="a"
 								href={buildUrl({
 									profileSlug: profileSlug,
 									collectionSlug: collectionSlug,

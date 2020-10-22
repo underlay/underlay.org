@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { signIn } from "next-auth/client";
+import { Button } from "evergreen-ui";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ const Login = () => {
 					setEmail(evt.target.value);
 				}}
 			/>
-			<button onClick={() => signIn("email", { email })}>Sign in with Email</button>
+			<Button onClick={() => signIn("email", { email })}>Sign in with Email</Button>
 		</div>
 	);
 };

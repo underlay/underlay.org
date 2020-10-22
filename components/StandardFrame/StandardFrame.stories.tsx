@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
-import Tag from "@atlaskit/tag/simple-tag";
+import { Badge } from "evergreen-ui";
 
 import { Section, StandardFrame } from "components";
 
@@ -18,7 +18,7 @@ export const Primary: React.FC<{}> = () => (
 			avatar:
 				"https://images.unsplash.com/photo-1516876437184-593fda40c7ce?&w=100&h=100&fit=crop",
 			detailsTop: "my-slug",
-			detailsBottom: <Tag color="greenLight" text="Verified: arnold.org" />,
+			detailsBottom: <Badge color="green">Verified: arnold.org</Badge>,
 		}}
 		scopeNavProps={{
 			navItems: [

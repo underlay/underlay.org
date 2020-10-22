@@ -18,14 +18,9 @@
 		"type-check": "tsc"
 	},
 	"dependencies": {
-		"@atlaskit/button": "^15.1.1",
-		"@atlaskit/css-reset": "^6.0.4",
-		"@atlaskit/dropdown-menu": "^10.1.1",
-		"@atlaskit/form": "^8.1.6",
-		"@atlaskit/tag": "^11.0.2",
-		"@atlaskit/textfield": "^4.0.9",
 		"@prisma/client": "^2.9.0",
 		"classnames": "^2.2.6",
+		"evergreen-ui": "^5.1.2",
 		"next": "^9.5.5",
 		"next-auth": "^3.1.0",
 		"normalize-css": "^2.3.1",

@@ -1,41 +1,41 @@
 import { AppProps, AppContext } from "next/app";
-import Head from "next/head";
-import "@atlaskit/css-reset";
+import { ThemeProvider } from "evergreen-ui";
 
 import { Header, Footer } from "components";
 import { InitData, getInitData } from "utils/server/initData";
 import { PageContext } from "utils/client/hooks";
+import { theme } from "utils/shared/theme";
 
 import "./app.scss";
 
 type ExpandedAppProps = AppProps & { initData: InitData };
 
-const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
+const App = ({ Component, pageProps, initData }: ExpandedAppProps) => {
 	const contentComponent =
 		pageProps && pageProps.serverSideNotFound ? (
 			<h1>404 Not Found</h1>
 		) : (
 			<Component {...pageProps} />
 		);
+
 	return (
-		<PageContext.Provider value={initData}>
-			<div className="app">
-				<Head>
-					<link rel="shortcut icon" href="/favicon.png" />
-				</Head>
-				<Header />
-				<div id="main-content" tabIndex={-1}>
-					{contentComponent}
+		<ThemeProvider value={theme}>
+			<PageContext.Provider value={initData}>
+				<div className="app">
+					<Header />
+					<div id="main-content" tabIndex={-1}>
+						{contentComponent}
+					</div>
+					<Footer />
 				</div>
-				<Footer />
-			</div>
-		</PageContext.Provider>
+			</PageContext.Provider>
+		</ThemeProvider>
 	);
 };
 
-Main.getInitialProps = async (appContext: AppContext) => {
+App.getInitialProps = async (appContext: AppContext) => {
 	const initData = await getInitData(appContext.ctx);
 	return { initData: initData };
 };
 
-export default Main;
+export default App;
