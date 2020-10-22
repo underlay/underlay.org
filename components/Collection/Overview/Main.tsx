@@ -1,6 +1,6 @@
 import React from "react";
 
-import Section from "components/Section";
+import { Section } from "components";
 
 import styles from "./Main.module.scss";
 
@@ -31,15 +31,12 @@ const PackageOverviewMain: React.FC<Props> = function ({
 	files,
 	readme = defaultReadme,
 }) {
-
 	return (
 		<div>
 			<Section title="Readme">
 				<div className={styles.readme}>{readme}</div>
 			</Section>
-			<Section title="Files">
-				{!files.length && <div>No Files Yet</div>}
-			</Section>
+			<Section title="Files">{!files.length && <div>No Files Yet</div>}</Section>
 			<Section title="Assertions">
 				{!assertions.length && <div>No Assertions Yet</div>}
 			</Section>

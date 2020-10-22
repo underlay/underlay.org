@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 
-export { default } from "components/Profile";
+export { Profile as default } from "components";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	console.log(context);

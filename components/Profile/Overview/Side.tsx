@@ -1,9 +1,7 @@
 import React from "react";
 
-import Section from "components/Section";
-import Avatar from "components/Avatar";
-import DiscussionList from "components/DiscussionList";
-import { Discussion } from "components/DiscussionPreview";
+import { Avatar, DiscussionList, Section } from "components";
+import { Discussion } from "components/DiscussionPreview/DiscussionPreview";
 
 type Props = {
 	discussions: Discussion[];

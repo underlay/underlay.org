@@ -1,8 +1,7 @@
 import React from "react";
 
+import { Avatar, Button } from "components";
 import { usePageContext } from "utils/client/hooks";
-import Button from "components/Button";
-import Avatar from "components/Avatar";
 
 import styles from "./Header.module.scss";
 

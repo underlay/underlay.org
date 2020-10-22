@@ -2,19 +2,21 @@ import { AppProps, AppContext } from "next/app";
 import Head from "next/head";
 import "@atlaskit/css-reset";
 
+import { Header, Footer } from "components";
 import { InitData, getInitData } from "utils/server/initData";
 import { PageContext } from "utils/client/hooks";
-import Header from "components/Header";
-import Footer from "components/Footer";
 
 import "./app.scss";
 
 type ExpandedAppProps = AppProps & { initData: InitData };
 
 const Main = ({ Component, pageProps, initData }: ExpandedAppProps) => {
-	const contentComponent = pageProps && pageProps.serverSideNotFound
-		? <h1>404 Not Found</h1>
-		: <Component {...pageProps} />	
+	const contentComponent =
+		pageProps && pageProps.serverSideNotFound ? (
+			<h1>404 Not Found</h1>
+		) : (
+			<Component {...pageProps} />
+		);
 	return (
 		<PageContext.Provider value={initData}>
 			<div className="app">

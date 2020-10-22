@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import Button from "components/Button";
+import { Button } from "components";
 import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 

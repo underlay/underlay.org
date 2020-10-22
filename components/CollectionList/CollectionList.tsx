@@ -1,6 +1,7 @@
 import React from "react";
 
-import CollectionPreview, { Collection } from "components/CollectionPreview";
+import { CollectionPreview } from "components";
+import { Collection } from "components/CollectionPreview/CollectionPreview";
 
 import styles from "./CollectionList.module.scss";
 

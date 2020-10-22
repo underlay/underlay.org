@@ -1,8 +1,7 @@
 import React from "react";
 
-import Section from "components/Section";
-import CollectionList from "components/CollectionList";
-import { Collection } from "components/CollectionPreview";
+import { Section, CollectionList } from "components/";
+import { Collection } from "components/CollectionPreview/CollectionPreview";
 
 type Props = {
 	collections: Collection[];

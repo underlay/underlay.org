@@ -2,8 +2,7 @@ import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
 import Tag from "@atlaskit/tag/simple-tag";
 
-import StandardFrame from "./StandardFrame";
-import Section from "components/Section";
+import { Section, StandardFrame } from "components";
 
 export default {
 	title: "Components/StandardFrame",

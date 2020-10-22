@@ -1,6 +1,7 @@
 import React from "react";
 
-import DiscussionPreview, { Discussion } from "components/DiscussionPreview";
+import { DiscussionPreview } from "components";
+import { Discussion } from "components/DiscussionPreview/DiscussionPreview";
 
 import styles from "./DiscussionList.module.scss";
 

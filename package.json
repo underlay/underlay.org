@@ -8,6 +8,7 @@
 		"type": "git",
 		"url": "https://github.com/underlay/r1.git"
 	},
+	"sideEffects": false,
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",

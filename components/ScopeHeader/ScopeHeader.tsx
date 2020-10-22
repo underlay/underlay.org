@@ -1,8 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import Icon from "components/Icon";
-import Avatar from "components/Avatar";
+import { Avatar, Icon } from "components";
 
 import styles from "./ScopeHeader.module.scss";
 

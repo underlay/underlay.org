@@ -1,8 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import Section from "components/Section";
-import Avatar from "components/Avatar";
+import { Avatar, Section } from "components";
 
 import styles from "./Side.module.scss";
 
