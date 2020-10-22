@@ -64,7 +64,7 @@ const getButtonAppearance = (appearance, intent) => {
 				},
 				focus: {
 					// boxShadow: `0 0 0 3px ${scales.blue.B5A}`,
-					boxShadow: `0 0 0 3px ${scales.neutral.N8A}`,
+					boxShadow: `0 0 0 3px ${defaultControlStyles.focus}`,
 				},
 				active: {
 					backgroundImage: "none",

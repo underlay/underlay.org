@@ -1,5 +1,5 @@
 import React from "react";
-import Document, { DocumentContext, Head, Main, NextScript } from "next/document";
+import Document, { DocumentContext, Html, Head, Main, NextScript } from "next/document";
 import { extractStyles } from "evergreen-ui";
 
 type ExtractedProps = {
@@ -17,7 +17,7 @@ export default class MyDocument extends Document<ExtractedProps> {
 		const { css, hydrationScript } = this.props;
 
 		return (
-			<html>
+			<Html>
 				<Head>
 					<link rel="shortcut icon" href="/favicon.png" />
 					<style dangerouslySetInnerHTML={{ __html: css }} />
@@ -28,7 +28,7 @@ export default class MyDocument extends Document<ExtractedProps> {
 					{hydrationScript}
 					<NextScript />
 				</body>
-			</html>
+			</Html>
 		);
 	}
 }
