@@ -77,6 +77,56 @@ model Organization {
     @@map(name: "organizations")
 }
 
+model Member {
+    id             String       @default(uuid()) @id
+    userId         String
+    user           User         @relation(fields: [userId], references: [id])
+    organizationId String
+    organization   Organization @relation(fields: [organizationId], references: [id])
+    createdAt      DateTime     @default(now()) @map(name: "created_at")
+    updatedAt      DateTime     @default(now()) @map(name: "updated_at") @updatedAt
+
+    @@map(name: "members")
+}
+
+
+
+
+
+
+model Schema {
+	id             String        @default(uuid()) @id
+
+	slug
+	version SchemaVersion[]
+	exampleCollectionThing
+
+	members
+	discussions
+
+	userId         String?       @map(name: "user_id")
+    user           User?         @relation(fields: [userId], references: [id])
+    organizationId String?       @map(name: "organization_id")
+    organization   Organization? @relation(fields: [organizationId], references: [id])
+    createdAt      DateTime      @default(now()) @map(name: "created_at")
+    updatedAt      DateTime      @default(now()) @map(name: "updated_at") @updatedAt
+	@@map(name: "schemas")
+}
+
+model SchemaVersion {
+	id             String        @default(uuid()) @id
+	content
+	readme
+	versionNumber
+	schemaId
+	schema
+}
+
+
+
+
+
+
 model Collection {
     id             String        @default(uuid()) @id
     name           String?
@@ -93,14 +143,14 @@ model Collection {
     @@map(name: "collections")
 }
 
-model Member {
-    id             String       @default(uuid()) @id
-    userId         String
-    user           User         @relation(fields: [userId], references: [id])
-    organizationId String
-    organization   Organization @relation(fields: [organizationId], references: [id])
-    createdAt      DateTime     @default(now()) @map(name: "created_at")
-    updatedAt      DateTime     @default(now()) @map(name: "updated_at") @updatedAt
 
-    @@map(name: "members")
+model CollectionVersion {
+	versionNumber
+
 }
+
+model Assertion {
+	url: 
+
+}
+
