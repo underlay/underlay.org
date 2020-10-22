@@ -1,6 +1,7 @@
 import React from "react";
-import { Button, Avatar } from "evergreen-ui";
+import { Button, IconButton } from "evergreen-ui";
 
+import { Avatar } from "components";
 import { usePageContext } from "utils/client/hooks";
 
 import styles from "./Header.module.scss";
@@ -23,24 +24,17 @@ const Header = () => {
 					</Button>
 				</div>
 				<div>
-					<Button
-						is={user ? undefined : "a"}
-						href={user ? undefined : "/login"}
-						appearance="minimal"
-						height={40}
-						iconBefore={
-							user ? (
-								<Avatar
-									borderRadius="3px"
-									size={32}
-									name={user.email}
-									src={user.avatar}
-								/>
-							) : undefined
-						}
-					>
-						{user ? undefined : "Login"}
-					</Button>
+					{user ? (
+						<IconButton
+							appearance="minimal"
+							height={40}
+							icon={<Avatar size={32} name={user.email} src={user.avatar} />}
+						/>
+					) : (
+						<Button is="a" href="/login" appearance="minimal" height={40}>
+							Login
+						</Button>
+					)}
 				</div>
 			</div>
 		</nav>

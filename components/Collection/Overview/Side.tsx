@@ -1,8 +1,7 @@
 import React from "react";
 import classNames from "classnames";
-import { Avatar } from "evergreen-ui";
 
-import { Section } from "components";
+import { Avatar, Section } from "components";
 
 import styles from "./Side.module.scss";
 
@@ -50,7 +49,6 @@ const Side: React.FC<Props> = function ({ contributors }) {
 									src={person.avatar}
 									name={person.initial}
 									size={35}
-									borderRadius="3px"
 								/>
 							</a>
 						);

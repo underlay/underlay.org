@@ -2,14 +2,14 @@
 /* Orignal values are left as comments next to their overwritten value */
 
 // @ts-nocheck
-import { Themer } from "evergreen-ui/esm/themer";
-import memoizeClassName from "evergreen-ui/esm/theme/src/default-theme/utils/memoizeClassName";
-import scales from "evergreen-ui/esm/theme/src/default-theme/foundational-styles/scales";
+import { Themer } from "evergreen-ui/commonjs/themer";
+import memoizeClassName from "evergreen-ui/commonjs/theme/src/default-theme/utils/memoizeClassName";
+import scales from "evergreen-ui/commonjs/theme/src/default-theme/foundational-styles/scales";
 import {
 	getTextColorForIntent,
 	getPrimaryButtonStylesForIntent,
-} from "evergreen-ui/esm/theme/src/default-theme/helpers";
-import { defaultControlStyles } from "evergreen-ui/esm/theme/src/default-theme/shared";
+} from "evergreen-ui/commonjs/theme/src/default-theme/helpers";
+import { defaultControlStyles } from "evergreen-ui/commonjs/theme/src/default-theme/shared";
 
 /**
  * Disabled styles are all the same for all buttons.

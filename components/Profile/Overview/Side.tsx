@@ -1,7 +1,6 @@
 import React from "react";
-import { Avatar } from "evergreen-ui";
 
-import { DiscussionList, Section } from "components";
+import { Avatar, DiscussionList, Section } from "components";
 import { Discussion } from "components/DiscussionPreview/DiscussionPreview";
 
 type Props = {
@@ -24,7 +23,6 @@ const NamespaceOverviewSide: React.FC<Props> = function ({ discussions, members 
 									src={member.user.avatar}
 									name={member.user.initial}
 									size={35}
-									borderRadius="3px"
 								/>
 							</a>
 						);

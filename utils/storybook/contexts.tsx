@@ -11,8 +11,8 @@ const loggedIn = {
 			name: "Test Person",
 			email: "g@hi.com",
 			slug: "test",
-			// avatar:
-			// 	"https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8",
+			avatar:
+				"https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8",
 		},
 		accessToken: "123abc",
 		expires: new Date(),

@@ -1,4 +1,5 @@
 import { defaultTheme } from "evergreen-ui";
+
 import getButtonClassName from "./getButtonClassName";
 
 export const theme = {
