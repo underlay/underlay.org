@@ -49,32 +49,48 @@ model VerificationRequest {
     @@map(name: "verification_requests")
 }
 
+
+
 model User {
-    id            String       @default(uuid()) @id
+    id    String @id
+    agent Agent  @relation(fields: [id], references: [id])
     name          String?
-    email         String?      @unique
+    email         String?   @unique
     avatar        String?
     slug          String?
-    collections   Collection[]
     organizations Member[]
-	emailVerified DateTime?    @map(name: "email_verified")
-    createdAt     DateTime     @default(now()) @map(name: "created_at")
-    updatedAt     DateTime     @default(now()) @map(name: "updated_at") @updatedAt
+    emailVerified DateTime? @map(name: "email_verified")
+    createdAt     DateTime  @default(now()) @map(name: "created_at")
+    updatedAt     DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+    collections CollectionCollaborator[]
+    schemas     SchemaCollaborator[]
 
     @@map(name: "users")
 }
 
 model Organization {
-    id          String       @default(uuid()) @id
-    name        String?
-    avatar      String?
-    slug        String?
-    collections Collection[]
-    members     Member[]
-    createdAt   DateTime     @default(now()) @map(name: "created_at")
-    updatedAt   DateTime     @default(now()) @map(name: "updated_at") @updatedAt
+    id    String @id
+    agent Agent  @relation(fields: [id], references: [id])
+    name      String?
+    avatar    String?
+    slug      String?
+    members   Member[]
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
     @@map(name: "organizations")
+}
+
+model Agent {
+    id           String        @id @default(uuid())
+    user         User?
+    organization Organization?
+    schemas            Schema[]
+    collections        Collection[]
+    schemaVersions     SchemaVersion[]
+    collectionVersions CollectionVersion[]
+
+	@@map(name: "agents")
 }
 
 model Member {
@@ -84,73 +100,108 @@ model Member {
     organizationId String
     organization   Organization @relation(fields: [organizationId], references: [id])
     createdAt      DateTime     @default(now()) @map(name: "created_at")
-    updatedAt      DateTime     @default(now()) @map(name: "updated_at") @updatedAt
+    updatedAt      DateTime    @default(now()) @map(name: "updated_at") @updatedAt
 
     @@map(name: "members")
 }
 
 
-
-
-
-
 model Schema {
-	id             String        @default(uuid()) @id
+    id             String          @id @default(uuid())
+    slug           String
+    agentId   String          @map(name: "agent_id")
+    agent     Agent           @relation(fields: [agentId], references: [id])
+    createdAt      DateTime        @default(now()) @map(name: "created_at")
+    updatedAt      DateTime        @default(now()) @updatedAt @map(name: "updated_at")
+    versions       SchemaVersion[]
+    collaborators SchemaCollaborator[]
 
-	slug
-	version SchemaVersion[]
-	exampleCollectionThing
-
-	members
-	discussions
-
-	userId         String?       @map(name: "user_id")
-    user           User?         @relation(fields: [userId], references: [id])
-    organizationId String?       @map(name: "organization_id")
-    organization   Organization? @relation(fields: [organizationId], references: [id])
-    createdAt      DateTime      @default(now()) @map(name: "created_at")
-    updatedAt      DateTime      @default(now()) @map(name: "updated_at") @updatedAt
-	@@map(name: "schemas")
+	@@unique([agentId, slug])
+    @@map(name: "schemas")
 }
 
 model SchemaVersion {
-	id             String        @default(uuid()) @id
-	content
-	readme
-	versionNumber
-	schemaId
-	schema
+    id              String              @id @default(uuid())
+    content         String              @default("") // Raw .toml text
+    readme          String              @default("") // Raw .md text
+    versionNumber   String              @default("0.0.0")
+	agentId String @map(name: "agent_id")
+    agent   Agent  @relation(fields: [agentId], references: [id])
+    schemaId        String
+    schema          Schema              @relation(fields: [schemaId], references: [id])
+	dataCollections CollectionVersion[] @relation("DataSchema")
+    metaCollections CollectionVersion[] @relation("MetaSchema")
+	createdAt      	DateTime        @default(now()) @map(name: "created_at")
+	
+	@@map(name: "schema_versions")
 }
-
-
-
-
-
 
 model Collection {
-    id             String        @default(uuid()) @id
-    name           String?
+    id             String              @id @default(uuid())
+    slug           String
     avatar         String?
-    slug           String?
     description    String?
-    userId         String?       @map(name: "user_id")
-    user           User?         @relation(fields: [userId], references: [id])
-    organizationId String?       @map(name: "organization_id")
-    organization   Organization? @relation(fields: [organizationId], references: [id])
-    createdAt      DateTime      @default(now()) @map(name: "created_at")
-    updatedAt      DateTime      @default(now()) @map(name: "updated_at") @updatedAt
+    agentId     String              @map(name: "agent_id")
+    agent       Agent               @relation(fields: [agentId], references: [id])
+    createdAt      DateTime            @default(now()) @map(name: "created_at")
+    updatedAt      DateTime            @default(now()) @updatedAt @map(name: "updated_at")
+    versions       CollectionVersion[]
+	collabcrators CollectionCollaborator[]
 
+    @@unique([agentId, slug])
     @@map(name: "collections")
 }
-
-
 model CollectionVersion {
-	versionNumber
+    id            String        @id @default(uuid())
+	hash 		  String
+    versionNumber String        @default("0.0.0")
+    readme        String?
+    collectionId  String
+    collection    Collection    @relation(fields: [collectionId], references: [id])
+    dataSchemaId  String
+    dataSchema    SchemaVersion @relation(name: "DataSchema", fields: [dataSchemaId], references: [id])
+    metaSchemaId  String
+    metaSchema    SchemaVersion @relation(name: "MetaSchema", fields: [metaSchemaId], references: [id])
+    metaKey       String // URI label from one of the classes in the metaSchema
+    assertions    Assertion[]
+	createdAt      DateTime            @default(now()) @map(name: "created_at")
+	agentId String @map(name: "agent_id")
+    agent   Agent  @relation(fields: [agentId], references: [id])
 
+	@@map(name: "collection_versions")
+}
+
+model CollectionCollaborator {
+    id           String     @id @default(uuid())
+    userId       String
+    user         User       @relation(fields: [userId], references: [id])
+    collectionId String
+    collection   Collection @relation(fields: [collectionId], references: [id])
+    createdAt    DateTime   @default(now()) @map(name: "created_at")
+    updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+	
+	@@map(name: "collection_collaborators")
+}
+model SchemaCollaborator {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    schemaId  String
+    schema    Schema   @relation(fields: [schemaId], references: [id])
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+	
+	@@map(name: "schema_collaborators")
 }
 
 model Assertion {
-	url: 
+    id           String            @id @default(uuid())
+    hash 		 String
+	collectionVersionId String
+    collectionVersion   CollectionVersion @relation(fields: [collectionId], references: [id])
+	createdAt      DateTime            @default(now()) @map(name: "created_at")
 
+	@@map(name: "assertions")
 }
+
 
