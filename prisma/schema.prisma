@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Account {
-    id                 String    @default(uuid()) @id
+    id                 String    @id @default(uuid())
     compoundId         String    @unique @map(name: "compound_id")
     userId             String    @map(name: "user_id")
     providerType       String    @map(name: "provider_type")
@@ -18,7 +18,7 @@ model Account {
     accessToken        String?   @map(name: "access_token")
     accessTokenExpires DateTime? @map(name: "access_token_expires")
     createdAt          DateTime  @default(now()) @map(name: "created_at")
-    updatedAt          DateTime  @default(now()) @map(name: "updated_at") @updatedAt
+    updatedAt          DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
     @@index([providerAccountId], name: "providerAccountId")
     @@index([providerId], name: "providerId")
@@ -27,33 +27,31 @@ model Account {
 }
 
 model Session {
-    id           String   @default(uuid()) @id
+    id           String   @id @default(uuid())
     userId       String   @map(name: "user_id")
     expires      DateTime
     sessionToken String   @unique @map(name: "session_token")
     accessToken  String   @unique @map(name: "access_token")
     createdAt    DateTime @default(now()) @map(name: "created_at")
-    updatedAt    DateTime @default(now()) @map(name: "updated_at") @updatedAt
+    updatedAt    DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
     @@map(name: "sessions")
 }
 
 model VerificationRequest {
-    id         String   @default(uuid()) @id
+    id         String   @id @default(uuid())
     identifier String
     token      String   @unique
     expires    DateTime
     createdAt  DateTime @default(now()) @map(name: "created_at")
-    updatedAt  DateTime @default(now()) @map(name: "updated_at") @updatedAt
+    updatedAt  DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
     @@map(name: "verification_requests")
 }
 
-
-
 model User {
-    id    String @id
-    agent Agent  @relation(fields: [id], references: [id])
+    id            String    @id
+    agent         Agent     @relation(fields: [id], references: [id])
     name          String?
     email         String?   @unique
     avatar        String?
@@ -62,6 +60,7 @@ model User {
     emailVerified DateTime? @map(name: "email_verified")
     createdAt     DateTime  @default(now()) @map(name: "created_at")
     updatedAt     DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+
     collections CollectionCollaborator[]
     schemas     SchemaCollaborator[]
 
@@ -69,8 +68,8 @@ model User {
 }
 
 model Organization {
-    id    String @id
-    agent Agent  @relation(fields: [id], references: [id])
+    id        String   @id
+    agent     Agent    @relation(fields: [id], references: [id])
     name      String?
     avatar    String?
     slug      String?
@@ -82,78 +81,78 @@ model Organization {
 }
 
 model Agent {
-    id           String        @id @default(uuid())
-    user         User?
-    organization Organization?
+    id                 String              @id @default(uuid())
+    user               User?
+    organization       Organization?
     schemas            Schema[]
     collections        Collection[]
     schemaVersions     SchemaVersion[]
     collectionVersions CollectionVersion[]
 
-	@@map(name: "agents")
+    @@map(name: "agents")
 }
 
 model Member {
-    id             String       @default(uuid()) @id
+    id             String       @id @default(uuid())
     userId         String
     user           User         @relation(fields: [userId], references: [id])
     organizationId String
     organization   Organization @relation(fields: [organizationId], references: [id])
     createdAt      DateTime     @default(now()) @map(name: "created_at")
-    updatedAt      DateTime    @default(now()) @map(name: "updated_at") @updatedAt
+    updatedAt      DateTime     @default(now()) @updatedAt @map(name: "updated_at")
 
     @@map(name: "members")
 }
 
-
 model Schema {
-    id             String          @id @default(uuid())
-    slug           String
-    agentId   String          @map(name: "agent_id")
-    agent     Agent           @relation(fields: [agentId], references: [id])
-    createdAt      DateTime        @default(now()) @map(name: "created_at")
-    updatedAt      DateTime        @default(now()) @updatedAt @map(name: "updated_at")
-    versions       SchemaVersion[]
+    id            String               @id @default(uuid())
+    slug          String
+    agentId       String               @map(name: "agent_id")
+    agent         Agent                @relation(fields: [agentId], references: [id])
+    createdAt     DateTime             @default(now()) @map(name: "created_at")
+    updatedAt     DateTime             @default(now()) @updatedAt @map(name: "updated_at")
+    versions      SchemaVersion[]
     collaborators SchemaCollaborator[]
 
-	@@unique([agentId, slug])
+    @@unique([agentId, slug])
     @@map(name: "schemas")
 }
 
 model SchemaVersion {
     id              String              @id @default(uuid())
     content         String              @default("") // Raw .toml text
-    readme          String              @default("") // Raw .md text
+    readme          String?
     versionNumber   String              @default("0.0.0")
-	agentId String @map(name: "agent_id")
-    agent   Agent  @relation(fields: [agentId], references: [id])
+    agentId         String              @map(name: "agent_id")
+    agent           Agent               @relation(fields: [agentId], references: [id])
     schemaId        String
     schema          Schema              @relation(fields: [schemaId], references: [id])
-	dataCollections CollectionVersion[] @relation("DataSchema")
+    dataCollections CollectionVersion[] @relation("DataSchema")
     metaCollections CollectionVersion[] @relation("MetaSchema")
-	createdAt      	DateTime        @default(now()) @map(name: "created_at")
-	
-	@@map(name: "schema_versions")
+    createdAt       DateTime            @default(now()) @map(name: "created_at")
+
+    @@map(name: "schema_versions")
 }
 
 model Collection {
-    id             String              @id @default(uuid())
-    slug           String
-    avatar         String?
-    description    String?
-    agentId     String              @map(name: "agent_id")
-    agent       Agent               @relation(fields: [agentId], references: [id])
-    createdAt      DateTime            @default(now()) @map(name: "created_at")
-    updatedAt      DateTime            @default(now()) @updatedAt @map(name: "updated_at")
-    versions       CollectionVersion[]
-	collabcrators CollectionCollaborator[]
+    id            String                   @id @default(uuid())
+    slug          String
+    avatar        String?
+    description   String?
+    agentId       String                   @map(name: "agent_id")
+    agent         Agent                    @relation(fields: [agentId], references: [id])
+    createdAt     DateTime                 @default(now()) @map(name: "created_at")
+    updatedAt     DateTime                 @default(now()) @updatedAt @map(name: "updated_at")
+    versions      CollectionVersion[]
+    collabcrators CollectionCollaborator[]
 
     @@unique([agentId, slug])
     @@map(name: "collections")
 }
+
 model CollectionVersion {
     id            String        @id @default(uuid())
-	hash 		  String
+    hash          String
     versionNumber String        @default("0.0.0")
     readme        String?
     collectionId  String
@@ -164,11 +163,11 @@ model CollectionVersion {
     metaSchema    SchemaVersion @relation(name: "MetaSchema", fields: [metaSchemaId], references: [id])
     metaKey       String // URI label from one of the classes in the metaSchema
     assertions    Assertion[]
-	createdAt      DateTime            @default(now()) @map(name: "created_at")
-	agentId String @map(name: "agent_id")
-    agent   Agent  @relation(fields: [agentId], references: [id])
+    createdAt     DateTime      @default(now()) @map(name: "created_at")
+    agentId       String        @map(name: "agent_id")
+    agent         Agent         @relation(fields: [agentId], references: [id])
 
-	@@map(name: "collection_versions")
+    @@map(name: "collection_versions")
 }
 
 model CollectionCollaborator {
@@ -179,9 +178,10 @@ model CollectionCollaborator {
     collection   Collection @relation(fields: [collectionId], references: [id])
     createdAt    DateTime   @default(now()) @map(name: "created_at")
     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-	
-	@@map(name: "collection_collaborators")
+
+    @@map(name: "collection_collaborators")
 }
+
 model SchemaCollaborator {
     id        String   @id @default(uuid())
     userId    String
@@ -190,18 +190,16 @@ model SchemaCollaborator {
     schema    Schema   @relation(fields: [schemaId], references: [id])
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
-	
-	@@map(name: "schema_collaborators")
+
+    @@map(name: "schema_collaborators")
 }
 
 model Assertion {
-    id           String            @id @default(uuid())
-    hash 		 String
-	collectionVersionId String
-    collectionVersion   CollectionVersion @relation(fields: [collectionId], references: [id])
-	createdAt      DateTime            @default(now()) @map(name: "created_at")
+    id                  String            @id @default(uuid())
+    hash                String
+    collectionVersionId String
+    collectionVersion   CollectionVersion @relation(fields: [id], references: [id])
+    createdAt           DateTime          @default(now()) @map(name: "created_at")
 
-	@@map(name: "assertions")
+    @@map(name: "assertions")
 }
-
-
