@@ -52,10 +52,10 @@ model VerificationRequest {
 model User {
     id            String    @id
     agent         Agent     @relation(fields: [id], references: [id])
-    name          String?
+    slug          String?   @unique
     email         String?   @unique
+    name          String?
     avatar        String?
-    slug          String?
     organizations Member[]
     emailVerified DateTime? @map(name: "email_verified")
     createdAt     DateTime  @default(now()) @map(name: "created_at")
@@ -70,9 +70,9 @@ model User {
 model Organization {
     id        String   @id
     agent     Agent    @relation(fields: [id], references: [id])
+    slug      String?  @unique
     name      String?
     avatar    String?
-    slug      String?
     members   Member[]
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
