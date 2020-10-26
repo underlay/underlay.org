@@ -122,7 +122,7 @@ model SchemaVersion {
     id              String              @id @default(uuid())
     content         String              @default("") // Raw .toml text
     readme          String?
-    versionNumber   String              @default("0.0.0") @map(name: "version_number")
+    versionNumber   String              @map(name: "version_number")
     agentId         String              @map(name: "agent_id")
     agent           Agent               @relation(fields: [agentId], references: [id])
     schemaId        String              @map(name: "schema_id")
@@ -165,7 +165,7 @@ model Collection {
 model CollectionVersion {
     id            String        @id @default(uuid())
     hash          String
-    versionNumber String        @default("0.0.0") @map(name: "version_number")
+    versionNumber String        @map(name: "version_number")
     readme        String?
     collectionId  String        @map(name: "collection_id")
     collection    Collection    @relation(fields: [collectionId], references: [id])
@@ -178,7 +178,6 @@ model CollectionVersion {
     agentId       String        @map(name: "agent_id")
     agent         Agent         @relation(fields: [agentId], references: [id])
     assertions    Assertion[]
-
 
     @@map(name: "collection_versions")
 }
