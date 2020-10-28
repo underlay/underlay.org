@@ -13,3 +13,4 @@ export { default as ScopeNav } from "./ScopeNav/ScopeNav";
 export { default as Section } from "./Section/Section";
 export { default as StandardFrame } from "./StandardFrame/StandardFrame";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";
+export { default as SchemaGraph } from "./SchemaGraph/SchemaGraph";

@@ -1,17 +1,13 @@
 import React from "react";
-import { useDebouncedCallback } from "use-debounce";
-// import { UnControlled as CodeMirror } from "react-codemirror2";
-import toml from "toml";
-import * as t from "io-ts";
+import useDebouncedCallback, { Options } from "use-debounce/lib/useDebouncedCallback";
 
-// import "codemirror/lib/codemirror.css";
-// import "codemirror/mode/toml/toml.js";
+import { Option } from "fp-ts/Option";
+import * as t from "io-ts";
 
 import dynamic from "next/dynamic";
 
-import { Schema, SchemaVersion } from "@prisma/client";
-
-import { TomlSchema } from "./codec";
+import { TomlSchema } from "utils/shared/schemas/codec";
+import { parseToml } from "utils/shared/schemas/parse";
 
 import styles from "./SchemaEditor.module.scss";
 
@@ -27,64 +23,45 @@ const CodeMirror = dynamic(
 	{ ssr: false }
 );
 
-type SchemaEditorProps = {
-	schema: Schema;
-	schemaVersion: SchemaVersion;
-};
-
-async function validate(input: string): Promise<t.TypeOf<typeof TomlSchema>> {
-	const doc = toml.parse(input);
-	const result = TomlSchema.decode(doc);
-	if (result._tag === "Left") {
-		throw result.left;
-	} else {
-		return result.right;
-	}
+export interface SchemaEditorProps {
+	initialValue: string;
+	onChange?: (value: string, result: Option<t.TypeOf<typeof TomlSchema>>) => void;
+	debounce?: number;
+	debounceOptions?: Options;
 }
 
-const SchemaEditor: React.FC<SchemaEditorProps> = (props: SchemaEditorProps) => {
-	const [error, setError] = React.useState<string | null>(null);
-	const [value, setValue] = React.useState<string>(props.schemaVersion.content);
-	const [schema, setSchema] = React.useState<t.TypeOf<typeof TomlSchema> | null>(null);
+const defaultDebounce = 200;
 
-	const debounced = useDebouncedCallback(
-		(editor: unknown, data: unknown, value: string) =>
-			validate(value)
-				.then((schema: t.TypeOf<typeof TomlSchema>) => {
-					setError(null);
-					setSchema(schema);
-				})
-				.catch((error: Error | t.Errors) => {
-					setValue(value);
-					setSchema(null);
-					if (!Array.isArray(error)) {
-						setError(error.toString());
-					} else {
-						const messages = ["Error parsing schema:", ""];
-						for (const { message, context } of error) {
-							const key = context
-								.map(({ key }) => key)
-								.join("/")
-								.padStart(1, "/");
-							messages.push(message ? `.${key} ${message}` : `.${key}`);
-						}
-						setError(messages.join("\n"));
-					}
-				}),
-		200
+export default function SchemaEditor(props: SchemaEditorProps) {
+	const [error, setError] = React.useState<string | null>(null);
+
+	const { callback } = useDebouncedCallback(
+		(editor: unknown, data: unknown, value: string) => {
+			const result = parseToml(value);
+			if (result._tag === "Left") {
+				setError(result.left);
+				if (props.onChange !== undefined) {
+					props.onChange(value, { _tag: "None" });
+				}
+			} else {
+				setError(null);
+				if (props.onChange !== undefined) {
+					props.onChange(value, { _tag: "Some", value: result.right });
+				}
+			}
+		},
+		props.debounce === undefined ? defaultDebounce : props.debounce,
+		props.debounceOptions || {}
 	);
 
 	return (
 		<div className={styles.editor}>
-			<p>Hello I'm a Schema Editor</p>
 			<CodeMirror
-				value={props.schemaVersion.content}
+				value={props.initialValue}
 				options={{ mode: "toml", lineNumbers: true }}
-				onChange={debounced.callback}
+				onChange={callback}
 			/>
 			{error !== null && <pre className={styles.error}>{error}</pre>}
 		</div>
 	);
-};
-
-export default SchemaEditor;
+}

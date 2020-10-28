@@ -5,7 +5,7 @@ import { APG } from "apg"; // Only for types
 import * as ns from "apg/lib/namespace.js";
 import { isRelationalSchema, relationalSchema } from "apg/lib/models/relational.js";
 
-const datatype = t.union([
+export const datatype = t.union([
 	t.literal("string"),
 	t.literal("integer"),
 	t.literal("double"),
@@ -16,7 +16,9 @@ const datatype = t.union([
 	t.literal("base64Binary"),
 ]);
 
-const type = t.union([
+export type Datatype = t.TypeOf<typeof datatype>;
+
+export const type = t.union([
 	t.type({ kind: t.literal("reference"), label: t.string }),
 	t.type({
 		kind: t.literal("literal"),
@@ -25,27 +27,20 @@ const type = t.union([
 	t.type({ kind: t.literal("uri") }),
 ]);
 
+export type Type = t.TypeOf<typeof type>;
+
+export const property = t.intersection([
+	type,
+	t.partial({
+		cardinality: t.union([t.literal("required"), t.literal("optional"), t.literal("any")]),
+	}),
+]);
+
+export type Property = t.TypeOf<typeof property>;
+
 const codec = t.type({
 	namespace: t.string,
-	shapes: t.record(
-		t.string,
-		t.record(
-			t.string,
-			t.union([
-				datatype,
-				t.intersection([
-					type,
-					t.partial({
-						cardinality: t.union([
-							t.literal("required"),
-							t.literal("optional"),
-							t.literal("any"),
-						]),
-					}),
-				]),
-			])
-		)
-	),
+	classes: t.record(t.string, t.record(t.string, t.union([datatype, property]))),
 });
 
 const namespacePattern = /^[a-z0-9]+:(?:\/[A-Za-z0-9-._:]*)+\/$/;
@@ -60,19 +55,19 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 			return result;
 		}
 
-		const { namespace, shapes } = result.right;
+		const { namespace, classes } = result.right;
 
 		if (namespacePattern.test(namespace) === false) {
 			return t.failure(input, context, `Invalid namespace string: ${namespace}`);
 		}
 
-		const labels = Object.keys(shapes);
+		const labels = Object.keys(classes);
 		for (const label of labels) {
 			const key = label.includes(":") ? label : namespace + label;
 			if (propertyPattern.test(key) === false) {
 				return t.failure(label, context, `Invalid label URI: ${key}`);
 			}
-			const shape = shapes[label];
+			const shape = classes[label];
 			const properties = Object.keys(shape);
 			for (const property of properties) {
 				const key = property.includes(":") ? property : namespace + property;
@@ -99,10 +94,10 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 	},
 	(input): t.TypeOf<typeof relationalSchema> => {
 		const labelKeys: string[] = [];
-		for (const label of Object.keys(input.shapes)) {
+		for (const label of Object.keys(input.classes)) {
 			const key = label.includes(":") ? label : input.namespace + label;
 			labelKeys.push(key);
-			const shape = input.shapes[label];
+			const shape = input.classes[label];
 			for (const property of Object.keys(shape)) {
 				const value = shape[property];
 				if (typeof value !== "string" && value.cardinality === "any") {
@@ -112,9 +107,9 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 		}
 		labelKeys.sort();
 		const schema: APG.Schema = new Array(labelKeys.length);
-		for (const label of Object.keys(input.shapes)) {
+		for (const label of Object.keys(input.classes)) {
 			const labelKey = label.includes(":") ? label : input.namespace + label;
-			const shape = input.shapes[label];
+			const shape = input.classes[label];
 			const propertyLabels = new Map<string, string>(
 				Object.keys(shape)
 					.map((property): [string, string] => [

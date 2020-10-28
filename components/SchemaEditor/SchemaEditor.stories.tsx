@@ -1,8 +1,6 @@
 import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
 
-import { Schema, SchemaVersion } from "@prisma/client";
-
 import SchemaEditor from "./SchemaEditor";
 
 export default {
@@ -13,43 +11,21 @@ export default {
 const content = `# This is an example schema!
 namespace = "http://example.com/"
 
-[shapes.Person]
+[classes.Person]
 
-[shapes.Person.orcidId]
+[classes.Person.orcidId]
 kind = "uri"
 cardinality = "optional"
 
-[shapes.Person.name]
+[classes.Person.name]
 kind = "literal"
 datatype = "string"
 cardinality = "any"
 
-[shapes.Person.knows]
+[classes.Person.knows]
 kind = "reference"
 label = "Person"
 cardinality = "any"
 `;
 
-const now = new Date();
-
-const schema: Schema = {
-	id: "",
-	slug: "people",
-	agentId: "",
-	createdAt: now,
-	updatedAt: now,
-};
-
-const schemaVersion: SchemaVersion = {
-	id: "",
-	content,
-	readme: null,
-	versionNumber: "0.0.1",
-	agentId: "",
-	schemaId: "",
-	createdAt: now,
-};
-
-export const Primary: React.FC<{}> = () => (
-	<SchemaEditor schema={schema} schemaVersion={schemaVersion} />
-);
+export const Primary: React.FC<{}> = () => <SchemaEditor initialValue={content} />;
