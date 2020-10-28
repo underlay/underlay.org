@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+    url = "***"
 }
 
 model Account {
@@ -92,7 +92,6 @@ model Agent {
     schemaVersions     SchemaVersion[]
     collectionVersions CollectionVersion[]
 
-    @@unique([userId, organizationId])
     @@map(name: "agents")
 }
 

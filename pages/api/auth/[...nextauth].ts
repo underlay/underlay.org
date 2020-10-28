@@ -1,12 +1,13 @@
-import NextAuth from "next-auth";
+import { NextApiRequest, NextApiResponse } from "next";
+import NextAuth, { InitOptions } from "next-auth";
 import Providers from "next-auth/providers";
 import Adapters from "next-auth/adapters";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
 
 const prisma = new PrismaClient();
-const options = {
+const options: InitOptions = {
 	// Configure one or more authentication providers
 	providers: [
 		// Providers.GitHub({
@@ -16,7 +17,7 @@ const options = {
 		Providers.Email({
 			server: process.env.EMAIL_SERVER,
 			from: process.env.EMAIL_FROM,
-			sendVerificationRequest: ({ identifier: email, url, token, site, provider }) => {
+			sendVerificationRequest: ({ identifier: email, url, provider }) => {
 				return new Promise((resolve, reject) => {
 					const { server, from } = provider;
 
@@ -36,12 +37,21 @@ const options = {
 								R1 Team
 							`),
 						},
+						// (error) => {
+						// 	if (error) {
+						// 		logger.error("SEND_VERIFICATION_EMAIL_ERROR", email, error);
+						// 		return reject(new Error("SEND_VERIFICATION_EMAIL_ERROR", error));
+						// 	}
+						// 	return resolve();
+						// }
 						(error) => {
-							if (error) {
-								logger.error("SEND_VERIFICATION_EMAIL_ERROR", email, error);
-								return reject(new Error("SEND_VERIFICATION_EMAIL_ERROR", error));
+							if (error === null) {
+								resolve();
+							} else {
+								// TODO: what's the right way to log errors?
+								console.error(error);
+								reject(new Error("SEND_VERIFICATION_EMAIL_ERROR"));
 							}
-							return resolve();
 						}
 					);
 				});
@@ -60,7 +70,7 @@ const options = {
 		},
 	}),
 	pages: {
-		verifyRequest: '/login?requested=true',
+		verifyRequest: "/login?requested=true",
 	},
 	callbacks: {
 		session: async (session, user) => {
@@ -76,6 +86,14 @@ const options = {
 			});
 		},
 	},
+	events: {
+		createUser: async (user: User) => {
+			// Create the user agent
+			await prisma.agent.create({
+				data: { user: { connect: { id: user.id } } },
+			});
+		},
+	},
 };
 
-export default (req, res) => NextAuth(req, res, options);
+export default (req: NextApiRequest, res: NextApiResponse) => NextAuth(req, res, options);
