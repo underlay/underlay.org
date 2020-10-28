@@ -10,6 +10,7 @@ import { TomlSchema } from "utils/shared/schemas/codec";
 import { parseToml } from "utils/shared/schemas/parse";
 
 import styles from "./SchemaEditor.module.scss";
+import { Alert, majorScale, Pane } from "evergreen-ui";
 
 const CodeMirror = dynamic(
 	async () => {
@@ -31,6 +32,7 @@ export interface SchemaEditorProps {
 }
 
 const defaultDebounce = 200;
+const schemaErrorMessage = "Invalid schema";
 
 export default function SchemaEditor(props: SchemaEditorProps) {
 	const [error, setError] = React.useState<string | null>(null);
@@ -55,13 +57,19 @@ export default function SchemaEditor(props: SchemaEditorProps) {
 	);
 
 	return (
-		<div className={styles.editor}>
-			<CodeMirror
-				value={props.initialValue}
-				options={{ mode: "toml", lineNumbers: true }}
-				onChange={callback}
-			/>
-			{error !== null && <pre className={styles.error}>{error}</pre>}
-		</div>
+		<Pane width={600}>
+			<Pane className={styles.editor} margin={majorScale(1)} border="default">
+				<CodeMirror
+					value={props.initialValue}
+					options={{ mode: "toml", lineNumbers: true }}
+					onChange={callback}
+				/>
+			</Pane>
+			{error !== null && (
+				<Alert intent="warning" title={schemaErrorMessage} margin={majorScale(1)}>
+					{error || null}
+				</Alert>
+			)}
+		</Pane>
 	);
 }
