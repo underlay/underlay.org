@@ -46,6 +46,8 @@ const codec = t.type({
 const namespacePattern = /^[a-z0-9]+:(?:\/[A-Za-z0-9-._:]*)+\/$/;
 const propertyPattern = /^[a-z0-9]+:(?:\/[A-Za-z0-9-._:]*)*[A-Za-z0-9-._:]+(?:\/|#)[A-Za-z0-9-._]+$/;
 
+const schemaKeys = new Set(["classes", "namespace"]);
+
 export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof relationalSchema>>(
 	"TomlSchema",
 	codec.is,
@@ -53,6 +55,14 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 		const result = codec.validate(input, context);
 		if (result._tag === "Left") {
 			return result;
+		}
+
+		for (const key of Object.keys(result.right)) {
+			if (schemaKeys.has(key)) {
+				continue;
+			} else {
+				return t.failure(input, context, `Extraneous top-level key: ${key}`);
+			}
 		}
 
 		const { namespace, classes } = result.right;
@@ -76,16 +86,28 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 				}
 				const value = shape[property];
 				if (typeof value !== "string") {
+					const keys = new Set(Object.keys(value));
+					keys.delete("kind");
+					keys.delete("cardinality");
 					if (value.kind === "reference") {
-						if (labels.includes(value.label)) {
-							continue;
-						} else {
+						keys.delete("label");
+						if (labels.includes(value.label) === false) {
 							return t.failure(
 								value,
 								context,
 								`Invalid reference label: class ${value.label} does not exist`
 							);
 						}
+					} else if (value.kind === "uri") {
+					} else if (value.kind === "literal") {
+						keys.delete("datatype");
+					}
+					if (keys.size > 0) {
+						return t.failure(
+							value,
+							context,
+							`Extraneous property keys: ${Array.from(keys).join(", ")}`
+						);
 					}
 				}
 			}
