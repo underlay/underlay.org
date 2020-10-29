@@ -15,9 +15,9 @@ import { Alert, majorScale, Pane } from "evergreen-ui";
 const CodeMirror = dynamic(
 	async () => {
 		// @ts-ignore
-		import("codemirror/lib/codemirror.css");
+		await import("codemirror/lib/codemirror.css");
 		// @ts-ignore
-		import("codemirror/mode/toml/toml.js");
+		await import("codemirror/mode/toml/toml.js");
 		const { UnControlled } = await import("react-codemirror2");
 		return UnControlled;
 	},
@@ -34,7 +34,7 @@ export interface SchemaEditorProps {
 const defaultDebounce = 200;
 
 export default function SchemaEditor(props: SchemaEditorProps) {
-	const [error, setError] = React.useState<{ key: string; message?: string } | null>(null);
+	const [error, setError] = React.useState<{ key?: string; message?: string } | null>(null);
 
 	const { callback } = useDebouncedCallback(
 		(editor: unknown, data: unknown, value: string) => {
@@ -67,7 +67,7 @@ export default function SchemaEditor(props: SchemaEditorProps) {
 			{error !== null && (
 				<Alert
 					intent="warning"
-					title={`Error in schema at ${error.key}`}
+					title={error.key ? `Error in schema at ${error.key}` : "Error parsing schema"}
 					margin={majorScale(1)}
 				>
 					{error.message || null}

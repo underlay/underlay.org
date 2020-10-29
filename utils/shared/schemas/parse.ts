@@ -13,12 +13,12 @@ const getContextKey = (context: t.Context): string =>
 
 export function parseToml(
 	input: string
-): Either<{ key: string; message?: string }, t.TypeOf<typeof TomlSchema>> {
+): Either<{ key?: string; message?: string }, t.TypeOf<typeof TomlSchema>> {
 	let doc: string;
 	try {
 		doc = toml.parse(input);
 	} catch (error) {
-		return { _tag: "Left", left: error.toString() };
+		return { _tag: "Left", left: { message: error.toString() } };
 	}
 
 	const result = TomlSchema.decode(doc);
@@ -27,7 +27,7 @@ export function parseToml(
 			const { context, message } = result.left.pop()!;
 			return { _tag: "Left", left: { key: getContextKey(context), message } };
 		} else {
-			return { _tag: "Left", left: { key: "/" } };
+			return { _tag: "Left", left: {} };
 		}
 	} else {
 		return result;
