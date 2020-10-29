@@ -68,7 +68,11 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 		const { namespace, classes } = result.right;
 
 		if (namespacePattern.test(namespace) === false) {
-			return t.failure(input, context, `Invalid namespace string: ${namespace}`);
+			return t.failure(
+				input,
+				t.appendContext(context, "namespace", codec),
+				`Invalid namespace string: ${namespace}`
+			);
 		}
 
 		const labels = Object.keys(classes);
@@ -82,7 +86,11 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 			for (const property of properties) {
 				const key = property.includes(":") ? property : namespace + property;
 				if (propertyPattern.test(key) === false) {
-					return t.failure(property, context, `Invalid property URI: ${key}`);
+					return t.failure(
+						property,
+						t.appendContext(context, `classes/${label}/${property}`, codec),
+						`Invalid property URI: ${key}`
+					);
 				}
 				const value = shape[property];
 				if (typeof value !== "string") {
@@ -94,7 +102,7 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 						if (labels.includes(value.label) === false) {
 							return t.failure(
 								value,
-								context,
+								t.appendContext(context, `classes/${label}/${property}`, codec),
 								`Invalid reference label: class ${value.label} does not exist`
 							);
 						}
@@ -105,7 +113,7 @@ export const TomlSchema = new t.Type<t.TypeOf<typeof codec>, t.TypeOf<typeof rel
 					if (keys.size > 0) {
 						return t.failure(
 							value,
-							context,
+							t.appendContext(context, `classes/${label}/${property}`, codec),
 							`Extraneous property keys: ${Array.from(keys).join(", ")}`
 						);
 					}

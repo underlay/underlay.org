@@ -5,18 +5,15 @@ import * as t from "io-ts";
 
 import { TomlSchema } from "./codec";
 
-function errorToString({ message, context }: t.ValidationError): string {
-	const key = context
-		.map(({ key }) => key)
+const getContextKey = (context: t.Context): string =>
+	context
+		.flatMap(({ key }) => (isNaN(parseInt(key)) ? [key] : []))
 		.join("/")
-		.padStart(1, "/")
-		.slice(1);
-	return message ? `Error at ${key} ${message}` : `Error at ${key}`;
-}
+		.padStart(1, "/");
 
-const defaultErrorMessage = "Invalid schema";
-
-export function parseToml(input: string): Either<string, t.TypeOf<typeof TomlSchema>> {
+export function parseToml(
+	input: string
+): Either<{ key: string; message?: string }, t.TypeOf<typeof TomlSchema>> {
 	let doc: string;
 	try {
 		doc = toml.parse(input);
@@ -26,9 +23,12 @@ export function parseToml(input: string): Either<string, t.TypeOf<typeof TomlSch
 
 	const result = TomlSchema.decode(doc);
 	if (result._tag === "Left") {
-		const error =
-			result.left.length > 0 ? errorToString(result.left.pop()!) : defaultErrorMessage;
-		return { _tag: "Left", left: error };
+		if (result.left.length > 0) {
+			const { context, message } = result.left.pop()!;
+			return { _tag: "Left", left: { key: getContextKey(context), message } };
+		} else {
+			return { _tag: "Left", left: { key: "/" } };
+		}
 	} else {
 		return result;
 	}

@@ -32,10 +32,9 @@ export interface SchemaEditorProps {
 }
 
 const defaultDebounce = 200;
-const schemaErrorMessage = "Invalid schema";
 
 export default function SchemaEditor(props: SchemaEditorProps) {
-	const [error, setError] = React.useState<string | null>(null);
+	const [error, setError] = React.useState<{ key: string; message?: string } | null>(null);
 
 	const { callback } = useDebouncedCallback(
 		(editor: unknown, data: unknown, value: string) => {
@@ -66,8 +65,12 @@ export default function SchemaEditor(props: SchemaEditorProps) {
 				/>
 			</Pane>
 			{error !== null && (
-				<Alert intent="warning" title={schemaErrorMessage} margin={majorScale(1)}>
-					{error || null}
+				<Alert
+					intent="warning"
+					title={`Error in schema at ${error.key}`}
+					margin={majorScale(1)}
+				>
+					{error.message || null}
 				</Alert>
 			)}
 		</Pane>
