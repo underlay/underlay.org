@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+    url = "***"
 }
 
 model Account {
@@ -117,7 +117,6 @@ model Schema {
     agent         Agent                @relation(fields: [agentId], references: [id])
     createdAt     DateTime             @default(now()) @map(name: "created_at")
     updatedAt     DateTime             @default(now()) @updatedAt @map(name: "updated_at")
-    isPublic      Boolean              @map(name: "is_public")
     versions      SchemaVersion[]
     collaborators SchemaCollaborator[]
 
@@ -160,7 +159,6 @@ model Collection {
     avatar        String?
     agentId       String                   @map(name: "agent_id")
     agent         Agent                    @relation(fields: [agentId], references: [id])
-    isPublic      Boolean                  @map(name: "is_public")
     createdAt     DateTime                 @default(now()) @map(name: "created_at")
     updatedAt     DateTime                 @default(now()) @updatedAt @map(name: "updated_at")
     versions      CollectionVersion[]
