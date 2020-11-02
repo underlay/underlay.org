@@ -5,6 +5,7 @@ import Adapters from "next-auth/adapters";
 import { PrismaClient, User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
+import { SessionUser } from "utils/shared/session";
 
 const prisma = new PrismaClient();
 const options: InitOptions = {
@@ -37,13 +38,6 @@ const options: InitOptions = {
 								R1 Team
 							`),
 						},
-						// (error) => {
-						// 	if (error) {
-						// 		logger.error("SEND_VERIFICATION_EMAIL_ERROR", email, error);
-						// 		return reject(new Error("SEND_VERIFICATION_EMAIL_ERROR", error));
-						// 	}
-						// 	return resolve();
-						// }
 						(error) => {
 							if (error === null) {
 								resolve();
@@ -70,20 +64,30 @@ const options: InitOptions = {
 		},
 	}),
 	pages: {
+		signIn: "/login",
+		newUser: "/login",
 		verifyRequest: "/login?requested=true",
 	},
 	callbacks: {
-		session: async (session, user) => {
-			return Promise.resolve({
-				...session,
-				user: {
-					id: user.id,
-					name: user.name,
-					email: user.email,
-					slug: user.slug,
-					avatar: user.avatar,
-				},
-			});
+		session: async (session, user: User) => {
+			if (user !== null) {
+				const { id, name, email } = user;
+				const agent = await prisma.agent.findFirst({ where: { userId: user.id } });
+				// If there's no agent we act like there's no user --
+				// there's probably a better way to handle this specific scenario
+				if (agent !== null) {
+					const sessionUser: SessionUser = {
+						id,
+						name,
+						email,
+						slug: user.slug,
+						avatar: user.avatar,
+						agentId: agent.id,
+					};
+					return { ...session, user: sessionUser };
+				}
+			}
+			return { ...session, user: null };
 		},
 	},
 	events: {
