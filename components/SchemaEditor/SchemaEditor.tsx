@@ -37,7 +37,7 @@ export default function SchemaEditor(props: SchemaEditorProps) {
 	const [error, setError] = React.useState<{ key?: string; message?: string } | null>(null);
 
 	const { callback } = useDebouncedCallback(
-		(editor: unknown, data: unknown, value: string) => {
+		({}: {}, {}: {}, value: string) => {
 			const result = parseToml(value);
 			if (result._tag === "Left") {
 				setError(result.left);
