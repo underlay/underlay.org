@@ -2,8 +2,7 @@ import React, { useContext } from "react";
 import { InitData } from "utils/server/initData";
 
 export const PageContext = React.createContext<InitData>({
-	sessionData: {},
-	locationData: { query: {} },
+	session: null,
 });
 
 export const usePageContext = (): InitData => {
