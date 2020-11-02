@@ -26,6 +26,7 @@ function EmailProvider({}) {
 	return (
 		<Pane>
 			<TextInput
+				autoFocus={true}
 				value={email}
 				onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
 					setEmail(value)
@@ -86,8 +87,8 @@ function SetSlug({ user, router }: { user: SessionUser; router: NextRouter }) {
 		<Pane>
 			<Heading marginY={majorScale(1)}>Select a username</Heading>
 			<TextInput
-				marginY={majorScale(1)}
 				width={majorScale(24)}
+				autoFocus={true}
 				value={slug}
 				onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
 					setSlug(value)
