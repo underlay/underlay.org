@@ -3,11 +3,13 @@ import { ThemeProvider } from "evergreen-ui";
 
 import { PageContext } from "utils/client/hooks";
 import { theme } from "utils/shared/theme";
+import { InitData } from "utils/server/initData";
 
-const loggedIn = {
-	sessionData: {
+const loggedIn: InitData = {
+	session: {
 		user: {
 			id: "1",
+			agentId: "1",
 			name: "Test Person",
 			email: "g@hi.com",
 			slug: "test",
@@ -15,16 +17,7 @@ const loggedIn = {
 				"https://i.picsum.photos/id/92/300/300.jpg?hmac=wejPPm2iDwH8IF-wCg1XrQ5YocYqoNCFMjlLAfBSCU8",
 		},
 		accessToken: "123abc",
-		expires: new Date(),
-	},
-	locationData: {
-		query: {
-			profileSlug: "fakeprofile",
-			collectionSlug: "fakecoll",
-			mode: "overview",
-			subMode: "assertions",
-		},
-		pathname: "/fakePath",
+		expires: "someday",
 	},
 };
 
