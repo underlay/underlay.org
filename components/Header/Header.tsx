@@ -7,8 +7,8 @@ import { usePageContext } from "utils/client/hooks";
 import styles from "./Header.module.scss";
 
 const Header = () => {
-	const { sessionData } = usePageContext();
-	const user = sessionData?.user;
+	const { session } = usePageContext();
+	const user = session?.user;
 	return (
 		<nav className={styles.header}>
 			<div className={styles.content}>
@@ -28,7 +28,13 @@ const Header = () => {
 						<IconButton
 							appearance="minimal"
 							height={40}
-							icon={<Avatar size={32} name={user.email} src={user.avatar} />}
+							icon={
+								<Avatar
+									size={32}
+									name={user.email}
+									src={user.avatar || undefined}
+								/>
+							}
 						/>
 					) : (
 						<Button is="a" href="/login" appearance="minimal" height={40}>

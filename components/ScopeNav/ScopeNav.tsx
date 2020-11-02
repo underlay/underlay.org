@@ -1,8 +1,8 @@
 import React from "react";
 import classNames from "classnames";
 import { Button } from "evergreen-ui";
+import { useRouter } from "next/router";
 
-import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
 import styles from "./ScopeNav.module.scss";
@@ -22,8 +22,8 @@ export type Props = {
 };
 
 const ScopeNav: React.FC<Props> = function ({ navItems }) {
-	const { locationData } = usePageContext();
-	const { profileSlug, collectionSlug, mode, subMode } = locationData.query;
+	const router = useRouter();
+	const { profileSlug, collectionSlug, mode, subMode } = router.query as Record<string, string>;
 	const activeModeData = navItems.find((item) => item.slug === mode);
 	const activeChildren = activeModeData?.children;
 

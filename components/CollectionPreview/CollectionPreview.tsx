@@ -1,8 +1,8 @@
 import React from "react";
 import classNames from "classnames";
+import { useRouter } from "next/router";
 
 import { Icon } from "components";
-import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
 import styles from "./CollectionPreview.module.scss";
@@ -26,13 +26,13 @@ const CollectionPreview: React.FC<Props> = function ({
 	numVersions,
 	className = "",
 }) {
-	const { locationData } = usePageContext();
-	const { profileSlug } = locationData.query;
+	const router = useRouter();
+	const { profileSlug } = router.query;
 
 	return (
 		<a
 			href={buildUrl({
-				profileSlug: profileSlug,
+				profileSlug: profileSlug as string,
 				collectionSlug: slug,
 			})}
 			className={classNames(styles.preview, className)}
