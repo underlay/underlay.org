@@ -72,20 +72,25 @@ const options: InitOptions = {
 		session: async (session, user: User) => {
 			if (user !== null) {
 				const { id, name, email } = user;
-				const agent = await prisma.agent.findFirst({ where: { userId: user.id } });
-				// If there's no agent we act like there's no user --
-				// there's probably a better way to handle this specific scenario
-				if (agent !== null) {
-					const sessionUser: SessionUser = {
-						id,
-						name,
-						email,
-						slug: user.slug,
-						avatar: user.avatar,
-						agentId: agent.id,
-					};
-					return { ...session, user: sessionUser };
-				}
+
+				// We don't actually want to update - just to
+				// either retrieve or create in one pass
+				const agent = await prisma.agent.upsert({
+					select: { id: true },
+					create: { user: { connect: { id } } },
+					update: {},
+					where: { userId: id },
+				});
+
+				const sessionUser: SessionUser = {
+					id,
+					name,
+					email,
+					slug: user.slug,
+					avatar: user.avatar,
+					agentId: agent.id,
+				};
+				return { ...session, user: sessionUser };
 			}
 			return { ...session, user: null };
 		},
