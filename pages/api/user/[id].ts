@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { PrismaClient, PrismaClientKnownRequestError } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 import * as t from "io-ts";
 
@@ -7,6 +7,7 @@ import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 
 import { slugPattern } from "utils/shared/slug";
+import { catchPrismaError } from "utils/server/catchPrismaError";
 
 const prisma = new PrismaClient();
 
@@ -61,17 +62,7 @@ export default makeHandler<"/api/user/[id]">({
 				// Better to just handle the error where it happens.
 				// A better end-user solution would be to implement a "check username available" API
 				// and integrate that into the UI with some debounce and a spinner (GitHub does this)
-				await prisma.user.update({ where: { id }, data }).catch((err) => {
-					if (err instanceof PrismaClientKnownRequestError) {
-						// This is the prisma code for unique constraint failures
-						// See https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/error-reference
-						if (err.code === "P2002") {
-							throw StatusCodes.CONFLICT;
-						}
-					}
-					throw err;
-				});
-
+				await prisma.user.update({ where: { id }, data }).catch(catchPrismaError);
 				return [{}, undefined];
 			},
 		},

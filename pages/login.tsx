@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { NextRouter, useRouter } from "next/router";
 import { signIn } from "next-auth/client";
 import { Pane, Button, TextInput, majorScale, Text, Heading, toaster } from "evergreen-ui";
@@ -8,7 +8,7 @@ import { SessionUser } from "utils/shared/session";
 
 import api from "next-rest/client";
 import StatusCodes from "http-status-codes";
-import { PageContext } from "utils/client/hooks";
+import { usePageContext } from "utils/client/hooks";
 
 // A very simple email regex - not intended to be exhaustive
 const emailPattern = /^.+@.+\.[a-z]{2,}$/;
@@ -110,9 +110,9 @@ function SetSlug({ user, router }: { user: SessionUser; router: NextRouter }) {
 	);
 }
 
-const Login = () => {
+const Login: React.FC<{}> = ({}) => {
 	const router = useRouter();
-	const { session } = useContext(PageContext);
+	const { session } = usePageContext();
 
 	return (
 		<Pane marginY={majorScale(12)} display="flex" justifyContent="center" flexWrap="wrap">
