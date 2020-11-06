@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-import { PrismaClient } from "@prisma/client";
 
 import * as t from "io-ts";
 
@@ -9,7 +8,7 @@ import { makeHandler } from "next-rest/server";
 import { slugPattern } from "utils/shared/slug";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
-const prisma = new PrismaClient();
+import prisma from "utils/server/prisma";
 
 const params = t.type({ id: t.string });
 const headers = t.type({ "content-type": t.literal("application/json") });
