@@ -1,20 +1,11 @@
-text {
-	font-weight: 300;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-	font-size: 14px;
+.graph svg {
+	width: 100%;
 }
 
-.node rect,
-.node circle,
-.node ellipse,
-.node polygon {
-	stroke: #333;
-	fill: #fff;
-	stroke-width: 1.5px;
+.graph .link {
+	display: none;
 }
 
-.edgePath path.path {
-	stroke: #333;
-	fill: none;
-	stroke-width: 1.5px;
+.graph:hover .link {
+	display: inline-flex;
 }
