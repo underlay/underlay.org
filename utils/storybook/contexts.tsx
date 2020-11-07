@@ -5,6 +5,9 @@ import { PageContext } from "utils/client/hooks";
 import { theme } from "utils/shared/theme";
 import { InitData } from "utils/server/initData";
 
+import { RouterContext as RC } from "next/dist/next-server/lib/router-context";
+import { NextRouter } from "next/dist/next-server/lib/router/router";
+
 const loggedIn: InitData = {
 	session: {
 		user: {
@@ -27,4 +30,28 @@ export const LoggedInContext = (storyFn: any) => {
 
 export const ThemedContext = (storyFn: any) => {
 	return <ThemeProvider value={theme}>{storyFn()}</ThemeProvider>;
+};
+
+const router: NextRouter = {
+	route: "",
+	pathname: "",
+	query: {},
+	asPath: "",
+	basePath: "",
+	push: async () => true,
+	replace: async () => true,
+	reload: () => null,
+	back: () => null,
+	prefetch: async () => undefined,
+	beforePopState: () => null,
+	isFallback: false,
+	events: {
+		on: () => null,
+		off: () => null,
+		emit: () => null,
+	},
+};
+
+export const RouterContext = (storyFn: any) => {
+	return <RC.Provider value={router}>{storyFn()}</RC.Provider>;
 };
