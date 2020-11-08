@@ -249,7 +249,7 @@ const parseVersion = ({
 const SchemaVersionsTab: React.FC<{
 	profileSlug: string;
 	schema: SerializedSchemaWithVersions;
-}> = ({ profileSlug, schema: { id } }) => {
+}> = ({ profileSlug, schema: { id, slug } }) => {
 	const [loading, setLoading] = useState(true);
 	const [end, setEnd] = useState(false);
 	const [versions, setVersions] = useState<
@@ -296,14 +296,14 @@ const SchemaVersionsTab: React.FC<{
 		<Pane width={majorScale(64)}>
 			<Table>
 				<Table.Body>
-					{versions.map(({ id, versionNumber, createdAt, slug }) => (
+					{versions.map(({ id, versionNumber, createdAt, slug: agentSlug }) => (
 						<Table.Row
 							key={id}
 							is="a"
 							href={`/${profileSlug}/schemas/${slug}/${versionNumber}`}
 						>
 							<Table.TextHeaderCell>{versionNumber}</Table.TextHeaderCell>
-							<Table.TextCell>{slug ? `@${slug}` : null}</Table.TextCell>
+							<Table.TextCell>{agentSlug ? `@${agentSlug}` : null}</Table.TextCell>
 							<Table.TextCell>
 								{createdAt.toLocaleDateString()} at {createdAt.toLocaleTimeString()}
 							</Table.TextCell>
