@@ -67,24 +67,35 @@ export default makeHandler<"/api/schema/[id]/versions">({
 					}
 				}
 
-				const versions = await prisma.schemaVersion.findMany({
-					take: 11,
-					select: { id: true, versionNumber: true, createdAt: true },
-					where: { schemaId: id },
-					orderBy: { createdAt: "desc" },
-					cursor: cursor === undefined ? undefined : { id: cursor },
-				});
+				const versions = await getVersions(id, cursor);
+				const result = versions.map(({ id, versionNumber, createdAt }) => ({
+					id,
+					versionNumber,
+					createdAt: createdAt.toISOString(),
+				}));
 
-				const resultVersions = versions
-					.slice(1)
-					.map(({ id, versionNumber, createdAt }) => ({
-						id,
-						versionNumber,
-						createdAt: createdAt.toISOString(),
-					}));
-
-				return [{ "content-type": "application/json" }, resultVersions];
+				return [{ "content-type": "application/json" }, result];
 			},
 		},
 	},
 });
+
+async function getVersions(id: string, cursor?: string) {
+	if (cursor === undefined) {
+		return prisma.schemaVersion.findMany({
+			take: 10,
+			select: { id: true, versionNumber: true, createdAt: true },
+			where: { schemaId: id },
+			orderBy: { createdAt: "desc" },
+		});
+	} else {
+		const versions = await prisma.schemaVersion.findMany({
+			take: 11,
+			select: { id: true, versionNumber: true, createdAt: true },
+			where: { schemaId: id },
+			orderBy: { createdAt: "desc" },
+			cursor: { id: cursor },
+		});
+		return versions.slice(1);
+	}
+}
