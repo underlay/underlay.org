@@ -22,6 +22,7 @@ import api from "next-rest/client";
 import semverValid from "semver/functions/valid";
 import semverInc from "semver/functions/inc";
 import semverLt from "semver/functions/lt";
+import semverMajor from "semver/functions/major";
 
 import ReadmeEditor from "components/ReadmeEditor/ReadmeEditor";
 import SchemaEditor, {
@@ -186,7 +187,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 		}
 	}, [schema, versionNumber, content, attachReadme, readme]);
 
-	const isVersionValid = semverValid(versionNumber) !== null;
+	const isVersionValid = semverValid(versionNumber) !== null && semverMajor(versionNumber) === 0;
 	const isVersionMonotonic =
 		isVersionValid && (previousVersion === null || semverLt(previousVersion, versionNumber));
 
@@ -274,6 +275,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 			<Paragraph marginY={majorScale(1)}>
 				Version numbers must be <Link href="https://semver.org/">semver</Link> strings -
 				like 0.2.6, 12.0.0-alpha, 5.2.0-rc.1, ...
+			</Paragraph>
+			<Paragraph marginY={majorScale(1)}>
+				Only version numbers with major version 0 can be published while R1 is in beta.
 			</Paragraph>
 			<TextInput
 				autoFocus={true}

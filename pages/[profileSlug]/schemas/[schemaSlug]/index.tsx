@@ -5,7 +5,6 @@ import {
 	minorScale,
 	Pane,
 	Paragraph,
-	Spinner,
 	Tab,
 	Table,
 	Tablist,
@@ -264,7 +263,7 @@ const SchemaVersionsTab: React.FC<{
 	}, [id]);
 
 	const handleClick = useCallback(() => {
-		if (versions.length === 0 || loading) {
+		if (loading) {
 			return;
 		}
 		setLoading(true);
@@ -306,9 +305,7 @@ const SchemaVersionsTab: React.FC<{
 			</Table>
 
 			<Pane marginY={majorScale(2)}>
-				{versions.length === 0 ? (
-					<Spinner marginX="auto" delay={200} />
-				) : end ? (
+				{end ? (
 					<Text>End of version history</Text>
 				) : (
 					<Button isLoading={loading} onClick={handleClick}>
