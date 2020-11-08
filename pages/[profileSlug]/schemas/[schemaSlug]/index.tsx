@@ -229,31 +229,38 @@ const SchemaAboutTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({
 	);
 };
 
-const parseVersionDates = ({
+const parseVersion = ({
 	id,
 	versionNumber,
 	createdAt,
+	agent: { user, organization },
 }: {
 	id: string;
 	versionNumber: string;
 	createdAt: string;
-}) => ({ id, versionNumber, createdAt: new Date(createdAt) });
+	agent: { user: null | { slug: null | string }; organization: null | { slug: null | string } };
+}) => ({
+	id,
+	versionNumber,
+	createdAt: new Date(createdAt),
+	slug: user?.slug || organization?.slug || null,
+});
 
 const SchemaVersionsTab: React.FC<{
 	profileSlug: string;
 	schema: SerializedSchemaWithVersions;
-}> = ({ profileSlug, schema: { id, slug } }) => {
+}> = ({ profileSlug, schema: { id } }) => {
 	const [loading, setLoading] = useState(true);
 	const [end, setEnd] = useState(false);
 	const [versions, setVersions] = useState<
-		{ id: string; versionNumber: string; createdAt: Date }[]
+		{ id: string; versionNumber: string; createdAt: Date; slug: null | string }[]
 	>([]);
 
 	useEffect(() => {
 		api.get("/api/schema/[id]/versions", { id }, { accept: "application/json" }, undefined)
 			.then(([{}, versions]) => {
 				setLoading(false);
-				setVersions(versions.map(parseVersionDates));
+				setVersions(versions.map(parseVersion));
 				setEnd(versions.length < 2);
 			})
 			.catch((err) => {
@@ -276,7 +283,7 @@ const SchemaVersionsTab: React.FC<{
 		)
 			.then(([{}, newVersions]) => {
 				setLoading(false);
-				setVersions(versions.concat(newVersions.map(parseVersionDates)));
+				setVersions(versions.concat(newVersions.map(parseVersion)));
 				setEnd(newVersions.length < 10);
 			})
 			.catch((err) => {
@@ -289,13 +296,14 @@ const SchemaVersionsTab: React.FC<{
 		<Pane width={majorScale(64)}>
 			<Table>
 				<Table.Body>
-					{versions.map(({ id, versionNumber, createdAt }) => (
+					{versions.map(({ id, versionNumber, createdAt, slug }) => (
 						<Table.Row
 							key={id}
 							is="a"
 							href={`/${profileSlug}/schemas/${slug}/${versionNumber}`}
 						>
 							<Table.TextHeaderCell>{versionNumber}</Table.TextHeaderCell>
+							<Table.TextCell>{slug ? `@${slug}` : null}</Table.TextCell>
 							<Table.TextCell>
 								{createdAt.toLocaleDateString()} at {createdAt.toLocaleTimeString()}
 							</Table.TextCell>

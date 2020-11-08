@@ -13,15 +13,6 @@ const params = t.intersection([t.type({ id: t.string }), t.partial({ cursor: t.s
 
 const getRequestHeaders = t.type({ accept: t.literal("application/json") });
 
-const getResponseHeaders = t.type({ "content-type": t.literal("application/json") });
-const getResponseBody = t.array(
-	t.type({
-		id: t.string,
-		versionNumber: t.string,
-		createdAt: t.string,
-	})
-);
-
 declare module "next-rest" {
 	interface API {
 		"/api/schema/[id]/versions": Route<{
@@ -33,8 +24,16 @@ declare module "next-rest" {
 						body: void;
 					};
 					response: {
-						headers: t.TypeOf<typeof getResponseHeaders>;
-						body: t.TypeOf<typeof getResponseBody>;
+						headers: { "content-type": "application/json" };
+						body: {
+							id: string;
+							versionNumber: string;
+							createdAt: string;
+							agent: {
+								user: null | { slug: null | string };
+								organization: null | { slug: null | string };
+							};
+						}[];
 					};
 				};
 			};
@@ -68,8 +67,9 @@ export default makeHandler<"/api/schema/[id]/versions">({
 				}
 
 				const versions = await getVersions(id, cursor);
-				const result = versions.map(({ id, versionNumber, createdAt }) => ({
+				const result = versions.map(({ id, versionNumber, createdAt, agent }) => ({
 					id,
+					agent,
 					versionNumber,
 					createdAt: createdAt.toISOString(),
 				}));
@@ -81,21 +81,22 @@ export default makeHandler<"/api/schema/[id]/versions">({
 });
 
 async function getVersions(id: string, cursor?: string) {
-	if (cursor === undefined) {
-		return prisma.schemaVersion.findMany({
-			take: 10,
-			select: { id: true, versionNumber: true, createdAt: true },
-			where: { schemaId: id },
-			orderBy: { createdAt: "desc" },
-		});
-	} else {
-		const versions = await prisma.schemaVersion.findMany({
-			take: 11,
-			select: { id: true, versionNumber: true, createdAt: true },
-			where: { schemaId: id },
-			orderBy: { createdAt: "desc" },
-			cursor: { id: cursor },
-		});
-		return versions.slice(1);
-	}
+	const versions = await prisma.schemaVersion.findMany({
+		take: cursor === undefined ? 10 : 11,
+		select: {
+			id: true,
+			versionNumber: true,
+			createdAt: true,
+			agent: {
+				select: {
+					user: { select: { slug: true } },
+					organization: { select: { slug: true } },
+				},
+			},
+		},
+		where: { schemaId: id },
+		orderBy: { createdAt: "desc" },
+		cursor: cursor === undefined ? undefined : { id: cursor },
+	});
+	return cursor === undefined ? versions : versions.slice(1);
 }
