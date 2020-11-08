@@ -6,6 +6,7 @@ import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 
 import prisma from "utils/server/prisma";
+import { schemaVersonPageSize } from "utils/shared/schemas/serialize";
 
 // Params that don't appear as path variables will be turned into
 // regular query params and retrieved from there automatically :-)
@@ -82,7 +83,7 @@ export default makeHandler<"/api/schema/[id]/versions">({
 
 async function getVersions(id: string, cursor?: string) {
 	const versions = await prisma.schemaVersion.findMany({
-		take: cursor === undefined ? 10 : 11,
+		take: cursor === undefined ? schemaVersonPageSize : schemaVersonPageSize + 1,
 		select: {
 			id: true,
 			versionNumber: true,

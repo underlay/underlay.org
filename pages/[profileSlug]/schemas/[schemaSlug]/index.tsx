@@ -24,6 +24,7 @@ import { usePageContext } from "utils/client/hooks";
 import { getSession } from "utils/shared/session";
 import prisma from "utils/server/prisma";
 import {
+	schemaVersonPageSize,
 	serializeSchemaWithVersions,
 	SerializedSchemaWithVersions,
 	SerializedSchemaVersion,
@@ -261,7 +262,7 @@ const SchemaVersionsTab: React.FC<{
 			.then(([{}, versions]) => {
 				setLoading(false);
 				setVersions(versions.map(parseVersion));
-				setEnd(versions.length < 2);
+				setEnd(versions.length < schemaVersonPageSize);
 			})
 			.catch((err) => {
 				setLoading(false);
