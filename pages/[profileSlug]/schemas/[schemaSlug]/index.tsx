@@ -47,20 +47,18 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 	context
 ) => {
 	const { profileSlug, schemaSlug } = context.params!;
-	const agent = await prisma.agent.findFirst({
-		where: { OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }] },
-	});
 
 	const notFoundProps: { props: SchemaProps } = {
 		props: { profileSlug, serverSideNotFound: true, schema: null, versionCount: 0 },
 	};
 
-	if (agent === null) {
-		return notFoundProps;
-	}
-
-	const schema = await prisma.schema.findOne({
-		where: { agentId_slug: { agentId: agent.id, slug: schemaSlug } },
+	const schema = await prisma.schema.findFirst({
+		where: {
+			slug: schemaSlug,
+			agent: {
+				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
+			},
+		},
 		include: {
 			versions: {
 				take: 1,
@@ -80,8 +78,6 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 		return notFoundProps;
 	}
 
-	const versionCount = await prisma.schemaVersion.count({ where: { schemaId: schema.id } });
-
 	if (!schema.isPublic) {
 		// We only have to access the session if the schema isn't public.
 		// This reduces the number of times we need to invoke the session
@@ -95,10 +91,12 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
-		if (session.user.agentId !== agent.id) {
+		if (session.user.agentId !== schema.agentId) {
 			return notFoundProps;
 		}
 	}
+
+	const versionCount = await prisma.schemaVersion.count({ where: { schemaId: schema.id } });
 
 	return {
 		props: {
