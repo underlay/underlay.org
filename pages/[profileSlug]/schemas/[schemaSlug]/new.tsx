@@ -58,17 +58,10 @@ export const getServerSideProps: GetServerSideProps<
 	NewSchemaVersionParams
 > = async (context) => {
 	const { profileSlug, schemaSlug } = context.params!;
-	const agent = await prisma.agent.findFirst({
-		where: { OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }] },
-	});
 
 	const notFoundProps: { props: NewSchemaVersionProps } = {
 		props: { profileSlug, serverSideNotFound: true, schema: null },
 	};
-
-	if (agent === null) {
-		return notFoundProps;
-	}
 
 	// @ts-expect-error (I think this is a mistake with the next-auth typings - not sure)
 	const session = await getSession(context);
@@ -76,16 +69,21 @@ export const getServerSideProps: GetServerSideProps<
 		return notFoundProps;
 	}
 
-	if (session.user.agentId !== agent.id) {
-		return notFoundProps;
-	}
-
-	const schema = await prisma.schema.findOne({
-		where: { agentId_slug: { agentId: agent.id, slug: schemaSlug } },
+	const schema = await prisma.schema.findFirst({
+		where: {
+			slug: schemaSlug,
+			agent: {
+				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
+			},
+		},
 		include: { versions: { take: 1, orderBy: { createdAt: "desc" } } },
 	});
 
 	if (schema === null) {
+		return notFoundProps;
+	}
+
+	if (session.user.agentId !== schema.agentId) {
 		return notFoundProps;
 	}
 
