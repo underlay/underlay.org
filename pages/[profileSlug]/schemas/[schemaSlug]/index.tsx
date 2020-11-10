@@ -24,11 +24,11 @@ import { usePageContext } from "utils/client/hooks";
 import { getSession } from "utils/shared/session";
 import prisma from "utils/server/prisma";
 import {
-	schemaVersonPageSize,
 	serializeSchemaWithVersions,
 	SerializedSchemaWithVersions,
 	SerializedSchemaVersion,
 } from "utils/shared/schemas/serialize";
+import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 import { nullOption, parseToml, toOption } from "utils/shared/schemas/parse";
 
 interface SchemaProps {
