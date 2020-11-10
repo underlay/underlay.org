@@ -141,6 +141,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 						color="neutral"
 						isSolid
 						marginRight={8}
+						alignSelf="center"
 						marginTop={minorScale(1)}
 						marginX={majorScale(2)}
 					>
