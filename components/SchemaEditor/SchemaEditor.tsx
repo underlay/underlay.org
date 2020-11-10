@@ -53,8 +53,10 @@ export default function SchemaEditor(props: SchemaEditorProps) {
 
 	return (
 		<Pane display="flex" flexWrap="wrap">
-			<SchemaContent initialValue={props.initialValue} onChange={callback} />
-			<Pane width={majorScale(60)}>
+			<Pane marginRight={majorScale(1)} marginBottom={majorScale(1)}>
+				<SchemaContent initialValue={props.initialValue} onChange={callback} />
+			</Pane>
+			<Pane width={majorScale(58)}>
 				{error !== null ? (
 					<Alert
 						intent="warning"
