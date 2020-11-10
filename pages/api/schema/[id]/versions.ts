@@ -6,7 +6,8 @@ import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 
 import prisma from "utils/server/prisma";
-import { schemaVersonPageSize } from "utils/shared/schemas/serialize";
+
+import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 
 // Params that don't appear as path variables will be turned into
 // regular query params and retrieved from there automatically :-)

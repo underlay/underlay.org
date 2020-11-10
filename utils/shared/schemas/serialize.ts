@@ -1,7 +1,5 @@
 import { Schema, SchemaVersion } from "@prisma/client";
 
-export const schemaVersonPageSize = 10;
-
 export type SerializedSchema = {
 	[key in keyof Schema]: Schema[key] extends Date ? string : Schema[key];
 };
