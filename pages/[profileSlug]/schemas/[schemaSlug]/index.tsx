@@ -1,4 +1,5 @@
 import {
+	Badge,
 	Button,
 	Link,
 	majorScale,
@@ -131,10 +132,22 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 	}
 
 	const updatedAt = new Date(schema.updatedAt);
-
+	const noVersions = versionCount === 0 || schema.versions.length === 0;
 	return (
 		<Pane maxWidth={majorScale(128)} paddingX={majorScale(2)} margin="auto">
-			<SchemaHeader profileSlug={profileSlug} schemaSlug={schema.slug} />
+			<SchemaHeader profileSlug={profileSlug} schemaSlug={schema.slug}>
+				{schema.isPublic ? null : (
+					<Badge
+						color="neutral"
+						isSolid
+						marginRight={8}
+						marginTop={minorScale(1)}
+						marginX={majorScale(2)}
+					>
+						Private
+					</Badge>
+				)}
+			</SchemaHeader>
 			<Pane marginY={minorScale(3)}>
 				<Text color="muted">
 					{versionCount === 1 ? "1 version" : `${versionCount} versions`} - last updated{" "}
@@ -155,6 +168,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 				<Tablist userSelect="none">
 					{tabs.map(({ label, value }) => (
 						<Tab
+							disabled={noVersions}
 							key={value}
 							onSelect={() => setSelectedTab(value)}
 							isSelected={value === selectedTab}
@@ -175,7 +189,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 				) : null}
 			</Pane>
 			<Pane>
-				{versionCount === 0 || schema.versions.length === 0 ? (
+				{noVersions ? (
 					<>
 						<Paragraph marginY={majorScale(1)}>
 							No versions of this schema have been published.
