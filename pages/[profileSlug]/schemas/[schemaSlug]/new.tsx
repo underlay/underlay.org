@@ -128,7 +128,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 		initialContent,
 	]);
 
-	const [content, setContent] = useState(initialContent);
+	const contentRef = useRef<string>(initialContent);
 	const [result, setResult] = useState<ResultType>(initialResult);
 
 	const [clean, setClean] = useState(true);
@@ -140,12 +140,12 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 	const handleChange = useCallback((value: string, result: ResultType) => {
 		cleanRef.current = false;
 		setClean(false);
-		setContent(value);
+		contentRef.current = value;
 		setResult(result);
 	}, []);
 
 	const [attachReadme, setAttachReadme] = useState(initialReadme !== null);
-	const [readme, setReadme] = useState(initialReadme || "");
+	const readmeRef = useRef(initialReadme || "");
 	const handleSetReadme = useCallback(
 		({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
 			cleanRef.current = false;
@@ -156,9 +156,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 	);
 
 	const handleChangeReadme = useCallback((value: string) => {
-		cleanRef.current = false;
 		setClean(false);
-		setReadme(value);
+		cleanRef.current = false;
+		readmeRef.current = value;
 	}, []);
 
 	const handleSaveDraft = useCallback(() => {
@@ -172,8 +172,8 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 				{ "content-type": "application/json" },
 				{
 					draftVersionNumber: versionNumber,
-					draftContent: content,
-					draftReadme: attachReadme ? readme : null,
+					draftContent: contentRef.current,
+					draftReadme: attachReadme ? readmeRef.current : null,
 				}
 			)
 				.then(([{}]) => {
@@ -185,7 +185,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 					toaster.danger(`Failed to save draft: ${err.toString()}`);
 				});
 		}
-	}, [schema, versionNumber, content, attachReadme, readme]);
+	}, [schema, versionNumber, attachReadme]);
 
 	const isVersionValid = semverValid(versionNumber) !== null && semverMajor(versionNumber) === 0;
 	const isVersionMonotonic =
@@ -200,8 +200,8 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 				{ "content-type": "application/json" },
 				{
 					versionNumber: versionNumber,
-					content: content,
-					readme: attachReadme ? readme : null,
+					content: contentRef.current,
+					readme: attachReadme ? readmeRef.current : null,
 				}
 			)
 				.then(([{}]) => {
@@ -220,17 +220,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 					);
 				});
 		}
-	}, [
-		profileSlug,
-		schema,
-		versionNumber,
-		isVersionMonotonic,
-		content,
-		result,
-		attachReadme,
-		readme,
-		session,
-	]);
+	}, [profileSlug, schema, versionNumber, isVersionMonotonic, result, attachReadme, session]);
 
 	const [openPublishDialog, setOpenPublishDialog] = useState(false);
 

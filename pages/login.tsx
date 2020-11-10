@@ -114,14 +114,6 @@ const Login: React.FC<{}> = ({}) => {
 	const router = useRouter();
 	const { session } = usePageContext();
 
-	if (session !== null && session.user.slug !== null) {
-		if (typeof router.query.callbackUrl === "string") {
-			router.push(router.query.callbackUrl);
-		} else {
-			router.push("/");
-		}
-	}
-
 	return (
 		<Pane marginY={majorScale(12)} display="flex" justifyContent="center" flexWrap="wrap">
 			{router.query.requested === "true" ? (
