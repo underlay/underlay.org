@@ -6,7 +6,7 @@ import { Header, Footer } from "components";
 
 import { PageContext } from "utils/client/hooks";
 import { theme } from "utils/shared/theme";
-import { cacheSession } from "utils/server/session";
+import { setCachedSession } from "utils/server/session";
 import { ClientSession } from "utils/shared/session";
 
 import "./app.scss";
@@ -31,7 +31,7 @@ const App = ({ Component, pageProps, session }: ExpandedAppProps) => {
 
 App.getInitialProps = async ({ ctx }: AppContext) => {
 	const session = await getSession(ctx);
-	cacheSession(ctx, session);
+	setCachedSession(ctx, session);
 	return { session };
 };
 
