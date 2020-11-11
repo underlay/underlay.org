@@ -1,10 +1,8 @@
 import React, { useContext } from "react";
-import { InitData } from "utils/server/initData";
+import { PageData } from "utils/shared/session";
 
-export const PageContext = React.createContext<InitData>({
-	session: null,
-});
+export const PageContext = React.createContext<PageData>({ session: null });
 
-export const usePageContext = (): InitData => {
+export const usePageContext = (): PageData => {
 	return useContext(PageContext);
 };

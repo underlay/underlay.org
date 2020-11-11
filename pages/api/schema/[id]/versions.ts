@@ -52,7 +52,7 @@ export default makeHandler<"/api/schema/[id]/versions">({
 			exec: async (req, { id, cursor }) => {
 				const schema = await prisma.schema.findOne({
 					where: { id },
-					select: { isPublic: true, agentId: true },
+					select: { isPublic: true, agent: { select: { userId: true } } },
 				});
 
 				if (schema === null) {
@@ -63,7 +63,7 @@ export default makeHandler<"/api/schema/[id]/versions">({
 				if (!schema.isPublic) {
 					// Private schema versions can only be retrieved by their creator agent
 					const session = await getSession({ req });
-					if (session === null || session.user.agentId !== schema.agentId) {
+					if (session === null || session.user.id !== schema.agent.userId) {
 						throw StatusCodes.NOT_FOUND;
 					}
 				}

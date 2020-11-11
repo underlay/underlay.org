@@ -11,8 +11,9 @@ import prisma from "utils/server/prisma";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
+
+// TODO: add agentId property here
 const requestBody = t.type({
-	agentId: t.string,
 	slug: t.string,
 	description: t.string,
 	isPublic: t.boolean,
@@ -46,21 +47,18 @@ export default makeHandler<"/api/schema">({
 			body: requestBody.is,
 			exec: async (req, {}, {}, body) => {
 				const session = await getSession({ req });
-				if (session === null || session.user.agentId === null) {
+				if (session === null) {
 					throw StatusCodes.UNAUTHORIZED;
 				}
 
-				const { agentId, slug, description, isPublic } = body;
+				const { slug, description, isPublic } = body;
 
-				// For now, users are only allowed to create schemas on behalf of themselves
-				if (session.user.agentId !== agentId) {
-					throw StatusCodes.UNAUTHORIZED;
-				}
-
+				// For now, we just create a schema that is linked to
+				// the session user as the agent.
 				const schema = await prisma.schema
 					.create({
 						data: {
-							agent: { connect: { id: agentId } },
+							agent: { connect: { userId: session.user.id } },
 							slug,
 							description,
 							isPublic,

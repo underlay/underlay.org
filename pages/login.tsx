@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NextRouter, useRouter } from "next/router";
 import { signIn } from "next-auth/client";
 import { Pane, Button, TextInput, majorScale, Text, Heading, toaster } from "evergreen-ui";
 
 import { slugPattern } from "utils/shared/slug";
-import { SessionUser } from "utils/shared/session";
 
 import api from "next-rest/client";
 import StatusCodes from "http-status-codes";
 import { usePageContext } from "utils/client/hooks";
+import { ClientUser } from "utils/shared/session";
 
 // A very simple email regex - not intended to be exhaustive
 const emailPattern = /^.+@.+\.[a-z]{2,}$/;
@@ -47,7 +47,7 @@ function EmailProvider({}) {
 	);
 }
 
-function SetSlug({ user, router }: { user: SessionUser; router: NextRouter }) {
+function SetSlug({ user, router }: { user: ClientUser; router: NextRouter }) {
 	const [slug, setSlug] = useState("");
 	const isValid = slugPattern.test(slug);
 	const [isLoading, setIsLoading] = useState(false);
@@ -114,15 +114,26 @@ const Login: React.FC<{}> = ({}) => {
 	const router = useRouter();
 	const { session } = usePageContext();
 
+	// This is in an effect so that it only runs on the client
+	useEffect(() => {
+		if (session !== null && session.user.slug !== null) {
+			if (typeof router.query.callbackUrl === "string") {
+				router.push(router.query.callbackUrl);
+			} else {
+				router.push("/");
+			}
+		}
+	}, []);
+
 	return (
 		<Pane marginY={majorScale(12)} display="flex" justifyContent="center" flexWrap="wrap">
 			{router.query.requested === "true" ? (
 				<Text>A sign-in link has been sent to your email. You can close this page.</Text>
 			) : session === null ? (
 				<EmailProvider />
-			) : (
+			) : session.user.slug === null ? (
 				<SetSlug user={session.user} router={router} />
-			)}
+			) : null}
 		</Pane>
 	);
 };

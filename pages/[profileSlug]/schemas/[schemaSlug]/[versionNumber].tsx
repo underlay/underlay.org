@@ -8,31 +8,41 @@ import semverValid from "semver/functions/valid";
 
 import { SchemaContent, SchemaGraph, SchemaHeader, ReadmeViewer } from "components";
 
-import { getSession } from "utils/shared/session";
 import prisma from "utils/server/prisma";
-import { SerializedSchemaVersion, serializeSchemaVersion } from "utils/shared/schemas/serialize";
 import { nullOption, parseToml, toOption } from "utils/shared/schemas/parse";
+import { getCachedSession } from "utils/server/session";
 
-interface SchemaProps {
-	profileSlug: string;
-	schemaSlug: string;
-	serverSideNotFound: boolean;
-	version: null | (SerializedSchemaVersion & { schema: { isPublic: boolean; agentId: string } });
-}
-
-type SchemaParams = {
+type SchemaVersionPageParams = {
 	profileSlug: string;
 	schemaSlug: string;
 	versionNumber: string;
 };
 
-export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> = async (
-	context
-) => {
+interface SchemaVersionPageProps {
+	notFound: boolean;
+	profileSlug: string;
+	schemaSlug: string;
+	version: null | SchemaVersion;
+}
+
+interface SchemaVersion {
+	versionNumber: string;
+	content: string;
+	readme: string | null;
+	createdAt: string;
+	schema: { isPublic: boolean; agent: { userId: null | string } };
+}
+
+export const getServerSideProps: GetServerSideProps<
+	SchemaVersionPageProps,
+	SchemaVersionPageParams
+> = async (context) => {
 	const { profileSlug, schemaSlug, versionNumber } = context.params!;
 
-	const notFoundProps: { props: SchemaProps } = {
-		props: { profileSlug, schemaSlug, serverSideNotFound: true, version: null },
+	const session = getCachedSession(context);
+
+	const notFoundProps: { props: SchemaVersionPageProps } = {
+		props: { profileSlug, schemaSlug, version: null, notFound: true },
 	};
 
 	if (semverValid(versionNumber) === null) {
@@ -49,7 +59,13 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 				slug: schemaSlug,
 			},
 		},
-		include: { schema: { select: { isPublic: true, agentId: true } } },
+		select: {
+			versionNumber: true,
+			content: true,
+			readme: true,
+			createdAt: true,
+			schema: { select: { isPublic: true, agent: { select: { userId: true } } } },
+		},
 	});
 
 	if (version === null) {
@@ -61,27 +77,23 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 		// This reduces the number of times we need to invoke the session
 		// handler, which is good to minimize.
 
-		// @ts-expect-error (I think this is a mistake with the next-auth typings - not sure)
-		const session = await getSession(context);
 		if (session === null) {
 			return notFoundProps;
 		}
 
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
-		if (session.user.agentId !== version.schema.agentId) {
+		if (session.user.id !== version.schema.agent.userId) {
 			return notFoundProps;
 		}
 	}
 
-	const { schema, ...rest } = version;
-
 	return {
 		props: {
+			notFound: false,
 			profileSlug,
 			schemaSlug,
-			serverSideNotFound: false,
-			version: { schema, ...serializeSchemaVersion(rest) },
+			version: { ...version, createdAt: version.createdAt.toISOString() },
 		},
 	};
 };
@@ -94,7 +106,7 @@ const tabs: { label: string; value: Tab }[] = [
 	{ label: "Source", value: "source" },
 ];
 
-const SchemaVersionOverview = ({ version, profileSlug, schemaSlug }: SchemaProps) => {
+const SchemaVersionPage = ({ version, profileSlug, schemaSlug }: SchemaVersionPageProps) => {
 	const [selectedTab, setSelectedTab] = useState<Tab>("about");
 
 	if (version === null) {
@@ -154,7 +166,7 @@ const SchemaVersionOverview = ({ version, profileSlug, schemaSlug }: SchemaProps
 
 const never = (_: never) => null;
 
-const SchemaAboutTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaAboutTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	if (version === null) {
 		return null;
 	}
@@ -172,7 +184,7 @@ const SchemaAboutTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({
 	);
 };
 
-const SchemaGraphTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaGraphTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	const result = useMemo(
 		() => (version === null ? nullOption : toOption(parseToml(version.content))),
 		[version]
@@ -181,7 +193,7 @@ const SchemaGraphTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({
 	return <Pane>{result._tag === "Some" && <SchemaGraph schema={result.value} />}</Pane>;
 };
 
-const SchemaSourceTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaSourceTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	if (version === null) {
 		return null;
 	}
@@ -193,4 +205,4 @@ const SchemaSourceTab: React.FC<{ version: SerializedSchemaVersion | null }> = (
 	);
 };
 
-export default SchemaVersionOverview;
+export default SchemaVersionPage;

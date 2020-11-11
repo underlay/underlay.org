@@ -10,12 +10,16 @@ import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import prisma from "utils/server/prisma";
 
+// 1
+
 const params = t.type({ id: t.string });
 const headers = t.type({ "content-type": t.literal("application/json") });
 const body = t.partial({
 	name: t.string,
 	slug: t.string,
 });
+
+// 2
 
 declare module "next-rest" {
 	interface API {
@@ -36,6 +40,8 @@ declare module "next-rest" {
 		}>;
 	}
 }
+
+// 3
 
 export default makeHandler<"/api/user/[id]">({
 	params: params.is,

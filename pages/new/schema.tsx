@@ -17,12 +17,10 @@ import {
 
 import api from "next-rest/client";
 
-import { slugPattern } from "utils/shared/slug";
-import { usePageContext } from "utils/client/hooks";
 import StatusCodes from "http-status-codes";
 
-// const namePatternErrorMessage =
-// 	"The schema name cannot be empty, and can only use letters, numbers, and hypens.";
+import { slugPattern } from "utils/shared/slug";
+import { usePageContext } from "utils/client/hooks";
 
 type Privacy = "private" | "public";
 const privacyOptions: { label: string; value: Privacy }[] = [
@@ -50,10 +48,10 @@ const NewSchema: React.FC<{}> = ({}) => {
 	);
 
 	const handleSubmit = useCallback(
-		(userSlug: string, agentId: string) => {
+		(userSlug: string) => {
 			setIsLoading(true);
 			const isPublic = privacy === "public";
-			const body = { agentId, slug: schemaSlug, description, isPublic };
+			const body = { slug: schemaSlug, description, isPublic };
 			api.post("/api/schema", {}, { "content-type": "application/json" }, body)
 				.then(([{}]) => router.push(`/${userSlug}/schemas/${schemaSlug}`))
 				.catch((error) => {
@@ -73,7 +71,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 		return null;
 	}
 
-	const { agentId, slug: userSlug } = session.user;
+	const { id: userId, slug: userSlug } = session.user;
 
 	if (userSlug === null) {
 		signIn();
@@ -92,8 +90,8 @@ const NewSchema: React.FC<{}> = ({}) => {
 			<Pane display="flex" flexDirection="row" marginY={majorScale(2)}>
 				<Pane>
 					<Heading marginY={majorScale(1)}>Owner</Heading>
-					<Select disabled={true} value={agentId} minWidth={majorScale(12)}>
-						<option value={agentId}>{userSlug}</option>
+					<Select disabled={true} value={userId} minWidth={majorScale(12)}>
+						<option value={userId}>{userSlug}</option>
 					</Select>
 				</Pane>
 				<Pane marginX={majorScale(4)}>
@@ -126,7 +124,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 			</Pane>
 			<Button
 				appearance="primary"
-				onClick={() => handleSubmit(userSlug, agentId)}
+				onClick={() => handleSubmit(userSlug)}
 				disabled={!nameIsValid || isLoading}
 				isLoading={isLoading}
 			>

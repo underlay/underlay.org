@@ -10,5 +10,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		}, 100);
 	});
 	return { props: { organizationData: { fish: val } } };
-	// return { props: { serverSideNotFound: true } };
+	// return { props: { notFound: true } };
 };

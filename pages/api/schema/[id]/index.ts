@@ -2,7 +2,6 @@ import { StatusCodes } from "http-status-codes";
 
 import * as t from "io-ts";
 
-import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 
 import semverValid from "semver/functions/valid";
@@ -12,6 +11,7 @@ import prisma from "utils/server/prisma";
 import { parseToml, toOption } from "utils/shared/schemas/parse";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 import { slugPattern } from "utils/shared/slug";
+import { getSession } from "next-auth/client";
 
 const params = t.type({ id: t.string });
 
@@ -75,14 +75,17 @@ export default makeHandler<"/api/schema/[id]">({
 
 				const schema = await prisma.schema.findOne({
 					where: { id },
-					select: { isPublic: true, agentId: true },
+					select: {
+						isPublic: true,
+						agent: { select: { userId: true } },
+					},
 				});
 
 				if (schema === null) {
 					throw StatusCodes.NOT_FOUND;
 				}
 
-				if (schema.agentId !== session.user.agentId) {
+				if (schema.agent.userId !== session.user.id) {
 					if (schema.isPublic) {
 						throw StatusCodes.UNAUTHORIZED;
 					} else {
@@ -119,7 +122,15 @@ export default makeHandler<"/api/schema/[id]">({
 
 				const schema = await prisma.schema.findOne({
 					where: { id },
-					include: { versions: { take: 1, orderBy: { createdAt: "desc" } } },
+					select: {
+						agent: { select: { userId: true } },
+						isPublic: true,
+						versions: {
+							take: 1,
+							orderBy: { createdAt: "desc" },
+							select: { versionNumber: true },
+						},
+					},
 				});
 
 				if (schema === null) {
@@ -127,7 +138,7 @@ export default makeHandler<"/api/schema/[id]">({
 				}
 
 				// For now, users can only create versions for schemas that they created
-				if (session.user.agentId !== schema.agentId) {
+				if (schema.agent.userId !== session.user.id) {
 					if (schema.isPublic) {
 						throw StatusCodes.UNAUTHORIZED;
 					} else {
@@ -161,7 +172,7 @@ export default makeHandler<"/api/schema/[id]">({
 							draftReadme: readme,
 							versions: {
 								create: {
-									agent: { connect: { id: session.user.agentId } },
+									agent: { connect: { userId: session.user.id } },
 									versionNumber,
 									readme,
 									content,

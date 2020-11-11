@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Badge,
 	Button,
@@ -15,42 +16,55 @@ import {
 
 import { GetServerSideProps } from "next";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import api from "next-rest/client";
 
 import { SchemaContent, SchemaGraph, SchemaHeader, ReadmeViewer } from "components";
 
-import { usePageContext } from "utils/client/hooks";
-import { getSession } from "utils/shared/session";
 import prisma from "utils/server/prisma";
-import {
-	serializeSchemaWithVersions,
-	SerializedSchemaWithVersions,
-	SerializedSchemaVersion,
-} from "utils/shared/schemas/serialize";
+
 import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 import { nullOption, parseToml, toOption } from "utils/shared/schemas/parse";
+import { getCachedSession } from "utils/server/session";
+import { usePageContext } from "utils/client/hooks";
 
-interface SchemaProps {
-	profileSlug: string;
-	serverSideNotFound: boolean;
-	schema: SerializedSchemaWithVersions | null;
-	versionCount: number;
-}
-
-type SchemaParams = {
+type SchemaPageParams = {
 	profileSlug: string;
 	schemaSlug: string;
 };
 
-export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> = async (
+interface SchemaPageProps {
+	notFound: boolean;
+	schemaSlug: string;
+	profileSlug: string;
+	versionCount: number;
+	schema: Schema | null;
+}
+
+interface Schema {
+	id: string;
+	description: string;
+	agent: { userId: string | null };
+	isPublic: boolean;
+	updatedAt: string;
+	versions: SchemaVersion[];
+}
+
+interface SchemaVersion {
+	id: string;
+	versionNumber: string;
+	content: string;
+	readme: string | null;
+}
+
+export const getServerSideProps: GetServerSideProps<SchemaPageProps, SchemaPageParams> = async (
 	context
 ) => {
 	const { profileSlug, schemaSlug } = context.params!;
 
-	const notFoundProps: { props: SchemaProps } = {
-		props: { profileSlug, serverSideNotFound: true, schema: null, versionCount: 0 },
+	const session = getCachedSession(context);
+
+	const notFoundProps: { props: SchemaPageProps } = {
+		props: { notFound: true, profileSlug, schemaSlug, versionCount: 0, schema: null },
 	};
 
 	const schema = await prisma.schema.findFirst({
@@ -60,7 +74,13 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
 			},
 		},
-		include: {
+		select: {
+			id: true,
+			slug: true,
+			description: true,
+			isPublic: true,
+			agent: { select: { userId: true } },
+			updatedAt: true,
 			versions: {
 				take: 1,
 				orderBy: { createdAt: "desc" },
@@ -69,7 +89,6 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 					versionNumber: true,
 					content: true,
 					readme: true,
-					createdAt: true,
 				},
 			},
 		},
@@ -80,19 +99,13 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 	}
 
 	if (!schema.isPublic) {
-		// We only have to access the session if the schema isn't public.
-		// This reduces the number of times we need to invoke the session
-		// handler, which is good to minimize.
-
-		// @ts-expect-error (I think this is a mistake with the next-auth typings - not sure)
-		const session = await getSession(context);
 		if (session === null) {
 			return notFoundProps;
 		}
 
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
-		if (session.user.agentId !== schema.agentId) {
+		if (session.user.id !== schema.agent.userId) {
 			return notFoundProps;
 		}
 	}
@@ -101,10 +114,11 @@ export const getServerSideProps: GetServerSideProps<SchemaProps, SchemaParams> =
 
 	return {
 		props: {
+			notFound: false,
 			profileSlug,
-			serverSideNotFound: false,
-			schema: serializeSchemaWithVersions(schema),
+			schemaSlug,
 			versionCount,
+			schema: { ...schema, updatedAt: schema.updatedAt.toISOString() },
 		},
 	};
 };
@@ -118,12 +132,12 @@ const tabs: { label: string; value: Tab }[] = [
 	{ label: "Version history", value: "versions" },
 ];
 
-const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
+const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPageProps) => {
 	const [selectedTab, setSelectedTab] = useState<Tab>("about");
 
 	const { session } = usePageContext();
 
-	const isOwner = session !== null && schema !== null && session.user.agentId === schema.agentId;
+	const isOwner = session !== null && schema !== null && session.user.id === schema.agent.userId;
 
 	const [version] = schema !== null && schema.versions.length > 0 ? schema.versions : [null];
 
@@ -132,10 +146,11 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 	}
 
 	const updatedAt = new Date(schema.updatedAt);
-	const noVersions = versionCount === 0 || schema.versions.length === 0;
+	const noVersions = versionCount === 0 || version === null;
+
 	return (
 		<Pane maxWidth={majorScale(128)} paddingX={majorScale(2)} margin="auto">
-			<SchemaHeader profileSlug={profileSlug} schemaSlug={schema.slug}>
+			<SchemaHeader profileSlug={profileSlug} schemaSlug={schemaSlug}>
 				{schema.isPublic ? null : (
 					<Badge
 						color="neutral"
@@ -183,7 +198,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 						appearance="minimal"
 						marginX={majorScale(2)}
 						is="a"
-						href={`/${profileSlug}/schemas/${schema.slug}/new`}
+						href={`/${profileSlug}/schemas/${schemaSlug}/new`}
 					>
 						New version
 					</Button>
@@ -198,7 +213,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 						{isOwner ? (
 							<Paragraph>
 								<Link
-									href={`/${profileSlug}/schemas/${schema.slug}/new`}
+									href={`/${profileSlug}/schemas/${schemaSlug}/new`}
 									color="neutral"
 								>
 									Create an initial version
@@ -214,7 +229,11 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 				) : selectedTab === "source" ? (
 					<SchemaSourceTab version={version} />
 				) : selectedTab === "versions" ? (
-					<SchemaVersionsTab profileSlug={profileSlug} schema={schema} />
+					<SchemaVersionsTab
+						profileSlug={profileSlug}
+						schemaSlug={schemaSlug}
+						schema={schema}
+					/>
 				) : (
 					never(selectedTab)
 				)}
@@ -225,7 +244,7 @@ const SchemaOverview = ({ schema, versionCount, profileSlug }: SchemaProps) => {
 
 const never = (_: never) => null;
 
-const SchemaAboutTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaAboutTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	if (version === null) {
 		return null;
 	}
@@ -262,8 +281,9 @@ const parseVersion = ({
 
 const SchemaVersionsTab: React.FC<{
 	profileSlug: string;
-	schema: SerializedSchemaWithVersions;
-}> = ({ profileSlug, schema: { id, slug } }) => {
+	schemaSlug: string;
+	schema: Schema;
+}> = ({ profileSlug, schemaSlug, schema: { id } }) => {
 	const [loading, setLoading] = useState(true);
 	const [end, setEnd] = useState(false);
 	const [versions, setVersions] = useState<
@@ -314,7 +334,7 @@ const SchemaVersionsTab: React.FC<{
 						<Table.Row
 							key={id}
 							is="a"
-							href={`/${profileSlug}/schemas/${slug}/${versionNumber}`}
+							href={`/${profileSlug}/schemas/${schemaSlug}/${versionNumber}`}
 						>
 							<Table.TextHeaderCell>{versionNumber}</Table.TextHeaderCell>
 							<Table.TextCell>{agentSlug ? `@${agentSlug}` : null}</Table.TextCell>
@@ -339,7 +359,7 @@ const SchemaVersionsTab: React.FC<{
 	);
 };
 
-const SchemaGraphTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaGraphTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	const result = useMemo(
 		() => (version === null ? nullOption : toOption(parseToml(version.content))),
 		[version]
@@ -348,7 +368,7 @@ const SchemaGraphTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({
 	return <Pane>{result._tag === "Some" && <SchemaGraph schema={result.value} />}</Pane>;
 };
 
-const SchemaSourceTab: React.FC<{ version: SerializedSchemaVersion | null }> = ({ version }) => {
+const SchemaSourceTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
 	if (version === null) {
 		return null;
 	}
@@ -360,4 +380,4 @@ const SchemaSourceTab: React.FC<{ version: SerializedSchemaVersion | null }> = (
 	);
 };
 
-export default SchemaOverview;
+export default SchemaPage;

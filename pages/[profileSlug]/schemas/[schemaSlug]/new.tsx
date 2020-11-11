@@ -17,54 +17,64 @@ import {
 } from "evergreen-ui";
 import { GetServerSideProps } from "next";
 
+import { useRouter } from "next/router";
 import api from "next-rest/client";
+
+import { StatusCodes } from "http-status-codes";
 
 import semverValid from "semver/functions/valid";
 import semverInc from "semver/functions/inc";
 import semverLt from "semver/functions/lt";
 import semverMajor from "semver/functions/major";
 
+import SchemaHeader from "components/SchemaHeader/SchemaHeader";
 import ReadmeEditor from "components/ReadmeEditor/ReadmeEditor";
 import SchemaEditor, {
 	initialSchemaContent,
 	ResultType,
 } from "components/SchemaEditor/SchemaEditor";
 
-import { getSession } from "utils/shared/session";
+import { getCachedSession } from "utils/server/session";
 import prisma from "utils/server/prisma";
 import { parseToml, toOption } from "utils/shared/schemas/parse";
-import {
-	SerializedSchemaWithVersions,
-	serializeSchemaWithVersions,
-} from "utils/shared/schemas/serialize";
 import { usePageContext } from "utils/client/hooks";
-import { StatusCodes } from "http-status-codes";
-import { useRouter } from "next/router";
-import SchemaHeader from "components/SchemaHeader/SchemaHeader";
 
-type NewSchemaVersionParams = {
+type NewSchemaVersionPageParams = {
 	profileSlug: string;
 	schemaSlug: string;
 };
 
-export interface NewSchemaVersionProps {
+interface NewSchemaVersionPageProps {
+	notFound: boolean;
 	profileSlug: string;
-	serverSideNotFound: boolean;
-	schema: SerializedSchemaWithVersions | null;
+	schemaSlug: string;
+	schema: Schema | null;
+}
+
+interface Schema {
+	id: string;
+	agent: { userId: string | null };
+	draftVersionNumber: string;
+	draftContent: string;
+	draftReadme: string | null;
+	versions: SchemaVersion[];
+}
+
+interface SchemaVersion {
+	versionNumber: string;
 }
 
 export const getServerSideProps: GetServerSideProps<
-	NewSchemaVersionProps,
-	NewSchemaVersionParams
+	NewSchemaVersionPageProps,
+	NewSchemaVersionPageParams
 > = async (context) => {
 	const { profileSlug, schemaSlug } = context.params!;
 
-	const notFoundProps: { props: NewSchemaVersionProps } = {
-		props: { profileSlug, serverSideNotFound: true, schema: null },
+	const notFoundProps: { props: NewSchemaVersionPageProps } = {
+		props: { notFound: true, profileSlug, schemaSlug, schema: null },
 	};
 
-	// @ts-expect-error (I think this is a mistake with the next-auth typings - not sure)
-	const session = await getSession(context);
+	const session = getCachedSession(context);
 	if (session === null) {
 		return notFoundProps;
 	}
@@ -76,34 +86,50 @@ export const getServerSideProps: GetServerSideProps<
 				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
 			},
 		},
-		include: { versions: { take: 1, orderBy: { createdAt: "desc" } } },
+		select: {
+			id: true,
+			agent: { select: { userId: true } },
+			draftVersionNumber: true,
+			draftContent: true,
+			draftReadme: true,
+			versions: { take: 1, orderBy: { createdAt: "desc" }, select: { versionNumber: true } },
+		},
 	});
 
 	if (schema === null) {
 		return notFoundProps;
 	}
 
-	if (session.user.agentId !== schema.agentId) {
+	if (session.user.id !== schema.agent.userId) {
 		return notFoundProps;
 	}
 
 	return {
 		props: {
+			notFound: false,
 			profileSlug,
-			serverSideNotFound: false,
-			schema: serializeSchemaWithVersions(schema),
+			schemaSlug,
+			schema,
 		},
 	};
 };
 
-const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug }) => {
+const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
+	schema,
+	profileSlug,
+	schemaSlug,
+}) => {
 	const { session } = usePageContext();
+
 	const router = useRouter();
 
-	const previousVersion =
-		schema === null || schema.versions.length === 0
-			? null
-			: semverValid(schema.versions[0].versionNumber);
+	const previousVersion = useMemo(
+		() =>
+			schema === null || schema.versions.length === 0
+				? null
+				: semverValid(schema.versions[0].versionNumber),
+		[schema]
+	);
 
 	const initialVersion = previousVersion && semverInc(previousVersion, "prerelease");
 	const [versionNumber, setVersionNumber] = useState(initialVersion || "0.0.0");
@@ -205,9 +231,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 				.then(([{}]) => {
 					setPublishing(false);
 					toaster.success(
-						`${profileSlug}/schemas/${schema.slug}@${versionNumber} published successfully`
+						`${profileSlug}/schemas/${schemaSlug}@${versionNumber} published successfully`
 					);
-					router.push(`/${profileSlug}/schemas/${schema.slug}`);
+					router.push(`/${profileSlug}/schemas/${schemaSlug}`);
 				})
 				.catch((err) => {
 					setPublishing(false);
@@ -245,7 +271,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 		router.push(`/${profileSlug}`);
 		return null;
 	} else if (session === null) {
-		router.push(`/${profileSlug}/schemas/${schema.slug}`);
+		router.push(`/${profileSlug}/schemas/${schemaSlug}`);
 		return null;
 	}
 
@@ -256,7 +282,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionProps> = ({ schema, profileSlug
 			margin="auto"
 			onKeyDown={handleKeyDown}
 		>
-			<NewSchemaVersionHeader profileSlug={profileSlug} schemaSlug={schema.slug} />
+			<NewSchemaVersionHeader profileSlug={profileSlug} schemaSlug={schemaSlug} />
 
 			<Heading marginTop={majorScale(8)}>Version number</Heading>
 
