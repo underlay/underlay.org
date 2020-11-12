@@ -1,5 +1,5 @@
 import { NextApiRequest } from "next";
-import { Session as ClientSession } from "next-auth/client";
+import { Session as ClientSession, getSession as getClientSession } from "next-auth/client";
 
 export interface SessionUser {
 	id: string;
@@ -20,3 +20,6 @@ export type Session = Omit<ClientSession, "user"> & { user: SessionUser };
 declare module "next-auth/client" {
 	function session(context: { req: NextApiRequest }): Promise<Session | null>;
 }
+
+export const getSession = (...args: Parameters<typeof getClientSession>): Promise<Session | null> =>
+	getClientSession(...args);

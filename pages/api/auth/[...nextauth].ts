@@ -2,12 +2,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { InitOptions } from "next-auth";
 import Providers from "next-auth/providers";
 import Adapters from "next-auth/adapters";
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
 import { SessionUser } from "utils/shared/session";
 
-const prisma = new PrismaClient();
+import prisma from "utils/server/prisma";
+
 const options: InitOptions = {
 	// Configure one or more authentication providers
 	providers: [
