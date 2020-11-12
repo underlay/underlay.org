@@ -20,7 +20,11 @@ const App = ({ Component, pageProps, session }: ExpandedAppProps) => {
 				<div className="app">
 					<Header />
 					<div id="main-content" tabIndex={-1}>
-						{pageProps.notFound ? <h1>404 Not Found</h1> : <Component {...pageProps} />}
+						{pageProps && pageProps.notFound ? (
+							<h1>404 Not Found</h1>
+						) : (
+							<Component {...pageProps} />
+						)}
 					</div>
 					<Footer />
 				</div>
