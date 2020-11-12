@@ -99,7 +99,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 					<TextInput
 						width={majorScale(24)}
 						autoFocus={true}
-						placeholder="[a-zA-Z0-9-]"
+						placeholder="[a-z0-9-]"
 						value={schemaSlug}
 						onChange={handleSchemaSlugChange}
 						isInvalid={!nameIsValid}

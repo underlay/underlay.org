@@ -95,7 +95,7 @@ function SetSlug({ user, router }: { user: ClientUser; router: NextRouter }) {
 				}
 				isInvalid={!isValid}
 				disabled={isLoading}
-				placeholder="[a-zA-Z0-9-]"
+				placeholder="[a-z0-9-]"
 			/>
 			<Button
 				marginX={majorScale(1)}
