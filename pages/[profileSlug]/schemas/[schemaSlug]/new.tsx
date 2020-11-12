@@ -53,6 +53,7 @@ interface NewSchemaVersionPageProps {
 
 interface Schema {
 	id: string;
+	description: string;
 	agent: { userId: string | null };
 	draftVersionNumber: string;
 	draftContent: string;
@@ -89,6 +90,7 @@ export const getServerSideProps: GetServerSideProps<
 		select: {
 			id: true,
 			agent: { select: { userId: true } },
+			description: true,
 			draftVersionNumber: true,
 			draftContent: true,
 			draftReadme: true,
@@ -146,7 +148,10 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	const [initialContent, initialReadme] =
 		schema === null
 			? [initialSchemaContent, null]
-			: [schema.draftContent || initialSchemaContent, schema.draftReadme || null];
+			: [
+					schema.draftContent || initialSchemaContent,
+					schema.draftReadme || `# ${schemaSlug}\n\n> ${schema.description}\n\n`,
+			  ];
 
 	const initialResult = useMemo<ResultType>(() => toOption(parseToml(initialContent)), [
 		initialContent,
