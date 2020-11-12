@@ -4,6 +4,7 @@ import { Either } from "fp-ts/Either";
 import * as t from "io-ts";
 
 import { TomlSchema } from "./codec";
+import { Option } from "fp-ts/lib/Option";
 
 const getContextKey = (context: t.Context): string =>
 	context
@@ -33,3 +34,7 @@ export function parseToml(
 		return result;
 	}
 }
+
+export const nullOption: { _tag: "None" } = { _tag: "None" };
+export const toOption = <L, R>(result: Either<L, R>): Option<R> =>
+	result._tag === "Left" ? nullOption : { _tag: "Some", value: result.right };

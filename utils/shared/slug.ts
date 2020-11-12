@@ -1,1 +1,1 @@
-export const slugPattern = /^[a-zA-Z0-9-]+$/;
+export const slugPattern = /^[a-z0-9-]+$/;

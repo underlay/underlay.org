@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+    url = "***"
 }
 
 model Account {
@@ -108,20 +108,19 @@ model Member {
 }
 
 model Schema {
-    id                 String               @id @default(uuid())
-    slug               String
-    description        String               @default("")
-    avatar             String?
-    agentId            String               @map(name: "agent_id")
-    agent              Agent                @relation(fields: [agentId], references: [id])
-    createdAt          DateTime             @default(now()) @map(name: "created_at")
-    updatedAt          DateTime             @default(now()) @updatedAt @map(name: "updated_at")
-    isPublic           Boolean              @map(name: "is_public")
-    draftVersionNumber String               @default("")
-    draftContent       String               @default("")
-    draftReadme        String?
-    versions           SchemaVersion[]
-    collaborators      SchemaCollaborator[]
+    id            String               @id @default(uuid())
+    slug          String
+    description   String               @default("")
+    avatar        String?
+    agentId       String               @map(name: "agent_id")
+    agent         Agent                @relation(fields: [agentId], references: [id])
+    createdAt     DateTime             @default(now()) @map(name: "created_at")
+    updatedAt     DateTime             @default(now()) @updatedAt @map(name: "updated_at")
+    isPublic      Boolean              @map(name: "is_public")
+    draftContent  String               @default("")
+    draftReadme   String?
+    versions      SchemaVersion[]
+    collaborators SchemaCollaborator[]
 
     @@unique([agentId, slug])
     @@map(name: "schemas")
@@ -142,7 +141,6 @@ model SchemaVersion {
     dataCollections CollectionVersion[] @relation("DataSchema")
     metaCollections CollectionVersion[] @relation("MetaSchema")
 
-    @@unique([schemaId, versionNumber])
     @@map(name: "schema_versions")
 }
 
@@ -192,7 +190,6 @@ model CollectionVersion {
     agent         Agent         @relation(fields: [agentId], references: [id])
     assertions    Assertion[]
 
-    @@unique([collectionId, versionNumber])
     @@map(name: "collection_versions")
 }
 

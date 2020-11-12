@@ -1,16 +1,20 @@
-import { NextApiRequest } from "next";
-import { Session as ClientSession, getSession as getClientSession } from "next-auth/client";
+import { NextApiRequest, NextPageContext } from "next";
 
-export interface SessionUser {
+import { Session } from "next-auth/client";
+
+export interface PageData {
+	session: ClientSession | null;
+}
+
+export interface ClientUser {
 	id: string;
-	agentId: string;
 	slug: string | null;
 	name: string | null;
 	email: string | null;
 	avatar: string | null;
 }
 
-export type Session = Omit<ClientSession, "user"> & { user: SessionUser };
+export type ClientSession = Omit<Session, "user"> & { user: ClientUser };
 
 // The typings for next-auth don't include an `id` property here
 // because IDs aren't required in their base User prisma model.
@@ -18,8 +22,7 @@ export type Session = Omit<ClientSession, "user"> & { user: SessionUser };
 // returned with every user result from prisma, so there will
 // always be an id property here as well.
 declare module "next-auth/client" {
-	function session(context: { req: NextApiRequest }): Promise<Session | null>;
+	function session(
+		context: NextPageContext | { req: NextApiRequest }
+	): Promise<ClientSession | null>;
 }
-
-export const getSession = (...args: Parameters<typeof getClientSession>): Promise<Session | null> =>
-	getClientSession(...args);

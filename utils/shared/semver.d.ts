@@ -12,3 +12,7 @@ declare module "semver/functions/inc" {
 declare module "semver/functions/lt" {
 	export default function (a: string, b: string): boolean;
 }
+
+declare module "semver/functions/major" {
+	export default function (input: string): number;
+}

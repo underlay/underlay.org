@@ -3,16 +3,16 @@ import { ThemeProvider } from "evergreen-ui";
 
 import { PageContext } from "utils/client/hooks";
 import { theme } from "utils/shared/theme";
-import { InitData } from "utils/server/initData";
 
 import { RouterContext as RC } from "next/dist/next-server/lib/router-context";
 import { NextRouter } from "next/dist/next-server/lib/router/router";
 
-const loggedIn: InitData = {
+import { PageData } from "utils/shared/session";
+
+const loggedIn: PageData = {
 	session: {
 		user: {
 			id: "1",
-			agentId: "1",
 			name: "Test Person",
 			email: "g@hi.com",
 			slug: "test",

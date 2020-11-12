@@ -1,0 +1,69 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Schema",
+      "field": "draftVersionNumber",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Schema",
+          "field": "draftVersionNumber"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Schema",
+          "field": "draftVersionNumber"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "\"\""
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "SchemaVersion",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[schemaId, versionNumber]"
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "CollectionVersion",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[collectionId, versionNumber]"
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    }
+  ]
+}

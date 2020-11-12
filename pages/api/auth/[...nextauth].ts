@@ -5,9 +5,10 @@ import Adapters from "next-auth/adapters";
 import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
-import { SessionUser } from "utils/shared/session";
 
 import prisma from "utils/server/prisma";
+
+import { ClientUser } from "utils/shared/session";
 
 const options: InitOptions = {
 	// Configure one or more authentication providers
@@ -71,37 +72,19 @@ const options: InitOptions = {
 	},
 	callbacks: {
 		session: async (session, user: User) => {
-			if (user !== null) {
-				const { id, name, email } = user;
-
-				// We don't actually want to update - just to
-				// either retrieve or create in one pass
-				const agent = await prisma.agent.upsert({
-					select: { id: true },
-					create: { user: { connect: { id } } },
-					update: {},
-					where: { userId: id },
-				});
-
-				const sessionUser: SessionUser = {
-					id,
-					name,
-					email,
-					slug: user.slug,
-					avatar: user.avatar,
-					agentId: agent.id,
-				};
-				return { ...session, user: sessionUser };
+			if (user) {
+				const { id, slug, name, email, avatar } = user;
+				const clientUser: ClientUser = { id, slug, name, email, avatar };
+				return { ...session, user: clientUser };
+			} else {
+				return { ...session, user: null };
 			}
-			return { ...session, user: null };
 		},
 	},
 	events: {
-		createUser: async (user: User) => {
+		createUser: async ({ id }: User) => {
 			// Create the user agent
-			await prisma.agent.create({
-				data: { user: { connect: { id: user.id } } },
-			});
+			await prisma.agent.create({ data: { user: { connect: { id } } } });
 		},
 	},
 };
