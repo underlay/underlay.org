@@ -13,9 +13,13 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start -p ${PORT:-3000}",
-		"storybook": "start-storybook -p 6006",
+		"storybook": "start-storybook --no-dll -p 6006",
 		"build-storybook": "build-storybook",
 		"type-check": "tsc"
+	},
+	"resolutions": {
+		"react": "17.0.1",
+		"react-dom": "17.0.1"
 	},
 	"dependencies": {
 		"@prisma/client": "^2.9.0",
@@ -31,14 +35,14 @@
 		"http-status-codes": "^2.1.4",
 		"io-ts": "^2.2.12",
 		"n3.ts": "^0.2.0",
-		"next": "^9.5.5",
+		"next": "^10.0.1",
 		"next-auth": "^3.1.0",
 		"next-rest": "^0.1.6",
 		"normalize-css": "^2.3.1",
 		"pg": "^8.3.3",
-		"react": "^16.13.1",
+		"react": "^17.0.1",
 		"react-codemirror2": "^7.2.1",
-		"react-dom": "^16.13.1",
+		"react-dom": "^17.0.1",
 		"react-markdown": "^5.0.2",
 		"semver": "^7.3.2",
 		"strip-indent": "^3.0.0",
