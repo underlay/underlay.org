@@ -45,10 +45,9 @@ type NewSchemaVersionPageParams = {
 };
 
 interface NewSchemaVersionPageProps {
-	notFound: boolean;
 	profileSlug: string;
 	schemaSlug: string;
-	schema: Schema | null;
+	schema: Schema;
 }
 
 interface Schema {
@@ -71,13 +70,9 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
 	const { profileSlug, schemaSlug } = context.params!;
 
-	const notFoundProps: { props: NewSchemaVersionPageProps } = {
-		props: { notFound: true, profileSlug, schemaSlug, schema: null },
-	};
-
 	const session = getCachedSession(context);
 	if (session === null) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	const schema = await prisma.schema.findFirst({
@@ -99,16 +94,15 @@ export const getServerSideProps: GetServerSideProps<
 	});
 
 	if (schema === null) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	if (session.user.id !== schema.agent.userId) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	return {
 		props: {
-			notFound: false,
 			profileSlug,
 			schemaSlug,
 			schema,
@@ -126,10 +120,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	const router = useRouter();
 
 	const previousVersion = useMemo(
-		() =>
-			schema === null || schema.versions.length === 0
-				? null
-				: semverValid(schema.versions[0].versionNumber),
+		() => (schema.versions.length === 0 ? null : semverValid(schema.versions[0].versionNumber)),
 		[schema]
 	);
 
@@ -145,13 +136,8 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 		[]
 	);
 
-	const [initialContent, initialReadme] =
-		schema === null
-			? [initialSchemaContent, null]
-			: [
-					schema.draftContent || initialSchemaContent,
-					schema.draftReadme || `# ${schemaSlug}\n\n> ${schema.description}\n\n`,
-			  ];
+	const initialContent = schema.draftContent || initialSchemaContent;
+	const initialReadme = schema.draftReadme || `# ${schemaSlug}\n\n> ${schema.description}\n\n`;
 
 	const initialResult = useMemo<ResultType>(() => toOption(parseToml(initialContent)), [
 		initialContent,
@@ -193,27 +179,25 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	const handleSaveDraft = useCallback(() => {
 		cleanRef.current = true;
 		setClean(true);
-		if (schema !== null) {
-			setSaving(true);
-			api.patch(
-				"/api/schema/[id]",
-				{ id: schema.id },
-				{ "content-type": "application/json" },
-				{
-					draftVersionNumber: versionNumber,
-					draftContent: contentRef.current,
-					draftReadme: attachReadme ? readmeRef.current : null,
-				}
-			)
-				.then(([{}]) => {
-					setSaving(false);
-					toaster.success("Saved draft", { duration: 2 });
-				})
-				.catch((err) => {
-					setSaving(false);
-					toaster.danger(`Failed to save draft: ${err.toString()}`);
-				});
-		}
+		setSaving(true);
+		api.patch(
+			"/api/schema/[id]",
+			{ id: schema.id },
+			{ "content-type": "application/json" },
+			{
+				draftVersionNumber: versionNumber,
+				draftContent: contentRef.current,
+				draftReadme: attachReadme ? readmeRef.current : null,
+			}
+		)
+			.then(([{}]) => {
+				setSaving(false);
+				toaster.success("Saved draft", { duration: 2 });
+			})
+			.catch((err) => {
+				setSaving(false);
+				toaster.danger(`Failed to save draft: ${err.toString()}`);
+			});
 	}, [schema, versionNumber, attachReadme]);
 
 	const isVersionValid = semverValid(versionNumber) !== null && semverMajor(versionNumber) === 0;
@@ -221,7 +205,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 		isVersionValid && (previousVersion === null || semverLt(previousVersion, versionNumber));
 
 	const handlePublishVersion = useCallback(() => {
-		if (session !== null && schema !== null && result._tag === "Some" && isVersionMonotonic) {
+		if (result._tag === "Some" && isVersionMonotonic) {
 			setPublishing(true);
 			api.post(
 				"/api/schema/[id]",
@@ -249,7 +233,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 					);
 				});
 		}
-	}, [profileSlug, schema, versionNumber, isVersionMonotonic, result, attachReadme, session]);
+	}, [profileSlug, schema, versionNumber, isVersionMonotonic, result, attachReadme]);
 
 	const [openPublishDialog, setOpenPublishDialog] = useState(false);
 
@@ -272,13 +256,11 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 		}
 	}, []);
 
-	if (schema === null) {
-		router.push(`/${profileSlug}`);
-		return null;
-	} else if (session === null) {
-		router.push(`/${profileSlug}/schemas/${schemaSlug}`);
-		return null;
-	}
+	useEffect(() => {
+		if (session === null) {
+			router.push(`/${profileSlug}/schemas/${schemaSlug}`);
+		}
+	}, []);
 
 	return (
 		<Pane

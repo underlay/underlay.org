@@ -9,7 +9,7 @@ import semverValid from "semver/functions/valid";
 import { SchemaContent, SchemaGraph, SchemaHeader, ReadmeViewer } from "components";
 
 import prisma from "utils/server/prisma";
-import { nullOption, parseToml, toOption } from "utils/shared/schemas/parse";
+import { parseToml, toOption } from "utils/shared/schemas/parse";
 import { getCachedSession } from "utils/server/session";
 
 type SchemaVersionPageParams = {
@@ -19,10 +19,9 @@ type SchemaVersionPageParams = {
 };
 
 interface SchemaVersionPageProps {
-	notFound: boolean;
 	profileSlug: string;
 	schemaSlug: string;
-	version: null | SchemaVersion;
+	version: SchemaVersion;
 }
 
 interface SchemaVersion {
@@ -41,12 +40,8 @@ export const getServerSideProps: GetServerSideProps<
 
 	const session = getCachedSession(context);
 
-	const notFoundProps: { props: SchemaVersionPageProps } = {
-		props: { profileSlug, schemaSlug, version: null, notFound: true },
-	};
-
 	if (semverValid(versionNumber) === null) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	const version = await prisma.schemaVersion.findFirst({
@@ -69,7 +64,7 @@ export const getServerSideProps: GetServerSideProps<
 	});
 
 	if (version === null) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	if (!version.schema.isPublic) {
@@ -78,19 +73,18 @@ export const getServerSideProps: GetServerSideProps<
 		// handler, which is good to minimize.
 
 		if (session === null) {
-			return notFoundProps;
+			return { notFound: true };
 		}
 
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
 		if (session.user.id !== version.schema.agent.userId) {
-			return notFoundProps;
+			return { notFound: true };
 		}
 	}
 
 	return {
 		props: {
-			notFound: false,
 			profileSlug,
 			schemaSlug,
 			version: { ...version, createdAt: version.createdAt.toISOString() },
@@ -108,10 +102,6 @@ const tabs: { label: string; value: Tab }[] = [
 
 const SchemaVersionPage = ({ version, profileSlug, schemaSlug }: SchemaVersionPageProps) => {
 	const [selectedTab, setSelectedTab] = useState<Tab>("about");
-
-	if (version === null) {
-		return null;
-	}
 
 	const createdAt = new Date(version.createdAt);
 
@@ -166,11 +156,7 @@ const SchemaVersionPage = ({ version, profileSlug, schemaSlug }: SchemaVersionPa
 
 const never = (_: never) => null;
 
-const SchemaAboutTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
-	if (version === null) {
-		return null;
-	}
-
+const SchemaAboutTab: React.FC<{ version: SchemaVersion }> = ({ version }) => {
 	return (
 		<Pane>
 			{version.readme === null ? (
@@ -184,20 +170,12 @@ const SchemaAboutTab: React.FC<{ version: SchemaVersion | null }> = ({ version }
 	);
 };
 
-const SchemaGraphTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
-	const result = useMemo(
-		() => (version === null ? nullOption : toOption(parseToml(version.content))),
-		[version]
-	);
-
+const SchemaGraphTab: React.FC<{ version: SchemaVersion }> = ({ version }) => {
+	const result = useMemo(() => toOption(parseToml(version.content)), [version]);
 	return <Pane>{result._tag === "Some" && <SchemaGraph schema={result.value} />}</Pane>;
 };
 
-const SchemaSourceTab: React.FC<{ version: SchemaVersion | null }> = ({ version }) => {
-	if (version === null) {
-		return null;
-	}
-
+const SchemaSourceTab: React.FC<{ version: SchemaVersion }> = ({ version }) => {
 	return (
 		<Pane>
 			<SchemaContent initialValue={version.content} readOnly={true} />

@@ -33,11 +33,10 @@ type SchemaPageParams = {
 };
 
 interface SchemaPageProps {
-	notFound: boolean;
 	schemaSlug: string;
 	profileSlug: string;
 	versionCount: number;
-	schema: Schema | null;
+	schema: Schema;
 }
 
 interface Schema {
@@ -62,10 +61,6 @@ export const getServerSideProps: GetServerSideProps<SchemaPageProps, SchemaPageP
 	const { profileSlug, schemaSlug } = context.params!;
 
 	const session = getCachedSession(context);
-
-	const notFoundProps: { props: SchemaPageProps } = {
-		props: { notFound: true, profileSlug, schemaSlug, versionCount: 0, schema: null },
-	};
 
 	const schema = await prisma.schema.findFirst({
 		where: {
@@ -95,18 +90,18 @@ export const getServerSideProps: GetServerSideProps<SchemaPageProps, SchemaPageP
 	});
 
 	if (schema === null) {
-		return notFoundProps;
+		return { notFound: true };
 	}
 
 	if (!schema.isPublic) {
 		if (session === null) {
-			return notFoundProps;
+			return { notFound: true };
 		}
 
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
 		if (session.user.id !== schema.agent.userId) {
-			return notFoundProps;
+			return { notFound: true };
 		}
 	}
 
@@ -114,7 +109,6 @@ export const getServerSideProps: GetServerSideProps<SchemaPageProps, SchemaPageP
 
 	return {
 		props: {
-			notFound: false,
 			profileSlug,
 			schemaSlug,
 			versionCount,
@@ -137,16 +131,13 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 
 	const { session } = usePageContext();
 
-	const isOwner = session !== null && schema !== null && session.user.id === schema.agent.userId;
+	const isOwner = session !== null && session.user.id === schema.agent.userId;
 
-	const [version] = schema !== null && schema.versions.length > 0 ? schema.versions : [null];
+	const [version] = schema.versions.length > 0 ? schema.versions : [null];
 
-	if (schema === null) {
-		return null;
-	}
-
-	const updatedAt = new Date(schema.updatedAt);
 	const noVersions = versionCount === 0 || version === null;
+
+	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
 
 	return (
 		<Pane maxWidth={majorScale(128)} paddingX={majorScale(2)} margin="auto">
