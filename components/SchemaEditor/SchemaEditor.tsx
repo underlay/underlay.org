@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import useDebouncedCallback, { Options } from "use-debounce/lib/useDebouncedCallback";
+import { Options } from "use-debounce/lib/useDebouncedCallback";
+import { useDebouncedCallback } from "use-debounce";
 
 import { Option } from "fp-ts/Option";
 import * as t from "io-ts";
