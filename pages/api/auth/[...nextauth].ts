@@ -5,6 +5,7 @@ import Adapters from "next-auth/adapters";
 import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
+import { SessionBase } from "next-auth/_utils";
 
 import prisma from "utils/server/prisma";
 
@@ -71,13 +72,13 @@ const options: InitOptions = {
 		verifyRequest: "/login?requested=true",
 	},
 	callbacks: {
-		session: async (session, user: User) => {
+		session: async (session: SessionBase, user: unknown) => {
 			if (user) {
-				const { id, slug, name, email, avatar } = user;
+				const { id, slug, name, email, avatar } = user as User;
 				const clientUser: ClientUser = { id, slug, name, email, avatar };
 				return { ...session, user: clientUser };
 			} else {
-				return { ...session, user: null };
+				return session;
 			}
 		},
 	},
