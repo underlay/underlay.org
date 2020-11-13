@@ -1,9 +1,9 @@
 import * as t from "io-ts";
 
 import { xsd } from "n3.ts/lib/IRIs.js";
-import { APG } from "apg"; // Only for types
-import * as ns from "apg/lib/namespace.js";
-import { isRelationalSchema, relationalSchema } from "apg/lib/models/relational.js";
+import { APG } from "@underlay/apg"; // Only for types
+import * as ns from "@underlay/apg/lib/namespace.js";
+import { isRelationalSchema, relationalSchema } from "@underlay/apg/lib/codecs/relational.js";
 
 export const datatype = t.union([
 	t.literal("string"),
