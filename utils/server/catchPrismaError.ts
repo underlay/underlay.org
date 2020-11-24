@@ -1,4 +1,4 @@
-import { PrismaClientKnownRequestError } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { StatusCodes } from "http-status-codes";
 
 // It's important for typechecking that this function returns never.
