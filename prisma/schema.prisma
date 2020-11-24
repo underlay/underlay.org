@@ -63,7 +63,7 @@ model User {
     collections CollectionCollaborator[]
     schemas     SchemaCollaborator[]
 
-    Agent Agent
+    Agent Agent?
     @@map(name: "users")
 }
 
@@ -76,7 +76,7 @@ model Organization {
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
-    Agent Agent
+    Agent Agent?
     @@map(name: "organizations")
 }
 
