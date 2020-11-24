@@ -73,7 +73,7 @@ export default makeHandler<"/api/schema/[id]">({
 					throw StatusCodes.UNAUTHORIZED;
 				}
 
-				const schema = await prisma.schema.findOne({
+				const schema = await prisma.schema.findUnique({
 					where: { id },
 					select: {
 						isPublic: true,
@@ -120,7 +120,7 @@ export default makeHandler<"/api/schema/[id]">({
 					throw StatusCodes.UNAUTHORIZED;
 				}
 
-				const schema = await prisma.schema.findOne({
+				const schema = await prisma.schema.findUnique({
 					where: { id },
 					select: {
 						agent: { select: { userId: true } },

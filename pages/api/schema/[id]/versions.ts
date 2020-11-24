@@ -50,7 +50,7 @@ export default makeHandler<"/api/schema/[id]/versions">({
 			headers: getRequestHeaders.is,
 			body: t.void.is,
 			exec: async (req, { id, cursor }) => {
-				const schema = await prisma.schema.findOne({
+				const schema = await prisma.schema.findUnique({
 					where: { id },
 					select: { isPublic: true, agent: { select: { userId: true } } },
 				});
