@@ -24,7 +24,7 @@
 		flex: 1 1 auto;
 	}
 	.content {
-		padding: 1em 0em 2.5em;
+		padding: 1em 0em 4em;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -33,9 +33,10 @@
 	}
 	.title {
 		position: relative;
-		left: -10px;
+		left: -21px;
 	}
 	img {
-		width: 35px;
+		height: 28px;
+		padding-top: 6px;
 	}
 }

@@ -32,13 +32,14 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 			<div className={styles.primary}>
 				{navItems.map((item) => {
 					const { slug: modeSlug, title } = item;
-					const isActive = mode === modeSlug;
+					const isActive = mode === modeSlug || (!mode && !modeSlug);
 					return (
 						<Button
 							className={classNames(styles.button, isActive && styles.active)}
 							appearance="minimal"
 							key={modeSlug}
 							is="a"
+							height={40}
 							href={buildUrl({
 								profileSlug: profileSlug,
 								collectionSlug: collectionSlug,
@@ -60,7 +61,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 							<Button
 								className={classNames(styles.button, isActive && styles.active)}
 								appearance="minimal"
-								height={24}
+								height={32}
 								key={subModeSlug}
 								is="a"
 								href={buildUrl({

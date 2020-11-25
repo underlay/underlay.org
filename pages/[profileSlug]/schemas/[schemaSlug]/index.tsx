@@ -18,7 +18,7 @@ import { GetServerSideProps } from "next";
 
 import api from "next-rest/client";
 
-import { SchemaContent, SchemaGraph, SchemaHeader, ReadmeViewer } from "components";
+import { SchemaContent, SchemaGraph, ScopeHeader, ScopeNav, ReadmeViewer } from "components";
 
 import prisma from "utils/server/prisma";
 
@@ -140,36 +140,31 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
 
 	return (
-		<Pane maxWidth={majorScale(128)} paddingX={majorScale(2)} margin="auto">
-			<SchemaHeader profileSlug={profileSlug} schemaSlug={schemaSlug}>
-				{schema.isPublic ? null : (
-					<Badge
-						color="neutral"
-						isSolid
-						marginRight={8}
-						alignSelf="center"
-						marginTop={minorScale(1)}
-						marginX={majorScale(2)}
-					>
-						Private
-					</Badge>
-				)}
-			</SchemaHeader>
-			<Pane marginY={minorScale(3)}>
-				<Text color="muted">
-					{versionCount === 1 ? "1 version" : `${versionCount} versions`} - last updated{" "}
-					{updatedAt.toLocaleDateString()}
-				</Text>
-			</Pane>
-			<Pane display="flex" alignItems="center" marginY={minorScale(3)}>
-				{schema.description === "" ? (
-					<Paragraph fontStyle="italic" color="muted">
-						No description available
-					</Paragraph>
-				) : (
-					<Paragraph size={500}>{schema.description}</Paragraph>
-				)}
-			</Pane>
+		<Pane>
+			<ScopeHeader
+				type="schema"
+				profileSlug={profileSlug}
+				contentSlug={schemaSlug}
+				detailsTop={
+					<Text color="muted">
+						{versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
+						updated {updatedAt.toLocaleDateString()}
+					</Text>
+				}
+				detailsBottom={schema.description}
+				isPrivate={schema.isPublic}
+			/>
+
+			<ScopeNav
+				navItems={[
+					{ slug: "", title: "Overview" },
+					{ slug: "edit", title: "Edit", ownerOnly: true },
+					{ slug: "versions", title: "Versions" },
+					{ slug: "settings", title: "Settings" },
+				].filter((item) => {
+					return !item.ownerOnly || isOwner;
+				})}
+			/>
 
 			<Pane marginY={majorScale(4)} display="flex" alignItems="center">
 				<Tablist userSelect="none">
