@@ -41,12 +41,12 @@ import { usePageContext } from "utils/client/hooks";
 
 type NewSchemaVersionPageParams = {
 	profileSlug: string;
-	schemaSlug: string;
+	contentSlug: string;
 };
 
 interface NewSchemaVersionPageProps {
 	profileSlug: string;
-	schemaSlug: string;
+	contentSlug: string;
 	schema: Schema;
 }
 
@@ -68,7 +68,7 @@ export const getServerSideProps: GetServerSideProps<
 	NewSchemaVersionPageProps,
 	NewSchemaVersionPageParams
 > = async (context) => {
-	const { profileSlug, schemaSlug } = context.params!;
+	const { profileSlug, contentSlug } = context.params!;
 
 	const session = getCachedSession(context);
 	if (session === null) {
@@ -77,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<
 
 	const schema = await prisma.schema.findFirst({
 		where: {
-			slug: schemaSlug,
+			slug: contentSlug,
 			agent: {
 				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
 			},
@@ -104,7 +104,7 @@ export const getServerSideProps: GetServerSideProps<
 	return {
 		props: {
 			profileSlug,
-			schemaSlug,
+			contentSlug,
 			schema,
 		},
 	};
@@ -113,7 +113,7 @@ export const getServerSideProps: GetServerSideProps<
 const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	schema,
 	profileSlug,
-	schemaSlug,
+	contentSlug,
 }) => {
 	const { session } = usePageContext();
 
@@ -137,7 +137,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	);
 
 	const initialContent = schema.draftContent || initialSchemaContent;
-	const initialReadme = schema.draftReadme || `# ${schemaSlug}\n\n> ${schema.description}\n\n`;
+	const initialReadme = schema.draftReadme || `# ${contentSlug}\n\n> ${schema.description}\n\n`;
 
 	const initialResult = useMemo<ResultType>(() => toOption(parseToml(initialContent)), [
 		initialContent,
@@ -220,9 +220,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 				.then(([{}]) => {
 					setPublishing(false);
 					toaster.success(
-						`${profileSlug}/schemas/${schemaSlug}@${versionNumber} published successfully`
+						`${profileSlug}/schemas/${contentSlug}@${versionNumber} published successfully`
 					);
-					router.push(`/${profileSlug}/schemas/${schemaSlug}`);
+					router.push(`/${profileSlug}/schemas/${contentSlug}`);
 				})
 				.catch((err) => {
 					setPublishing(false);
@@ -258,7 +258,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 
 	useEffect(() => {
 		if (session === null) {
-			router.push(`/${profileSlug}/schemas/${schemaSlug}`);
+			router.push(`/${profileSlug}/schemas/${contentSlug}`);
 		}
 	}, []);
 
@@ -269,7 +269,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 			margin="auto"
 			onKeyDown={handleKeyDown}
 		>
-			<NewSchemaVersionHeader profileSlug={profileSlug} schemaSlug={schemaSlug} />
+			<NewSchemaVersionHeader profileSlug={profileSlug} contentSlug={contentSlug} />
 
 			<Heading marginTop={majorScale(8)}>Version number</Heading>
 
@@ -357,11 +357,11 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 	);
 };
 
-const NewSchemaVersionHeader: React.FC<{ profileSlug: string; schemaSlug: string }> = ({
+const NewSchemaVersionHeader: React.FC<{ profileSlug: string; contentSlug: string }> = ({
 	profileSlug,
-	schemaSlug,
+	contentSlug,
 }) => (
-	<SchemaHeader profileSlug={profileSlug} schemaSlug={schemaSlug}>
+	<SchemaHeader profileSlug={profileSlug} contentSlug={contentSlug}>
 		<Text size={600} marginX={majorScale(1)}>
 			/
 		</Text>

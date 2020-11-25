@@ -19,12 +19,16 @@ type NavItem = {
 };
 export type Props = {
 	navItems: NavItem[];
+	contentType?: "collection" | "schema";
+	activeMode?: string;
+	activeSubmode?: string;
 };
 
-const ScopeNav: React.FC<Props> = function ({ navItems }) {
+const ScopeNav: React.FC<Props> = function ({ navItems, contentType, activeMode, activeSubmode }) {
 	const router = useRouter();
-	const { profileSlug, collectionSlug, mode, subMode } = router.query as Record<string, string>;
-	const activeModeData = navItems.find((item) => item.slug === mode);
+	console.log(router.query);
+	const { profileSlug, contentSlug } = router.query as Record<string, string>;
+	const activeModeData = navItems.find((item) => item.slug === activeMode);
 	const activeChildren = activeModeData?.children;
 
 	return (
@@ -32,7 +36,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 			<div className={styles.primary}>
 				{navItems.map((item) => {
 					const { slug: modeSlug, title } = item;
-					const isActive = mode === modeSlug || (!mode && !modeSlug);
+					const isActive = activeMode === modeSlug || (!activeMode && !modeSlug);
 					return (
 						<Button
 							className={classNames(styles.button, isActive && styles.active)}
@@ -42,8 +46,9 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 							height={40}
 							href={buildUrl({
 								profileSlug: profileSlug,
-								collectionSlug: collectionSlug,
+								contentSlug: contentSlug,
 								mode: modeSlug,
+								type: contentType,
 							})}
 						>
 							{title}
@@ -55,7 +60,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 				<div className={styles.secondary}>
 					{activeChildren.map((item) => {
 						const { slug: subModeSlug, title } = item;
-						const isActive = subMode === subModeSlug;
+						const isActive = activeSubmode === subModeSlug;
 						const modeSlug = activeModeData?.slug;
 						return (
 							<Button
@@ -66,9 +71,10 @@ const ScopeNav: React.FC<Props> = function ({ navItems }) {
 								is="a"
 								href={buildUrl({
 									profileSlug: profileSlug,
-									collectionSlug: collectionSlug,
+									contentSlug: contentSlug,
 									mode: modeSlug,
 									subMode: subModeSlug,
+									type: contentType,
 								})}
 							>
 								{title}

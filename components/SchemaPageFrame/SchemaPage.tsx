@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-	Badge,
 	Button,
 	Link,
 	majorScale,
-	minorScale,
 	Pane,
 	Paragraph,
 	Tab,
@@ -13,27 +11,16 @@ import {
 	Text,
 	toaster,
 } from "evergreen-ui";
-
-import { GetServerSideProps } from "next";
-
 import api from "next-rest/client";
+import { useRouter } from "next/router";
 
 import { SchemaContent, SchemaGraph, ScopeHeader, ScopeNav, ReadmeViewer } from "components";
-
-import prisma from "utils/server/prisma";
-
 import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 import { nullOption, parseToml, toOption } from "utils/shared/schemas/parse";
-import { getCachedSession } from "utils/server/session";
 import { usePageContext } from "utils/client/hooks";
 
-type SchemaPageParams = {
-	profileSlug: string;
-	schemaSlug: string;
-};
-
-interface SchemaPageProps {
-	schemaSlug: string;
+export interface SchemaPageProps {
+	contentSlug: string;
 	profileSlug: string;
 	versionCount: number;
 	schema: Schema;
@@ -55,88 +42,23 @@ interface SchemaVersion {
 	readme: string | null;
 }
 
-export const getServerSideProps: GetServerSideProps<SchemaPageProps, SchemaPageParams> = async (
-	context
-) => {
-	const { profileSlug, schemaSlug } = context.params!;
+// type Tab = "about" | "graph" | "source" | "versions";
 
-	const session = getCachedSession(context);
+// const tabs: { label: string; value: Tab }[] = [
+// 	{ label: "About", value: "about" },
+// 	{ label: "Graph", value: "graph" },
+// 	{ label: "Source", value: "source" },
+// 	{ label: "Version history", value: "versions" },
+// ];
 
-	const schema = await prisma.schema.findFirst({
-		where: {
-			slug: schemaSlug,
-			agent: {
-				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
-			},
-		},
-		select: {
-			id: true,
-			slug: true,
-			description: true,
-			isPublic: true,
-			agent: { select: { userId: true } },
-			updatedAt: true,
-			versions: {
-				take: 1,
-				orderBy: { createdAt: "desc" },
-				select: {
-					id: true,
-					versionNumber: true,
-					content: true,
-					readme: true,
-				},
-			},
-		},
-	});
-
-	if (schema === null) {
-		return { notFound: true };
-	}
-
-	if (!schema.isPublic) {
-		if (session === null) {
-			return { notFound: true };
-		}
-
-		// For now, a private schema is only accessible by the user that created it.
-		// We'll have to update this with more expressive access control logic
-		if (session.user.id !== schema.agent.userId) {
-			return { notFound: true };
-		}
-	}
-
-	const versionCount = await prisma.schemaVersion.count({ where: { schemaId: schema.id } });
-
-	return {
-		props: {
-			profileSlug,
-			schemaSlug,
-			versionCount,
-			schema: { ...schema, updatedAt: schema.updatedAt.toISOString() },
-		},
-	};
-};
-
-type Tab = "about" | "graph" | "source" | "versions";
-
-const tabs: { label: string; value: Tab }[] = [
-	{ label: "About", value: "about" },
-	{ label: "Graph", value: "graph" },
-	{ label: "Source", value: "source" },
-	{ label: "Version history", value: "versions" },
-];
-
-const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPageProps) => {
-	const [selectedTab, setSelectedTab] = useState<Tab>("about");
-
+const SchemaPage = ({ schema, versionCount, profileSlug, contentSlug }: SchemaPageProps) => {
+	// const [selectedTab, setSelectedTab] = useState<Tab>("about");
 	const { session } = usePageContext();
-
 	const isOwner = session !== null && session.user.id === schema.agent.userId;
-
+	const router = useRouter();
+	const { profileSlug, contentSlug, mode, subMode } = router.query as Record<string, string>;
 	const [version] = schema.versions.length > 0 ? schema.versions : [null];
-
 	const noVersions = versionCount === 0 || version === null;
-
 	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
 
 	return (
@@ -144,7 +66,7 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 			<ScopeHeader
 				type="schema"
 				profileSlug={profileSlug}
-				contentSlug={schemaSlug}
+				contentSlug={contentSlug}
 				detailsTop={
 					<Text color="muted">
 						{versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
@@ -164,7 +86,10 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 				].filter((item) => {
 					return !item.ownerOnly || isOwner;
 				})}
+				contentType="schema"
 			/>
+
+			
 
 			<Pane marginY={majorScale(4)} display="flex" alignItems="center">
 				<Tablist userSelect="none">
@@ -184,7 +109,7 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 						appearance="minimal"
 						marginX={majorScale(2)}
 						is="a"
-						href={`/${profileSlug}/schemas/${schemaSlug}/new`}
+						href={`/${profileSlug}/schemas/${contentSlug}/new`}
 					>
 						New version
 					</Button>
@@ -199,7 +124,7 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 						{isOwner ? (
 							<Paragraph>
 								<Link
-									href={`/${profileSlug}/schemas/${schemaSlug}/new`}
+									href={`/${profileSlug}/schemas/${contentSlug}/new`}
 									color="neutral"
 								>
 									Create an initial version
@@ -217,7 +142,7 @@ const SchemaPage = ({ schema, versionCount, profileSlug, schemaSlug }: SchemaPag
 				) : selectedTab === "versions" ? (
 					<SchemaVersionsTab
 						profileSlug={profileSlug}
-						schemaSlug={schemaSlug}
+						contentSlug={contentSlug}
 						schema={schema}
 					/>
 				) : (
@@ -267,9 +192,9 @@ const parseVersion = ({
 
 const SchemaVersionsTab: React.FC<{
 	profileSlug: string;
-	schemaSlug: string;
+	contentSlug: string;
 	schema: Schema;
-}> = ({ profileSlug, schemaSlug, schema: { id } }) => {
+}> = ({ profileSlug, contentSlug, schema: { id } }) => {
 	const [loading, setLoading] = useState(true);
 	const [end, setEnd] = useState(false);
 	const [versions, setVersions] = useState<
@@ -320,7 +245,7 @@ const SchemaVersionsTab: React.FC<{
 						<Table.Row
 							key={id}
 							is="a"
-							href={`/${profileSlug}/schemas/${schemaSlug}/${versionNumber}`}
+							href={`/${profileSlug}/schemas/${contentSlug}/${versionNumber}`}
 						>
 							<Table.TextHeaderCell>{versionNumber}</Table.TextHeaderCell>
 							<Table.TextCell>{agentSlug ? `@${agentSlug}` : null}</Table.TextCell>
