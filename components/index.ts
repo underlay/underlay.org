@@ -15,6 +15,6 @@ export { default as StandardFrame } from "./StandardFrame/StandardFrame";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";
 export { default as SchemaContent } from "./SchemaContent/SchemaContent";
 export { default as SchemaGraph } from "./SchemaGraph/SchemaGraph";
-export { default as SchemaHeader } from "./SchemaHeader/SchemaHeader";
 export { default as SchemaPageFrame } from "./SchemaPageFrame/SchemaPageFrame";
+export { default as SchemaVersionOverview } from "./SchemaVersionOverview/SchemaVersionOverview";
 export { default as ReadmeViewer } from "./ReadmeViewer/ReadmeViewer";

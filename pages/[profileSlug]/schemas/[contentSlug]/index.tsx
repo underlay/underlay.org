@@ -1,10 +1,11 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-// import prisma from "utils/server/prisma";
 
-import { SchemaPageFrame } from "components";
+import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
+import prisma from "utils/server/prisma";
 import { getSchemaPageHeaderData, getSchemaPagePermissions } from "utils/server/schemaPages";
+import { buildUrl } from "utils/shared/urls";
 
 type SchemaPageParams = {
 	profileSlug: string;
@@ -13,7 +14,16 @@ type SchemaPageParams = {
 
 interface SchemaOverviewProps {
 	schemaPageHeaderProps: SchemaPageHeaderProps;
+	currentVersion: SchemaVersion;
 }
+
+type SchemaVersion = {
+	id: string;
+	versionNumber: string;
+	content: string;
+	readme: string | null;
+	createdAt: string;
+};
 
 export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaPageParams> = async (
 	context
@@ -24,6 +34,36 @@ export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaP
 	if (!schemaPageHeaderProps || !hasAccess) {
 		return { notFound: true };
 	}
+	if (schemaPageHeaderProps.versionCount < 1) {
+		/* If there are no versions yet, redirect to the */
+		/* edit page for creation. */
+		const { profileSlug, contentSlug } = schemaPageHeaderProps;
+		return {
+			redirect: {
+				destination: buildUrl({
+					profileSlug,
+					contentSlug,
+					mode: "edit",
+					type: "schema",
+				}),
+				permanent: false,
+			},
+		};
+	}
+
+	const currentVersion = await prisma.schemaVersion.findFirst({
+		where: {
+			schemaId: schemaPageHeaderProps.schema.id,
+		},
+		orderBy: { createdAt: "desc" },
+		select: {
+			id: true,
+			versionNumber: true,
+			content: true,
+			readme: true,
+			createdAt: true,
+		},
+	});
 
 	return {
 		props: {
@@ -31,15 +71,19 @@ export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaP
 				...schemaPageHeaderProps,
 				mode: "",
 			},
+			currentVersion: { ...currentVersion!, createdAt: currentVersion!.createdAt.toISOString() },
 		},
 	};
 };
 
-const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) => {
+const SchemaOverview: React.FC<SchemaOverviewProps> = ({
+	schemaPageHeaderProps,
+	currentVersion,
+}) => {
 	return (
 		<SchemaPageFrame {...schemaPageHeaderProps}>
-			<h1>Overview Content</h1>
+			<SchemaVersionOverview {...currentVersion} />
 		</SchemaPageFrame>
 	);
 };
-export default SchemaPage;
+export default SchemaOverview;

@@ -22,16 +22,6 @@ export const getSchemaPageHeaderData = async (
 			isPublic: true,
 			agent: { select: { userId: true } },
 			updatedAt: true,
-			versions: {
-				take: 1,
-				orderBy: { createdAt: "desc" },
-				select: {
-					id: true,
-					versionNumber: true,
-					content: true,
-					readme: true,
-				},
-			},
 		},
 	});
 
@@ -40,10 +30,22 @@ export const getSchemaPageHeaderData = async (
 	}
 
 	const versionCount = await prisma.schemaVersion.count({ where: { schemaId: schema?.id } });
+	const currentVersionDetails = await prisma.schemaVersion.findFirst({
+		where: {
+			schemaId: schema.id,
+		},
+		orderBy: { createdAt: "desc" },
+		select: {
+			versionNumber: true,
+			createdAt: true,
+		},
+	});
 	return {
 		contentSlug,
 		profileSlug,
 		versionCount,
+		currentVersionDate: currentVersionDetails!.createdAt.toISOString(),
+		currentVersionNumber: currentVersionDetails!.versionNumber,
 		schema: { ...schema, updatedAt: schema.updatedAt.toISOString() },
 	};
 };

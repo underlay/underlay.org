@@ -1,13 +1,15 @@
 import React, { useMemo } from "react";
 import { Text } from "evergreen-ui";
 
-import { ScopeHeader, ScopeNav } from "components";
+import { StandardFrame } from "components";
 import { usePageContext } from "utils/client/hooks";
 
 export type SchemaPageHeaderProps = {
 	contentSlug: string;
 	profileSlug: string;
 	versionCount: number;
+	currentVersionDate: string;
+	currentVersionNumber: string;
 	schema: Schema;
 	mode?: string;
 	submode?: string;
@@ -26,6 +28,8 @@ type SchemaPageFrameProps = SchemaPageHeaderProps & { children: React.ReactNode 
 const SchemaPageHeader = ({
 	schema,
 	versionCount,
+	currentVersionDate,
+	currentVersionNumber,
 	profileSlug,
 	contentSlug,
 	mode,
@@ -34,40 +38,40 @@ const SchemaPageHeader = ({
 }: SchemaPageFrameProps) => {
 	const { session } = usePageContext();
 	const isOwner = session !== null && session.user.id === schema.agent.userId;
-	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
+	const updatedAt = useMemo(() => new Date(currentVersionDate), [currentVersionDate]);
 
 	return (
-		<React.Fragment>
-			<ScopeHeader
-				type="schema"
-				profileSlug={profileSlug}
-				contentSlug={contentSlug}
-				detailsTop={
+		<StandardFrame
+			scopeHeaderProps={{
+				type: "schema",
+				profileSlug: profileSlug,
+				contentSlug: contentSlug,
+				detailsTop: (
 					<Text color="muted">
-						{versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
-						updated {updatedAt.toLocaleDateString()}
+						Latest Version: {currentVersionNumber} · {updatedAt.toLocaleDateString()}
+						{/* {versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
+						updated {updatedAt.toLocaleDateString()} */}
 					</Text>
-				}
-				detailsBottom={schema.description}
-				isPrivate={schema.isPublic}
-			/>
-			<div className="content-indent">
-				<ScopeNav
-					navItems={[
-						{ slug: "", title: "Overview" },
-						{ slug: "edit", title: "Edit", ownerOnly: true },
-						{ slug: "versions", title: "Versions" },
-						{ slug: "settings", title: "Settings" },
-					].filter((item) => {
-						return !item.ownerOnly || isOwner;
-					})}
-					contentType="schema"
-					activeMode={mode}
-					activeSubmode={submode}
-				/>
-				{children}
-			</div>
-		</React.Fragment>
+				),
+
+				detailsBottom: schema.description,
+				isPrivate: schema.isPublic,
+			}}
+			scopeNavProps={{
+				navItems: [
+					{ slug: "", title: "Overview" },
+					{ slug: "edit", title: "Edit", ownerOnly: true },
+					{ slug: "versions", title: `Versions (${versionCount})` },
+					{ slug: "settings", title: "Settings" },
+				].filter((item) => {
+					return !item.ownerOnly || isOwner;
+				}),
+				contentType: "schema",
+				activeMode: mode,
+				activeSubmode: submode,
+			}}
+			content={children}
+		/>
 	);
 };
 export default SchemaPageHeader;
