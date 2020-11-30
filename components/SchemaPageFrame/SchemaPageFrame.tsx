@@ -55,14 +55,14 @@ const SchemaPageHeader = ({
 				),
 
 				detailsBottom: schema.description,
-				isPrivate: schema.isPublic,
+				isPrivate: !schema.isPublic,
 			}}
 			scopeNavProps={{
 				navItems: [
 					{ slug: "", title: "Overview" },
 					{ slug: "edit", title: "Edit", ownerOnly: true },
 					{ slug: "versions", title: `Versions (${versionCount})` },
-					{ slug: "settings", title: "Settings" },
+					{ slug: "settings", title: "Settings", ownerOnly: true },
 				].filter((item) => {
 					return !item.ownerOnly || isOwner;
 				}),
