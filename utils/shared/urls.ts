@@ -1,14 +1,16 @@
 type urlInputs = {
 	profileSlug?: string;
-	collectionSlug?: string;
+	contentSlug?: string;
 	mode?: string;
 	subMode?: string;
+	type?: "schema" | "collection";
 };
 
-export const buildUrl = ({ profileSlug, collectionSlug, mode, subMode }: urlInputs): string => {
+export const buildUrl = ({ profileSlug, contentSlug, mode, subMode, type }: urlInputs): string => {
 	const profileString = profileSlug ? `/${profileSlug}` : "";
-	const collectionString = collectionSlug ? `/${collectionSlug}` : "";
+	const contentString = contentSlug ? `/${contentSlug}` : "";
 	const modeString = mode ? `/${mode}` : "";
 	const subModeString = subMode ? `/${subMode}` : "";
-	return `${profileString}${collectionString}${modeString}${subModeString}`;
+	const typeString = type ? `/${type}s` : "";
+	return `${profileString}${typeString}${contentString}${modeString}${subModeString}`;
 };

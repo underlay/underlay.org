@@ -1,11 +1,12 @@
 import React from "react";
 import { Button, IconButton, Menu, Pane, Popover, Position } from "evergreen-ui";
+import { signOut } from "next-auth/client";
 
 import { Avatar } from "components";
 import { usePageContext } from "utils/client/hooks";
 
 import styles from "./Header.module.scss";
-import { signOut } from "next-auth/client";
+
 
 const Header = () => {
 	const { session } = usePageContext();
@@ -14,14 +15,14 @@ const Header = () => {
 		<nav className={styles.header}>
 			<div className={styles.content}>
 				<Pane>
-					<Button height={40} appearance="minimal" is="a" href="/">
-						R1
+					<Button className={styles.title} height={40} appearance="minimal" is="a" href="/">
+						<img src="/headerLogo.svg" alt="Underlay r1 logo" />
 					</Button>
 				</Pane>
 				<Pane display="flex" alignItems="center">
 					{user ? (
 						<>
-							<Button is="a" href="/new/schema" marginRight={12} appearance="minimal">
+							<Button is="a" href="/new/schema" marginRight={12} height={40} appearance="minimal">
 								New schema
 							</Button>
 							<Popover

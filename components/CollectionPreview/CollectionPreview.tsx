@@ -33,7 +33,7 @@ const CollectionPreview: React.FC<Props> = function ({
 		<a
 			href={buildUrl({
 				profileSlug: profileSlug as string,
-				collectionSlug: slug,
+				contentSlug: slug,
 			})}
 			className={classNames(styles.preview, className)}
 		>

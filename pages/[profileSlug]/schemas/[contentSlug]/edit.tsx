@@ -1,3 +1,11 @@
+import React from "react";
+import { GetServerSideProps } from "next";
+import prisma from "utils/server/prisma";
+
+import { SchemaPageFrame, Section } from "components";
+import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
+import { getSchemaPageHeaderData, getSchemaPagePermissions } from "utils/server/schemaPages";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	Button,
@@ -15,7 +23,6 @@ import {
 	TickCircleIcon,
 	toaster,
 } from "evergreen-ui";
-import { GetServerSideProps } from "next";
 
 import { useRouter } from "next/router";
 import api from "next-rest/client";
@@ -27,30 +34,28 @@ import semverInc from "semver/functions/inc";
 import semverLt from "semver/functions/lt";
 import semverMajor from "semver/functions/major";
 
-import SchemaHeader from "components/SchemaHeader/SchemaHeader";
 import ReadmeEditor from "components/ReadmeEditor/ReadmeEditor";
 import SchemaEditor, {
 	initialSchemaContent,
 	ResultType,
 } from "components/SchemaEditor/SchemaEditor";
 
-import { getCachedSession } from "utils/server/session";
-import prisma from "utils/server/prisma";
+// import { getCachedSession } from "utils/server/session";
+// import prisma from "utils/server/prisma";
 import { parseToml, toOption } from "utils/shared/schemas/parse";
 import { usePageContext } from "utils/client/hooks";
 
-type NewSchemaVersionPageParams = {
+type SchemaPageParams = {
 	profileSlug: string;
-	schemaSlug: string;
+	contentSlug: string;
 };
 
-interface NewSchemaVersionPageProps {
-	profileSlug: string;
-	schemaSlug: string;
-	schema: Schema;
+interface SchemaEditProps {
+	schemaPageHeaderProps: SchemaPageHeaderProps;
+	draftSchema: draftSchema;
 }
 
-interface Schema {
+interface draftSchema {
 	id: string;
 	description: string;
 	agent: { userId: string | null };
@@ -64,23 +69,19 @@ interface SchemaVersion {
 	versionNumber: string;
 }
 
-export const getServerSideProps: GetServerSideProps<
-	NewSchemaVersionPageProps,
-	NewSchemaVersionPageParams
-> = async (context) => {
-	const { profileSlug, schemaSlug } = context.params!;
-
-	const session = getCachedSession(context);
-	if (session === null) {
+export const getServerSideProps: GetServerSideProps<SchemaEditProps, SchemaPageParams> = async (
+	context
+) => {
+	const { profileSlug, contentSlug } = context.params!;
+	const schemaPageHeaderProps = await getSchemaPageHeaderData(profileSlug, contentSlug);
+	const hasAccess = getSchemaPagePermissions(context, schemaPageHeaderProps);
+	if (!schemaPageHeaderProps || !hasAccess) {
 		return { notFound: true };
 	}
 
-	const schema = await prisma.schema.findFirst({
+	const schemaWithDraft = await prisma.schema.findFirst({
 		where: {
-			slug: schemaSlug,
-			agent: {
-				OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
-			},
+			id: schemaPageHeaderProps.schema.id,
 		},
 		select: {
 			id: true,
@@ -93,35 +94,29 @@ export const getServerSideProps: GetServerSideProps<
 		},
 	});
 
-	if (schema === null) {
-		return { notFound: true };
-	}
-
-	if (session.user.id !== schema.agent.userId) {
-		return { notFound: true };
-	}
-
 	return {
 		props: {
-			profileSlug,
-			schemaSlug,
-			schema,
+			schemaPageHeaderProps: {
+				...schemaPageHeaderProps,
+				mode: "edit",
+			},
+			draftSchema: schemaWithDraft!,
 		},
 	};
 };
 
-const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
-	schema,
-	profileSlug,
-	schemaSlug,
-}) => {
+const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSchema }) => {
+	const { profileSlug, contentSlug } = schemaPageHeaderProps;
 	const { session } = usePageContext();
 
 	const router = useRouter();
 
 	const previousVersion = useMemo(
-		() => (schema.versions.length === 0 ? null : semverValid(schema.versions[0].versionNumber)),
-		[schema]
+		() =>
+			draftSchema.versions.length === 0
+				? null
+				: semverValid(draftSchema.versions[0].versionNumber),
+		[draftSchema]
 	);
 
 	const initialVersion = previousVersion && semverInc(previousVersion, "prerelease");
@@ -136,8 +131,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 		[]
 	);
 
-	const initialContent = schema.draftContent || initialSchemaContent;
-	const initialReadme = schema.draftReadme || `# ${schemaSlug}\n\n> ${schema.description}\n\n`;
+	const initialContent = draftSchema.draftContent || initialSchemaContent;
+	const initialReadme =
+		draftSchema.draftReadme || `# ${contentSlug}\n\n> ${draftSchema.description}\n\n`;
 
 	const initialResult = useMemo<ResultType>(() => toOption(parseToml(initialContent)), [
 		initialContent,
@@ -182,7 +178,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 		setSaving(true);
 		api.patch(
 			"/api/schema/[id]",
-			{ id: schema.id },
+			{ id: draftSchema.id },
 			{ "content-type": "application/json" },
 			{
 				draftVersionNumber: versionNumber,
@@ -198,7 +194,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 				setSaving(false);
 				toaster.danger(`Failed to save draft: ${err.toString()}`);
 			});
-	}, [schema, versionNumber, attachReadme]);
+	}, [draftSchema, versionNumber, attachReadme]);
 
 	const isVersionValid = semverValid(versionNumber) !== null && semverMajor(versionNumber) === 0;
 	const isVersionMonotonic =
@@ -209,7 +205,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 			setPublishing(true);
 			api.post(
 				"/api/schema/[id]",
-				{ id: schema.id },
+				{ id: draftSchema.id },
 				{ "content-type": "application/json" },
 				{
 					versionNumber: versionNumber,
@@ -220,9 +216,9 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 				.then(([{}]) => {
 					setPublishing(false);
 					toaster.success(
-						`${profileSlug}/schemas/${schemaSlug}@${versionNumber} published successfully`
+						`${profileSlug}/schemas/${contentSlug}@${versionNumber} published successfully`
 					);
-					router.push(`/${profileSlug}/schemas/${schemaSlug}`);
+					router.push(`/${profileSlug}/schemas/${contentSlug}`);
 				})
 				.catch((err) => {
 					setPublishing(false);
@@ -233,7 +229,7 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 					);
 				});
 		}
-	}, [profileSlug, schema, versionNumber, isVersionMonotonic, result, attachReadme]);
+	}, [profileSlug, draftSchema, versionNumber, isVersionMonotonic, result, attachReadme]);
 
 	const [openPublishDialog, setOpenPublishDialog] = useState(false);
 
@@ -258,115 +254,98 @@ const NewSchemaVersion: React.FC<NewSchemaVersionPageProps> = ({
 
 	useEffect(() => {
 		if (session === null) {
-			router.push(`/${profileSlug}/schemas/${schemaSlug}`);
+			router.push(`/${profileSlug}/schemas/${contentSlug}`);
 		}
 	}, []);
-
 	return (
-		<Pane
-			maxWidth={majorScale(128)}
-			paddingX={majorScale(2)}
-			margin="auto"
-			onKeyDown={handleKeyDown}
-		>
-			<NewSchemaVersionHeader profileSlug={profileSlug} schemaSlug={schemaSlug} />
-
-			<Heading marginTop={majorScale(8)}>Version number</Heading>
-
-			<Paragraph marginY={majorScale(1)}>
-				Version numbers must be <Link href="https://semver.org/">semver</Link> strings -
-				like 0.2.6, 12.0.0-alpha, 5.2.0-rc.1, ...
-			</Paragraph>
-			<Paragraph marginY={majorScale(1)}>
-				Only version numbers with major version 0 can be published while R1 is in beta.
-			</Paragraph>
-			<TextInput
-				autoFocus={true}
-				width={majorScale(16)}
-				value={versionNumber}
-				isInvalid={!isVersionValid || !isVersionMonotonic}
-				onChange={handleVersionChange}
-			/>
-
-			{isVersionValid && !isVersionMonotonic && (
-				<Paragraph marginY={majorScale(1)} color="muted">
-					Versions must only increment (last version is {previousVersion || "0.0.0"})
-				</Paragraph>
-			)}
-
-			<Heading marginTop={majorScale(4)}>Content</Heading>
-
-			<Pane marginY={majorScale(2)}>
-				<SchemaEditor initialValue={initialContent} onChange={handleChange} />
-			</Pane>
-
-			<Heading marginTop={majorScale(4)}>Readme</Heading>
-			<Paragraph marginY={majorScale(1)}>
-				Readme files are written in{" "}
-				<Link href="https://commonmark.org/" color="neutral">
-					markdown
-				</Link>{" "}
-				and are used to document a specific version of a schema.
-			</Paragraph>
-			<Pane display="flex" marginY={majorScale(1)}>
-				<Text>Attach readme?</Text>
-				<Switch
-					height={20}
-					marginX={majorScale(2)}
-					checked={attachReadme}
-					onChange={handleSetReadme}
-				/>
-			</Pane>
-
-			<Pane marginY={majorScale(2)}>
-				{attachReadme ? (
-					<ReadmeEditor
-						initialValue={initialReadme || ""}
-						onChange={handleChangeReadme}
+		<SchemaPageFrame {...schemaPageHeaderProps}>
+			<Pane onKeyDown={handleKeyDown}>
+				<Section title="Version Number" useMargin>
+					<Paragraph marginY={majorScale(1)}>
+						Version numbers must be <Link href="https://semver.org/">semver</Link>{" "}
+						strings - like 0.2.6, 12.0.0-alpha, 5.2.0-rc.1, ...
+					</Paragraph>
+					<Paragraph marginY={majorScale(1)}>
+						Only version numbers with major version 0 can be published while R1 is in
+						beta.
+					</Paragraph>
+					<TextInput
+						autoFocus={true}
+						width={majorScale(16)}
+						value={versionNumber}
+						isInvalid={!isVersionValid || !isVersionMonotonic}
+						onChange={handleVersionChange}
 					/>
-				) : null}
-			</Pane>
-			<Pane marginTop={majorScale(4)}>
-				<Button
-					disabled={clean}
-					onClick={handleSaveDraft}
-					iconAfter={saving ? <Spinner /> : clean ? <TickCircleIcon /> : <DotIcon />}
+
+					{isVersionValid && !isVersionMonotonic && (
+						<Paragraph marginY={majorScale(1)} color="muted">
+							Versions must only increment (last version is{" "}
+							{previousVersion || "0.0.0"})
+						</Paragraph>
+					)}
+				</Section>
+				<Section title="Content" useMargin>
+					<Pane marginY={majorScale(2)}>
+						<SchemaEditor initialValue={initialContent} onChange={handleChange} />
+					</Pane>
+				</Section>
+				<Section title="Readme" useMargin>
+					<Heading marginTop={majorScale(4)}>Readme</Heading>
+					<Paragraph marginY={majorScale(1)}>
+						Readme files are written in{" "}
+						<Link href="https://commonmark.org/" color="neutral">
+							markdown
+						</Link>{" "}
+						and are used to document a specific version of a schema.
+					</Paragraph>
+					<Pane display="flex" marginY={majorScale(1)}>
+						<Text>Attach readme?</Text>
+						<Switch
+							height={20}
+							marginX={majorScale(2)}
+							checked={attachReadme}
+							onChange={handleSetReadme}
+						/>
+					</Pane>
+
+					<Pane marginY={majorScale(2)}>
+						{attachReadme ? (
+							<ReadmeEditor
+								initialValue={initialReadme || ""}
+								onChange={handleChangeReadme}
+							/>
+						) : null}
+					</Pane>
+				</Section>
+				<Pane marginTop={majorScale(4)}>
+					<Button
+						disabled={clean}
+						onClick={handleSaveDraft}
+						iconAfter={saving ? <Spinner /> : clean ? <TickCircleIcon /> : <DotIcon />}
+					>
+						Save draft
+					</Button>
+					<Button
+						marginX={majorScale(2)}
+						disabled={result._tag === "None" || !isVersionValid || !isVersionMonotonic}
+						onClick={() => setOpenPublishDialog(true)}
+						iconAfter={publishing ? <Spinner /> : null}
+					>
+						Publish version
+					</Button>
+				</Pane>
+				<Dialog
+					title="Publish new version"
+					confirmLabel="Publish"
+					isShown={openPublishDialog}
+					onCloseComplete={() => setOpenPublishDialog(false)}
+					onConfirm={handlePublishVersion}
+					preventBodyScrolling={true}
 				>
-					Save draft
-				</Button>
-				<Button
-					marginX={majorScale(2)}
-					disabled={result._tag === "None" || !isVersionValid || !isVersionMonotonic}
-					onClick={() => setOpenPublishDialog(true)}
-					iconAfter={publishing ? <Spinner /> : null}
-				>
-					Publish version
-				</Button>
+					Are you sure you want to do this?
+				</Dialog>
 			</Pane>
-			<Dialog
-				title="Publish new version"
-				confirmLabel="Publish"
-				isShown={openPublishDialog}
-				onCloseComplete={() => setOpenPublishDialog(false)}
-				onConfirm={handlePublishVersion}
-				preventBodyScrolling={true}
-			>
-				Are you sure you want to do this?
-			</Dialog>
-		</Pane>
+		</SchemaPageFrame>
 	);
 };
-
-const NewSchemaVersionHeader: React.FC<{ profileSlug: string; schemaSlug: string }> = ({
-	profileSlug,
-	schemaSlug,
-}) => (
-	<SchemaHeader profileSlug={profileSlug} schemaSlug={schemaSlug}>
-		<Text size={600} marginX={majorScale(1)}>
-			/
-		</Text>
-		<Text size={600}>new version</Text>
-	</SchemaHeader>
-);
-
-export default NewSchemaVersion;
+export default SchemaEdit;

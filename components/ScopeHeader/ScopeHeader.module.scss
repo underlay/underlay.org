@@ -6,7 +6,7 @@
 
 	.typeIcon {
 		position: absolute;
-		left: -42px;
+		left: -40px;
 	}
 	.avatarComponent {
 		float: left;
@@ -21,6 +21,10 @@
 		top: -5px;
 		a {
 			color: inherit;
+			text-decoration: none;
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 	}
 	.details {

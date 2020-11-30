@@ -20,6 +20,7 @@ export const Primary: React.FC<{}> = () => (
 					{ slug: "overview", title: "Overview" },
 					{ slug: "query", title: "Query" },
 				]}
+				activeMode="overview"
 			/>
 		</div>
 		<div style={wrapperStyle}>
@@ -35,6 +36,8 @@ export const Primary: React.FC<{}> = () => (
 					},
 					{ slug: "query", title: "Query" },
 				]}
+				activeMode="overview"
+				activeSubmode="assertions"
 			/>
 		</div>
 	</div>
