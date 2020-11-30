@@ -40,12 +40,16 @@ export const getSchemaPageHeaderData = async (
 			createdAt: true,
 		},
 	});
+
+	const currentVersionDate = currentVersionDetails ? currentVersionDetails.createdAt.toISOString() : "";
+	const currentVersionNumber = currentVersionDetails ? currentVersionDetails.versionNumber : "";
+
 	return {
 		contentSlug,
 		profileSlug,
 		versionCount,
-		currentVersionDate: currentVersionDetails!.createdAt.toISOString(),
-		currentVersionNumber: currentVersionDetails!.versionNumber,
+		currentVersionDate: currentVersionDate,
+		currentVersionNumber: currentVersionNumber,
 		schema: { ...schema, updatedAt: schema.updatedAt.toISOString() },
 	};
 };

@@ -48,7 +48,10 @@ const SchemaPageHeader = ({
 				contentSlug: contentSlug,
 				detailsTop: (
 					<Text color="muted">
-						Latest Version: {currentVersionNumber} · {updatedAt.toLocaleDateString()}
+						{currentVersionNumber
+							? `Latest Version: ${currentVersionNumber} · ${updatedAt.toLocaleDateString()}`
+							: "Unpublished"}
+						{/* Latest Version: {currentVersionNumber || "Unpublished"} · {updatedAt.toLocaleDateString()} */}
 						{/* {versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
 						updated {updatedAt.toLocaleDateString()} */}
 					</Text>
