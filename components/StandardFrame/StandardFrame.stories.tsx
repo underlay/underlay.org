@@ -14,7 +14,8 @@ export const Primary: React.FC<{}> = () => (
 		className="organization-container"
 		scopeHeaderProps={{
 			type: "org",
-			title: "Hello Org",
+			profileTitle: "Hello Org",
+			profileSlug: 'hello',
 			avatar:
 				"https://images.unsplash.com/photo-1516876437184-593fda40c7ce?&w=100&h=100&fit=crop",
 			detailsTop: "my-slug",

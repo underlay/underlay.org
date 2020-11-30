@@ -4,16 +4,15 @@
 // const prisma = new PrismaClient();
 // import { Button } from '@blueprintjs/core';
 
-const Submode = () => {
+const CollectionPage = () => {
 	return (
 		<div>
-			In Collection Submode Page
-			
+			In Collection Page
 		</div>
 	);
 };
 
-export default Submode;
+export default CollectionPage;
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 // 	const initData = await getInitData(context.req);

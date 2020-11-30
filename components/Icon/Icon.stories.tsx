@@ -16,6 +16,7 @@ export const Primary: React.FC<{}> = () => (
 		<Icon icon="collection" size={64} />
 		<Icon icon="org" size={64} />
 		<Icon icon="rocket" size={64} />
+		<Icon icon="schema" size={64} />
 		<Icon icon="user" size={64} />
 	</div>
 	<div>
