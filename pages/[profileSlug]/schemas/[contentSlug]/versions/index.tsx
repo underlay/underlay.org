@@ -14,7 +14,7 @@ import {
 	countSchemaVersions,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
-import { SchemaPageParams, SchemaPageProps } from "utils/server/schemaPage";
+import { SchemaPageParams, SchemaPageProps } from "utils/server/propTypes";
 
 type SchemaOverviewProps = SchemaPageProps & { schema: { id: string } };
 

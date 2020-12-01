@@ -18,7 +18,7 @@ import {
 	SchemaPageProps,
 	SchemaVersionProps,
 	SchemaVersionPageParams,
-} from "utils/server/schemaPage";
+} from "utils/server/propTypes";
 
 type SchemaVersionPageProps = SchemaPageProps & {
 	schemaVersion: SchemaVersionProps;

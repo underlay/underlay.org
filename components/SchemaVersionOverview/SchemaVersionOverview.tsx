@@ -2,7 +2,7 @@ import React from "react";
 import { Pane, Paragraph } from "evergreen-ui";
 
 import { Section, SchemaEditor, ReadmeViewer } from "components";
-import { SchemaVersionProps } from "utils/server/schemaPage";
+import { SchemaVersionProps } from "utils/server/propTypes";
 
 export type SchemaVersionOverviewProps = SchemaVersionProps;
 

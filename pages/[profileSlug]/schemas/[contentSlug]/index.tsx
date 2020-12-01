@@ -14,7 +14,7 @@ import {
 import { getSchemaPagePermissions } from "utils/server/permissions";
 import { buildUrl } from "utils/shared/urls";
 import { SchemaVersionOverviewProps } from "components/SchemaVersionOverview/SchemaVersionOverview";
-import { SchemaPageProps, SchemaPageParams } from "utils/server/schemaPage";
+import { SchemaPageProps, SchemaPageParams } from "utils/server/propTypes";
 
 /** Data fetching!
  * We have two basic goals: try to fetch everything

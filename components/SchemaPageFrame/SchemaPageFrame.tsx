@@ -5,7 +5,7 @@ import { StandardFrame } from "components";
 import { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
-import { SchemaPageProps } from "utils/server/schemaPage";
+import { SchemaPageProps } from "utils/server/propTypes";
 
 type SchemaPageFrameProps = SchemaPageProps & { children: React.ReactNode };
 

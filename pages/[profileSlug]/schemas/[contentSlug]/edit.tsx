@@ -40,7 +40,7 @@ import {
 	prisma,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
-import { SchemaPageProps, SchemaPageParams } from "utils/server/schemaPage";
+import { SchemaPageProps, SchemaPageParams } from "utils/server/propTypes";
 
 // We use an intersection to "augment" the nested schema type
 type SchemaEditProps = SchemaPageProps & {
