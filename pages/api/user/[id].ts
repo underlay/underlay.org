@@ -8,7 +8,7 @@ import { makeHandler } from "next-rest/server";
 import { slugPattern } from "utils/shared/slug";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
-import prisma from "utils/server/prisma";
+import { prisma } from "utils/server/prisma";
 
 // 1
 

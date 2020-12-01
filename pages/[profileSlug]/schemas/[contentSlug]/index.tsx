@@ -3,87 +3,84 @@ import { GetServerSideProps } from "next";
 
 import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
-import prisma from "utils/server/prisma";
-import { getSchemaPageHeaderData, getSchemaPagePermissions } from "utils/server/schemaPages";
+import {
+	prisma,
+	findResourceWhere,
+	selectSchemaPageProps,
+	selectVersionOverviewProps,
+	countSchemaVersions,
+	serializeUpdatedAt,
+	serializeCreatedAt,
+} from "utils/server/prisma";
+import { getSchemaPagePermissions } from "utils/server/permissions";
 import { buildUrl } from "utils/shared/urls";
+import { SchemaVersionOverviewProps } from "components/SchemaVersionOverview/SchemaVersionOverview";
 
 type SchemaPageParams = {
 	profileSlug: string;
 	contentSlug: string;
 };
 
-interface SchemaOverviewProps {
-	schemaPageHeaderProps: SchemaPageHeaderProps;
-	currentVersion: SchemaVersion;
-}
-
-type SchemaVersion = {
-	id: string;
-	versionNumber: string;
-	content: string;
-	readme: string | null;
-	createdAt: string;
-};
+type SchemaOverviewProps = SchemaPageHeaderProps & { latestVersion: SchemaVersionOverviewProps };
 
 export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaPageParams> = async (
 	context
 ) => {
 	const { profileSlug, contentSlug } = context.params!;
-	const schemaPageHeaderProps = await getSchemaPageHeaderData(profileSlug, contentSlug);
-	const hasAccess = getSchemaPagePermissions(context, schemaPageHeaderProps);
-	if (!schemaPageHeaderProps || !hasAccess) {
+
+	const schemaWithVersion = await prisma.schema.findFirst({
+		where: findResourceWhere(profileSlug, contentSlug),
+		select: {
+			...selectSchemaPageProps,
+			versions: {
+				take: 1,
+				orderBy: { createdAt: "desc" },
+				select: selectVersionOverviewProps,
+			},
+		},
+	});
+
+	// The reason to check if schema === null separately from getSchemaPagePermissions
+	// is so that TypeScript know it's not null afterward
+	if (schemaWithVersion === null) {
+		return { notFound: true };
+	} else if (!getSchemaPagePermissions(context, schemaWithVersion)) {
 		return { notFound: true };
 	}
-	if (schemaPageHeaderProps.versionCount < 1) {
-		/* If there are no versions yet, redirect to the */
-		/* edit page for creation. */
-		const { profileSlug, contentSlug } = schemaPageHeaderProps;
+
+	const versionCount = await countSchemaVersions(schemaWithVersion);
+
+	if (versionCount < 1) {
 		return {
 			redirect: {
-				destination: buildUrl({
-					profileSlug,
-					contentSlug,
-					mode: "edit",
-					type: "schema",
-				}),
+				destination: buildUrl({ profileSlug, contentSlug, mode: "edit", type: "schema" }),
 				permanent: false,
 			},
 		};
 	}
 
-	const currentVersion = await prisma.schemaVersion.findFirst({
-		where: {
-			schemaId: schemaPageHeaderProps.schema.id,
-		},
-		orderBy: { createdAt: "desc" },
-		select: {
-			id: true,
-			versionNumber: true,
-			content: true,
-			readme: true,
-			createdAt: true,
-		},
-	});
+	const {
+		versions: [latestVersion],
+		...schema
+	} = schemaWithVersion;
 
 	return {
 		props: {
-			schemaPageHeaderProps: {
-				...schemaPageHeaderProps,
-				mode: "",
-			},
-			currentVersion: { ...currentVersion!, createdAt: currentVersion!.createdAt.toISOString() },
+			profileSlug,
+			contentSlug,
+			versionCount,
+			schema: serializeUpdatedAt(schema),
+			latestVersion: serializeCreatedAt(latestVersion),
 		},
 	};
 };
 
-const SchemaOverview: React.FC<SchemaOverviewProps> = ({
-	schemaPageHeaderProps,
-	currentVersion,
-}) => {
+const SchemaOverview: React.FC<SchemaOverviewProps> = ({ latestVersion, ...props }) => {
 	return (
-		<SchemaPageFrame {...schemaPageHeaderProps}>
-			<SchemaVersionOverview {...currentVersion} />
+		<SchemaPageFrame {...props}>
+			<SchemaVersionOverview {...latestVersion} />
 		</SchemaPageFrame>
 	);
 };
+
 export default SchemaOverview;

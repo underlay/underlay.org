@@ -18,3 +18,4 @@ export { default as SchemaGraph } from "./SchemaGraph/SchemaGraph";
 export { default as SchemaPageFrame } from "./SchemaPageFrame/SchemaPageFrame";
 export { default as SchemaVersionOverview } from "./SchemaVersionOverview/SchemaVersionOverview";
 export { default as ReadmeViewer } from "./ReadmeViewer/ReadmeViewer";
+export { default as ReadmeEditor } from "./ReadmeEditor/ReadmeEditor";

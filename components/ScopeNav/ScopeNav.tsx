@@ -7,16 +7,17 @@ import { buildUrl } from "utils/shared/urls";
 
 import styles from "./ScopeNav.module.scss";
 
-type NavChild = {
+export type NavChild = {
 	slug: string;
 	title: string;
 };
 
-type NavItem = {
+export type NavItem = {
 	slug: string;
 	title: string;
 	children?: NavChild[];
 };
+
 export type Props = {
 	navItems: NavItem[];
 	contentType?: "collection" | "schema";
@@ -26,7 +27,7 @@ export type Props = {
 
 const ScopeNav: React.FC<Props> = function ({ navItems, contentType, activeMode, activeSubmode }) {
 	const router = useRouter();
-	console.log(router.query);
+
 	const { profileSlug, contentSlug } = router.query as Record<string, string>;
 	const activeModeData = navItems.find((item) => item.slug === activeMode);
 	const activeChildren = activeModeData?.children;

@@ -7,7 +7,7 @@ import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
 import { SessionBase } from "next-auth/_utils";
 
-import prisma from "utils/server/prisma";
+import { prisma } from "utils/server/prisma";
 
 import { ClientUser } from "utils/shared/session";
 

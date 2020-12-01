@@ -2,34 +2,29 @@ import React, { useMemo } from "react";
 import { Text } from "evergreen-ui";
 
 import { StandardFrame } from "components";
+import { NavItem } from "components/ScopeNav/ScopeNav";
+
 import { usePageContext } from "utils/client/hooks";
 
 export type SchemaPageHeaderProps = {
-	contentSlug: string;
 	profileSlug: string;
-	versionCount: number;
-	currentVersionDate: string;
-	currentVersionNumber: string;
-	schema: Schema;
+	contentSlug: string;
 	mode?: string;
 	submode?: string;
-};
-
-export type Schema = {
-	id: string;
-	description: string;
-	agent: { userId: string | null };
-	isPublic: boolean;
-	updatedAt: string;
+	versionCount: number;
+	schema: {
+		description: string;
+		agent: { userId: string | null };
+		isPublic: boolean;
+		updatedAt: string;
+	};
 };
 
 type SchemaPageFrameProps = SchemaPageHeaderProps & { children: React.ReactNode };
 
-const SchemaPageHeader = ({
+const SchemaPageFrame = ({
 	schema,
 	versionCount,
-	currentVersionDate,
-	currentVersionNumber,
 	profileSlug,
 	contentSlug,
 	mode,
@@ -38,7 +33,22 @@ const SchemaPageHeader = ({
 }: SchemaPageFrameProps) => {
 	const { session } = usePageContext();
 	const isOwner = session !== null && session.user.id === schema.agent.userId;
-	const updatedAt = useMemo(() => new Date(currentVersionDate), [currentVersionDate]);
+	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
+	const navItems = useMemo<NavItem[]>(
+		() =>
+			isOwner
+				? [
+						{ slug: "", title: "Overview" },
+						{ slug: "edit", title: "Edit" },
+						{ slug: "versions", title: `Versions (${versionCount})` },
+						{ slug: "settings", title: "Settings" },
+				  ]
+				: [
+						{ slug: "", title: "Overview" },
+						{ slug: "versions", title: `Versions (${versionCount})` },
+				  ],
+		[isOwner, versionCount]
+	);
 
 	return (
 		<StandardFrame
@@ -47,28 +57,13 @@ const SchemaPageHeader = ({
 				profileSlug: profileSlug,
 				contentSlug: contentSlug,
 				detailsTop: (
-					<Text color="muted">
-						{currentVersionNumber
-							? `Latest Version: ${currentVersionNumber} · ${updatedAt.toLocaleDateString()}`
-							: "Unpublished"}
-						{/* Latest Version: {currentVersionNumber || "Unpublished"} · {updatedAt.toLocaleDateString()} */}
-						{/* {versionCount === 1 ? "1 version" : `${versionCount} versions`} - last
-						updated {updatedAt.toLocaleDateString()} */}
-					</Text>
+					<Text color="muted">Last updated at {updatedAt.toLocaleDateString()}</Text>
 				),
-
 				detailsBottom: schema.description,
 				isPrivate: !schema.isPublic,
 			}}
 			scopeNavProps={{
-				navItems: [
-					{ slug: "", title: "Overview" },
-					{ slug: "edit", title: "Edit", ownerOnly: true },
-					{ slug: "versions", title: `Versions (${versionCount})` },
-					{ slug: "settings", title: "Settings", ownerOnly: true },
-				].filter((item) => {
-					return !item.ownerOnly || isOwner;
-				}),
+				navItems: navItems,
 				contentType: "schema",
 				activeMode: mode,
 				activeSubmode: submode,
@@ -77,4 +72,5 @@ const SchemaPageHeader = ({
 		/>
 	);
 };
-export default SchemaPageHeader;
+
+export default SchemaPageFrame;

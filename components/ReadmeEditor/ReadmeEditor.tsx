@@ -1,46 +1,77 @@
-import React, { useCallback } from "react";
+import React, { useEffect, useRef } from "react";
 
-import dynamic from "next/dynamic";
+import { majorScale, Pane } from "evergreen-ui";
+
+import { Text } from "@codemirror/next/text";
 
 import styles from "./ReadmeEditor.module.scss";
-import { Pane } from "evergreen-ui";
-
-const CodeMirror = dynamic(
-	async () => {
-		// @ts-ignore
-		await import("codemirror/lib/codemirror.css");
-		// @ts-ignore
-		await import("codemirror/mode/markdown/markdown.js");
-		const { UnControlled } = await import("react-codemirror2");
-		return UnControlled;
-	},
-	{ ssr: false }
-);
 
 export interface ReadmeEditorProps {
 	initialValue: string;
-	onChange?: (value: string) => void;
+	onChange?: (doc: Text) => void;
+	readOnly?: boolean;
 }
 
-const ReadmeEditor: React.FC<ReadmeEditorProps> = (props) => {
-	const handleChange = useCallback(
-		({}: {}, {}: {}, value: string) => {
-			if (props.onChange !== undefined) {
-				props.onChange(value);
-			}
-		},
-		[props.onChange]
-	);
+import dynamic from "next/dynamic";
 
-	return (
-		<Pane className={styles.editor} border="default">
-			<CodeMirror
-				value={props.initialValue}
-				options={{ mode: "markdown", lineNumbers: true }}
-				onChange={handleChange}
-			/>
-		</Pane>
-	);
-};
+const ReadmeEditor = dynamic(
+	async () => {
+		const { EditorState, EditorView, basicSetup } = await import(
+			"@codemirror/next/basic-setup"
+		);
+		const { keymap } = await import("@codemirror/next/view");
+		const { defaultKeymap, indentMore, indentLess } = await import("@codemirror/next/commands");
+		const { linter } = await import("@codemirror/next/lint");
+
+		const baseExtensions = [
+			basicSetup,
+			keymap([
+				...defaultKeymap,
+				{
+					key: "Tab",
+					preventDefault: true,
+					run: indentMore,
+				},
+				{
+					key: "Shift-Tab",
+					preventDefault: true,
+					run: indentLess,
+				},
+			]),
+		];
+
+		return function ReadmeEditor({ initialValue, onChange, readOnly }: ReadmeEditorProps) {
+			const div = useRef<HTMLDivElement>(null);
+
+			useEffect(() => {
+				if (div.current) {
+					const extensions = [...baseExtensions];
+					extensions.push(
+						linter((view) => {
+							if (onChange !== undefined) {
+								onChange(view.state.doc);
+							}
+							return [];
+						})
+					);
+
+					if (readOnly) {
+						extensions.push(EditorView.editable.of(false));
+					}
+
+					const state = EditorState.create({ doc: initialValue, extensions });
+					new EditorView({ state, parent: div.current });
+				}
+			}, []);
+
+			return (
+				<Pane maxWidth={majorScale(128)}>
+					<div className={styles.editor} ref={div}></div>
+				</Pane>
+			);
+		};
+	},
+	{ ssr: false }
+);
 
 export default ReadmeEditor;

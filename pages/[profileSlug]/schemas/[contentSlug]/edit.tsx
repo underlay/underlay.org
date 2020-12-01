@@ -1,30 +1,26 @@
-import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "utils/server/prisma";
 
-import { SchemaPageFrame, Section } from "components";
 import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
-import { getSchemaPageHeaderData, getSchemaPagePermissions } from "utils/server/schemaPages";
+import { getSchemaPagePermissions } from "utils/server/permissions";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-	Button,
-	Dialog,
-	DotIcon,
-	Heading,
 	Link,
 	majorScale,
 	Pane,
 	Paragraph,
-	Spinner,
 	Switch,
-	Text,
 	TextInput,
-	TickCircleIcon,
 	toaster,
+	Text,
+	Button,
+	Spinner,
+	TickCircleIcon,
+	DotIcon,
+	Dialog,
 } from "evergreen-ui";
-
-import { useRouter } from "next/router";
+import { Text as CodeMirrorText } from "@codemirror/next/text";
+import { UpdateProps } from "@underlay/tasl-codemirror";
 import api from "next-rest/client";
 
 import { StatusCodes } from "http-status-codes";
@@ -34,93 +30,94 @@ import semverInc from "semver/functions/inc";
 import semverLt from "semver/functions/lt";
 import semverMajor from "semver/functions/major";
 
-import ReadmeEditor from "components/ReadmeEditor/ReadmeEditor";
-import SchemaEditor, {
-	initialSchemaContent,
-	ResultType,
-} from "components/SchemaEditor/SchemaEditor";
+import { SchemaPageFrame, SchemaEditor, ReadmeEditor, Section } from "components";
+import { useRouter } from "next/router";
+import { buildUrl } from "utils/shared/urls";
 
-// import { getCachedSession } from "utils/server/session";
-// import prisma from "utils/server/prisma";
-import { parseToml, toOption } from "utils/shared/schemas/parse";
-import { usePageContext } from "utils/client/hooks";
+import {
+	countSchemaVersions,
+	findResourceWhere,
+	selectSchemaPageProps,
+	prisma,
+	serializeUpdatedAt,
+} from "utils/server/prisma";
 
 type SchemaPageParams = {
 	profileSlug: string;
 	contentSlug: string;
 };
 
-interface SchemaEditProps {
-	schemaPageHeaderProps: SchemaPageHeaderProps;
-	draftSchema: draftSchema;
-}
-
-interface draftSchema {
-	id: string;
-	description: string;
-	agent: { userId: string | null };
-	draftVersionNumber: string;
-	draftContent: string;
-	draftReadme: string | null;
-	versions: SchemaVersion[];
-}
-
-interface SchemaVersion {
-	versionNumber: string;
-}
+// We use an intersection to "augment" the nested schema type
+type SchemaEditProps = SchemaPageHeaderProps & {
+	schema: {
+		id: string;
+		draftVersionNumber: string;
+		draftContent: string;
+		draftReadme: string | null;
+	};
+	latestVersion: { versionNumber: string } | null;
+};
 
 export const getServerSideProps: GetServerSideProps<SchemaEditProps, SchemaPageParams> = async (
 	context
 ) => {
 	const { profileSlug, contentSlug } = context.params!;
-	const schemaPageHeaderProps = await getSchemaPageHeaderData(profileSlug, contentSlug);
-	const hasAccess = getSchemaPagePermissions(context, schemaPageHeaderProps);
-	if (!schemaPageHeaderProps || !hasAccess) {
-		return { notFound: true };
-	}
 
-	const schemaWithDraft = await prisma.schema.findFirst({
-		where: {
-			id: schemaPageHeaderProps.schema.id,
-		},
+	const schemaWithVersion = await prisma.schema.findFirst({
+		where: findResourceWhere(profileSlug, contentSlug),
 		select: {
-			id: true,
-			agent: { select: { userId: true } },
-			description: true,
+			...selectSchemaPageProps,
 			draftVersionNumber: true,
 			draftContent: true,
 			draftReadme: true,
-			versions: { take: 1, orderBy: { createdAt: "desc" }, select: { versionNumber: true } },
+			versions: {
+				take: 1,
+				orderBy: { createdAt: "desc" },
+				select: { versionNumber: true },
+			},
 		},
 	});
 
+	// The reason to check if schema === null separately from getSchemaPagePermissions
+	// is so that TypeScript know it's not null afterward
+	if (schemaWithVersion === null) {
+		return { notFound: true };
+	} else if (!getSchemaPagePermissions(context, schemaWithVersion)) {
+		return { notFound: true };
+	}
+
+	const versionCount = await countSchemaVersions(schemaWithVersion);
+
+	const { versions, ...schema } = schemaWithVersion;
+	const latestVersion = versions.length > 0 ? versions[0] : null;
+
 	return {
 		props: {
-			schemaPageHeaderProps: {
-				...schemaPageHeaderProps,
-				mode: "edit",
-			},
-			draftSchema: schemaWithDraft!,
+			mode: "edit",
+			profileSlug,
+			contentSlug,
+			versionCount,
+			latestVersion,
+			schema: serializeUpdatedAt(schema),
 		},
 	};
 };
 
-const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSchema }) => {
-	const { profileSlug, contentSlug } = schemaPageHeaderProps;
-	const { session } = usePageContext();
-
+const SchemaEdit: React.FC<SchemaEditProps> = (props) => {
+	const { profileSlug, contentSlug, schema, latestVersion } = props;
+	const { id, draftVersionNumber, draftContent, draftReadme } = schema;
 	const router = useRouter();
 
-	const previousVersion = useMemo(
-		() =>
-			draftSchema.versions.length === 0
-				? null
-				: semverValid(draftSchema.versions[0].versionNumber),
-		[draftSchema]
-	);
+	const cleanRef = useRef(true);
+	const [clean, setClean] = useState(true);
+	const [saving, setSaving] = useState(false);
+	const [publishing, setPublishing] = useState(false);
 
-	const initialVersion = previousVersion && semverInc(previousVersion, "prerelease");
-	const [versionNumber, setVersionNumber] = useState(initialVersion || "0.0.0");
+	const [versionNumber, setVersionNumber] = useState(draftVersionNumber || "0.0.0");
+	const lastestVersionNumber = useMemo(
+		() => latestVersion && semverValid(latestVersion.versionNumber),
+		[latestVersion]
+	);
 
 	const handleVersionChange = useCallback(
 		({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,32 +128,19 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 		[]
 	);
 
-	const initialContent = draftSchema.draftContent || initialSchemaContent;
-	const initialReadme =
-		draftSchema.draftReadme || `# ${contentSlug}\n\n> ${draftSchema.description}\n\n`;
+	const [errorCount, setErrorCount] = useState(0);
 
-	const initialResult = useMemo<ResultType>(() => toOption(parseToml(initialContent)), [
-		initialContent,
-	]);
+	const doc = useRef<CodeMirrorText | null>(null);
 
-	const contentRef = useRef<string>(initialContent);
-	const [result, setResult] = useState<ResultType>(initialResult);
-
-	const [clean, setClean] = useState(true);
-	const [saving, setSaving] = useState(false);
-	const [publishing, setPublishing] = useState(false);
-
-	const cleanRef = useRef(clean);
-
-	const handleChange = useCallback((value: string, result: ResultType) => {
-		cleanRef.current = false;
+	const handleChange = useCallback((props: UpdateProps) => {
+		setErrorCount(props.errors);
 		setClean(false);
-		contentRef.current = value;
-		setResult(result);
+		cleanRef.current = false;
+		doc.current = props.state.doc;
 	}, []);
 
-	const [attachReadme, setAttachReadme] = useState(initialReadme !== null);
-	const readmeRef = useRef(initialReadme || "");
+	const readme = useRef<CodeMirrorText | null>(null);
+	const [attachReadme, setAttachReadme] = useState(draftReadme !== null);
 	const handleSetReadme = useCallback(
 		({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
 			cleanRef.current = false;
@@ -166,24 +150,31 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 		[]
 	);
 
-	const handleChangeReadme = useCallback((value: string) => {
+	const handleChangeReadme = useCallback((value: CodeMirrorText) => {
 		setClean(false);
 		cleanRef.current = false;
-		readmeRef.current = value;
+		readme.current = value;
 	}, []);
 
 	const handleSaveDraft = useCallback(() => {
+		const content = doc.current === null ? draftContent : doc.current.toString();
+		const readmeContent = attachReadme
+			? readme.current === null
+				? draftReadme
+				: readme.current.toString()
+			: null;
+
 		cleanRef.current = true;
 		setClean(true);
 		setSaving(true);
 		api.patch(
 			"/api/schema/[id]",
-			{ id: draftSchema.id },
+			{ id },
 			{ "content-type": "application/json" },
 			{
 				draftVersionNumber: versionNumber,
-				draftContent: contentRef.current,
-				draftReadme: attachReadme ? readmeRef.current : null,
+				draftContent: content,
+				draftReadme: readmeContent,
 			}
 		)
 			.then(([{}]) => {
@@ -194,31 +185,31 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 				setSaving(false);
 				toaster.danger(`Failed to save draft: ${err.toString()}`);
 			});
-	}, [draftSchema, versionNumber, attachReadme]);
+	}, [id, versionNumber, attachReadme]);
 
 	const isVersionValid = semverValid(versionNumber) !== null && semverMajor(versionNumber) === 0;
 	const isVersionMonotonic =
-		isVersionValid && (previousVersion === null || semverLt(previousVersion, versionNumber));
+		isVersionValid &&
+		(lastestVersionNumber === null || semverLt(lastestVersionNumber, versionNumber));
 
 	const handlePublishVersion = useCallback(() => {
-		if (result._tag === "Some" && isVersionMonotonic) {
+		if (errorCount === 0 && isVersionMonotonic) {
 			setPublishing(true);
-			api.post(
-				"/api/schema/[id]",
-				{ id: draftSchema.id },
-				{ "content-type": "application/json" },
-				{
-					versionNumber: versionNumber,
-					content: contentRef.current,
-					readme: attachReadme ? readmeRef.current : null,
-				}
-			)
-				.then(([{}]) => {
+
+			const content = doc.current === null ? draftContent : doc.current.toString();
+			const readmeContent = attachReadme
+				? readme.current === null
+					? draftReadme
+					: readme.current.toString()
+				: null;
+
+			publishVersion(id, versionNumber, content, readmeContent)
+				.then(() => {
 					setPublishing(false);
 					toaster.success(
-						`${profileSlug}/schemas/${contentSlug}@${versionNumber} published successfully`
+						`${profileSlug}/${contentSlug}/${versionNumber} published successfully`
 					);
-					router.push(`/${profileSlug}/schemas/${contentSlug}`);
+					router.push(buildUrl({ profileSlug, contentSlug, type: "schema" }));
 				})
 				.catch((err) => {
 					setPublishing(false);
@@ -229,7 +220,7 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 					);
 				});
 		}
-	}, [profileSlug, draftSchema, versionNumber, isVersionMonotonic, result, attachReadme]);
+	}, [profileSlug, versionNumber, isVersionMonotonic, attachReadme]);
 
 	const [openPublishDialog, setOpenPublishDialog] = useState(false);
 
@@ -251,14 +242,8 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 			}
 		}
 	}, []);
-
-	useEffect(() => {
-		if (session === null) {
-			router.push(`/${profileSlug}/schemas/${contentSlug}`);
-		}
-	}, []);
 	return (
-		<SchemaPageFrame {...schemaPageHeaderProps}>
+		<SchemaPageFrame {...props}>
 			<Pane onKeyDown={handleKeyDown}>
 				<Section title="Version Number" useMargin>
 					<Paragraph marginY={majorScale(1)}>
@@ -280,22 +265,18 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 					{isVersionValid && !isVersionMonotonic && (
 						<Paragraph marginY={majorScale(1)} color="muted">
 							Versions must only increment (last version is{" "}
-							{previousVersion || "0.0.0"})
+							{lastestVersionNumber || "0.0.0"})
 						</Paragraph>
 					)}
 				</Section>
 				<Section title="Content" useMargin>
 					<Pane marginY={majorScale(2)}>
-						<SchemaEditor initialValue={initialContent} onChange={handleChange} />
+						<SchemaEditor initialValue={draftContent} onChange={handleChange} />
 					</Pane>
 				</Section>
 				<Section title="Readme" useMargin>
-					<Heading marginTop={majorScale(4)}>Readme</Heading>
 					<Paragraph marginY={majorScale(1)}>
-						Readme files are written in{" "}
-						<Link href="https://commonmark.org/" color="neutral">
-							markdown
-						</Link>{" "}
+						Readme files are written in <a href="https://commonmark.org/">markdown</a>{" "}
 						and are used to document a specific version of a schema.
 					</Paragraph>
 					<Pane display="flex" marginY={majorScale(1)}>
@@ -311,7 +292,7 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 					<Pane marginY={majorScale(2)}>
 						{attachReadme ? (
 							<ReadmeEditor
-								initialValue={initialReadme || ""}
+								initialValue={draftReadme || ""}
 								onChange={handleChangeReadme}
 							/>
 						) : null}
@@ -327,7 +308,7 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 					</Button>
 					<Button
 						marginX={majorScale(2)}
-						disabled={result._tag === "None" || !isVersionValid || !isVersionMonotonic}
+						disabled={errorCount > 0 || !isVersionValid || !isVersionMonotonic}
 						onClick={() => setOpenPublishDialog(true)}
 						iconAfter={publishing ? <Spinner /> : null}
 					>
@@ -348,4 +329,36 @@ const SchemaEdit: React.FC<SchemaEditProps> = ({ schemaPageHeaderProps, draftSch
 		</SchemaPageFrame>
 	);
 };
+
+async function publishVersion(
+	id: string,
+	versionNumber: string,
+	content: string,
+	readme: string | null
+) {
+	await api.post(
+		"/api/schema/[id]",
+		{ id },
+		{ "content-type": "application/json" },
+		{
+			versionNumber: versionNumber,
+			content: content,
+			readme: readme,
+		}
+	);
+
+	const nextVersion = semverInc(versionNumber, "prerelease");
+
+	await api.patch(
+		"/api/schema/[id]",
+		{ id },
+		{ "content-type": "application/json" },
+		{
+			draftVersionNumber: nextVersion || versionNumber,
+			draftContent: content,
+			draftReadme: readme,
+		}
+	);
+}
+
 export default SchemaEdit;

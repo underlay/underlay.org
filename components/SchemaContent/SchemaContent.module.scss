@@ -1,3 +1,32 @@
-.editor :global(.CodeMirror) {
-	height: max-content;
+@import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css);
+
+.editor :global(.cm-scroller) {
+	font-family: "Fira Code", monospace;
+	background-color: white;
+}
+
+@supports (font-variation-settings: normal) {
+	.editor :global(.cm-scroller) {
+		font-family: "Fira Code VF", monospace;
+	}
+}
+
+.editor :global(.cm-focused) {
+	outline: none;
+}
+
+.editor :global(.cm-tooltip) {
+	font-family: "Fira Code", monospace;
+	font-size: 0.75em;
+}
+
+.editor :global(.cm-panel),
+.editor :global(.cm-tooltip) {
+	font-family: "Fira Code", monospace;
+	font-size: 0.75em;
+}
+
+.editor :global(.cm-panel-lint) button {
+	display: none;
+	pointer-events: none;
 }

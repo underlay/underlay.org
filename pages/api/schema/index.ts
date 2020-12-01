@@ -7,12 +7,13 @@ import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
-import prisma from "utils/server/prisma";
+import { prisma } from "utils/server/prisma";
+
+import { initialSchemaContent } from "components/SchemaContent/SchemaContent";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
 
-// TODO: add agentId property here
 const requestBody = t.type({
 	slug: t.string,
 	description: t.string,
@@ -53,6 +54,10 @@ export default makeHandler<"/api/schema">({
 
 				const { slug, description, isPublic } = body;
 
+				const draftContent = initialSchemaContent;
+				const draftReadme = `# ${slug}\n\n> ${description}`;
+				const draftVersionNumber = "0.0.0";
+
 				// For now, we just create a schema that is linked to
 				// the session user as the agent.
 				const schema = await prisma.schema
@@ -62,6 +67,9 @@ export default makeHandler<"/api/schema">({
 							slug,
 							description,
 							isPublic,
+							draftContent,
+							draftReadme,
+							draftVersionNumber,
 						},
 					})
 					.catch(catchPrismaError);

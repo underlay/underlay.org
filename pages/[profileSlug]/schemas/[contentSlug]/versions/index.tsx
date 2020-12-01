@@ -6,34 +6,48 @@ import { Button, majorScale, Pane, Table, Text, toaster } from "evergreen-ui";
 
 import { SchemaPageFrame } from "components";
 import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
-import { getSchemaPageHeaderData, getSchemaPagePermissions } from "utils/server/schemaPages";
+import { getSchemaPagePermissions } from "utils/server/permissions";
 import { schemaVersonPageSize } from "utils/shared/schemas/versions";
+import {
+	prisma,
+	findResourceWhere,
+	selectSchemaPageProps,
+	countSchemaVersions,
+	serializeUpdatedAt,
+} from "utils/server/prisma";
 
 type SchemaPageParams = {
 	profileSlug: string;
 	contentSlug: string;
 };
 
-interface SchemaOverviewProps {
-	schemaPageHeaderProps: SchemaPageHeaderProps;
-}
+type SchemaOverviewProps = SchemaPageHeaderProps & { schema: { id: string } };
 
 export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaPageParams> = async (
 	context
 ) => {
 	const { profileSlug, contentSlug } = context.params!;
-	const schemaPageHeaderProps = await getSchemaPageHeaderData(profileSlug, contentSlug);
-	const hasAccess = getSchemaPagePermissions(context, schemaPageHeaderProps);
-	if (!schemaPageHeaderProps || !hasAccess) {
+
+	const schema = await prisma.schema.findFirst({
+		where: findResourceWhere(profileSlug, contentSlug),
+		select: selectSchemaPageProps,
+	});
+
+	if (schema === null) {
+		return { notFound: true };
+	} else if (!getSchemaPagePermissions(context, schema)) {
 		return { notFound: true };
 	}
 
+	const versionCount = await countSchemaVersions(schema);
+
 	return {
 		props: {
-			schemaPageHeaderProps: {
-				...schemaPageHeaderProps,
-				mode: "versions",
-			},
+			mode: "versions",
+			profileSlug,
+			contentSlug,
+			schema: serializeUpdatedAt(schema),
+			versionCount,
 		},
 	};
 };
@@ -55,12 +69,9 @@ const parseVersion = ({
 	slug: user?.slug || organization?.slug || null,
 });
 
-const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) => {
-	const {
-		profileSlug,
-		contentSlug,
-		schema: { id },
-	} = schemaPageHeaderProps;
+const SchemaPage: React.FC<SchemaOverviewProps> = (props) => {
+	const { profileSlug, contentSlug, schema } = props;
+
 	const [loading, setLoading] = useState(true);
 	const [end, setEnd] = useState(false);
 	const [versions, setVersions] = useState<
@@ -68,7 +79,12 @@ const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) =>
 	>([]);
 
 	useEffect(() => {
-		api.get("/api/schema/[id]/versions", { id }, { accept: "application/json" }, undefined)
+		api.get(
+			"/api/schema/[id]/versions",
+			{ id: schema.id },
+			{ accept: "application/json" },
+			undefined
+		)
 			.then(([{}, versions]) => {
 				setLoading(false);
 				setVersions(versions.map(parseVersion));
@@ -78,7 +94,7 @@ const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) =>
 				setLoading(false);
 				toaster.danger(`Error retrieving version history: ${err.toString()}`);
 			});
-	}, [id]);
+	}, [schema.id]);
 
 	const handleClick = useCallback(() => {
 		if (loading) {
@@ -88,7 +104,7 @@ const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) =>
 		const { id: cursor } = versions[versions.length - 1];
 		api.get(
 			"/api/schema/[id]/versions",
-			{ id, cursor },
+			{ id: schema.id, cursor },
 			{ accept: "application/json" },
 			undefined
 		)
@@ -104,8 +120,8 @@ const SchemaPage: React.FC<SchemaOverviewProps> = ({ schemaPageHeaderProps }) =>
 	}, [versions, loading]);
 
 	return (
-		<SchemaPageFrame {...schemaPageHeaderProps}>
-			<h1>Versions Content</h1>
+		<SchemaPageFrame {...props}>
+			<h1>Version History</h1>
 			<Pane width={majorScale(64)}>
 				<Table>
 					<Table.Body>

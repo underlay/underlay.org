@@ -5,7 +5,7 @@ import * as t from "io-ts";
 import { getSession } from "next-auth/client";
 import { makeHandler } from "next-rest/server";
 
-import prisma from "utils/server/prisma";
+import { prisma } from "utils/server/prisma";
 
 import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 

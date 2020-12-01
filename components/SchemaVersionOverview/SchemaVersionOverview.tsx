@@ -1,11 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Pane, Paragraph } from "evergreen-ui";
 
-import { Section, SchemaContent, SchemaGraph, ReadmeViewer } from "components";
-import { parseToml, toOption } from "utils/shared/schemas/parse";
+import { Section, SchemaEditor, ReadmeViewer } from "components";
 
-interface SchemaVersionOverviewProps {
-	// id: string;
+export interface SchemaVersionOverviewProps {
 	versionNumber: string;
 	content: string;
 	readme: string | null;
@@ -13,17 +11,25 @@ interface SchemaVersionOverviewProps {
 }
 
 const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
-	// id,
 	versionNumber,
 	content,
 	readme,
 	createdAt,
 }) => {
-	const result = useMemo(() => toOption(parseToml(content)), []);
-	const date =  new Date(createdAt);
+	const date = new Date(createdAt);
 	return (
 		<React.Fragment>
-			<Section title={<span>v{versionNumber} · {date.toLocaleDateString()}<br />README</span>} useMargin useUppercase={false}>
+			<Section
+				title={
+					<span>
+						v{versionNumber} · {date.toLocaleDateString()}
+						<br />
+						README
+					</span>
+				}
+				useMargin
+				useUppercase={false}
+			>
 				<Pane>
 					{readme === null ? (
 						<Paragraph fontStyle="italic" color="muted">
@@ -35,14 +41,11 @@ const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
 				</Pane>
 			</Section>
 
-			<Section title="Graph" useMargin>
-				<Pane>{result._tag === "Some" && <SchemaGraph schema={result.value} />}</Pane>
-			</Section>
-
-			<Section title="File" useMargin>
-				<SchemaContent initialValue={content} readOnly={true} />
+			<Section title="Content" useMargin>
+				<SchemaEditor initialValue={content} readOnly={true} />
 			</Section>
 		</React.Fragment>
 	);
 };
+
 export default SchemaVersionOverview;
