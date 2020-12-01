@@ -5,22 +5,9 @@ import { StandardFrame } from "components";
 import { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
+import { SchemaPageProps } from "utils/server/schemaPage";
 
-export type SchemaPageHeaderProps = {
-	profileSlug: string;
-	contentSlug: string;
-	mode?: string;
-	submode?: string;
-	versionCount: number;
-	schema: {
-		description: string;
-		agent: { userId: string | null };
-		isPublic: boolean;
-		updatedAt: string;
-	};
-};
-
-type SchemaPageFrameProps = SchemaPageHeaderProps & { children: React.ReactNode };
+type SchemaPageFrameProps = SchemaPageProps & { children: React.ReactNode };
 
 const SchemaPageFrame = ({
 	schema,

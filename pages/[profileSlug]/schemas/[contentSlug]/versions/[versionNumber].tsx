@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 import semverValid from "semver/functions/valid";
 
 import { SchemaPageFrame, SchemaVersionOverview } from "components";
-import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
 import {
 	countSchemaVersions,
 	findResourceWhere,
@@ -14,16 +13,15 @@ import {
 	serializeCreatedAt,
 } from "utils/server/prisma";
 import { getSchemaPagePermissions } from "utils/server/permissions";
-import { SchemaVersionOverviewProps } from "components/SchemaVersionOverview/SchemaVersionOverview";
 
-type SchemaVersionPageParams = {
-	profileSlug: string;
-	contentSlug: string;
-	versionNumber: string;
-};
+import {
+	SchemaPageProps,
+	SchemaVersionProps,
+	SchemaVersionPageParams,
+} from "utils/server/schemaPage";
 
-type SchemaVersionPageProps = SchemaPageHeaderProps & {
-	schemaVersion: SchemaVersionOverviewProps;
+type SchemaVersionPageProps = SchemaPageProps & {
+	schemaVersion: SchemaVersionProps;
 };
 
 export const getServerSideProps: GetServerSideProps<
@@ -50,6 +48,9 @@ export const getServerSideProps: GetServerSideProps<
 		return { notFound: true };
 	}
 
+	// We need to take the .schema property out
+	// before returning as a prop so that react doesn't
+	// complain about not being able to serialize Dates
 	const { schema, ...schemaVersion } = schemaVersionWithSchema;
 
 	const versionCount = await countSchemaVersions(schema);

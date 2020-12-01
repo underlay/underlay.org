@@ -5,7 +5,6 @@ import api from "next-rest/client";
 import { Button, majorScale, Pane, Table, Text, toaster } from "evergreen-ui";
 
 import { SchemaPageFrame } from "components";
-import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
 import { getSchemaPagePermissions } from "utils/server/permissions";
 import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 import {
@@ -15,13 +14,9 @@ import {
 	countSchemaVersions,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
+import { SchemaPageParams, SchemaPageProps } from "utils/server/schemaPage";
 
-type SchemaPageParams = {
-	profileSlug: string;
-	contentSlug: string;
-};
-
-type SchemaOverviewProps = SchemaPageHeaderProps & { schema: { id: string } };
+type SchemaOverviewProps = SchemaPageProps & { schema: { id: string } };
 
 export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaPageParams> = async (
 	context

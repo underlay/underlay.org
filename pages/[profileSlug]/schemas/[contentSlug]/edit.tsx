@@ -1,6 +1,5 @@
 import { GetServerSideProps } from "next";
 
-import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
 import { getSchemaPagePermissions } from "utils/server/permissions";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -41,14 +40,10 @@ import {
 	prisma,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
-
-type SchemaPageParams = {
-	profileSlug: string;
-	contentSlug: string;
-};
+import { SchemaPageProps, SchemaPageParams } from "utils/server/schemaPage";
 
 // We use an intersection to "augment" the nested schema type
-type SchemaEditProps = SchemaPageHeaderProps & {
+type SchemaEditProps = SchemaPageProps & {
 	schema: {
 		id: string;
 		draftVersionNumber: string;

@@ -2,13 +2,9 @@ import React from "react";
 import { Pane, Paragraph } from "evergreen-ui";
 
 import { Section, SchemaEditor, ReadmeViewer } from "components";
+import { SchemaVersionProps } from "utils/server/schemaPage";
 
-export interface SchemaVersionOverviewProps {
-	versionNumber: string;
-	content: string;
-	readme: string | null;
-	createdAt: string;
-}
+export type SchemaVersionOverviewProps = SchemaVersionProps;
 
 const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
 	versionNumber,
