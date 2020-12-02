@@ -23,7 +23,12 @@ export interface ScopeNavProps {
 }
 
 const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
-	const { mode: activeMode, subMode: activeSubmode, ...locationData } = useLocationContext();
+	const {
+		mode: activeMode,
+		subMode: activeSubmode,
+		profileSlug,
+		contentSlug,
+	} = useLocationContext();
 
 	const activeModeData = navItems.find(({ mode }) => mode === activeMode);
 	const activeChildren = activeModeData?.children;
@@ -40,7 +45,7 @@ const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
 							key={mode || ""}
 							is="a"
 							height={40}
-							href={buildUrl({ ...locationData, mode })}
+							href={buildUrl({ profileSlug, contentSlug, mode })}
 						>
 							{title}
 						</Button>
@@ -53,7 +58,7 @@ const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
 						const { subMode: subMode, title } = item;
 						const isActive = activeSubmode === subMode;
 						const mode = activeModeData?.mode;
-						const url = buildUrl({ ...locationData, mode, subMode });
+						const url = buildUrl({ profileSlug, contentSlug, mode, subMode });
 						return (
 							<Button
 								className={classNames(styles.button, isActive && styles.active)}
