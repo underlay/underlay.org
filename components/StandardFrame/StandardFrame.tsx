@@ -2,8 +2,8 @@ import React from "react";
 import classNames from "classnames";
 
 import { ScopeHeader, ScopeNav } from "components";
-import { Props as ScopeHeaderProps } from "components/ScopeHeader/ScopeHeader";
-import { Props as ScopeNavProps } from "components/ScopeNav/ScopeNav";
+import { ScopeHeaderProps } from "components/ScopeHeader/ScopeHeader";
+import { ScopeNavProps } from "components/ScopeNav/ScopeNav";
 
 import styles from "./StandardFrame.module.scss";
 

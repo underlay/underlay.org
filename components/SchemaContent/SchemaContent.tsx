@@ -1,51 +1,68 @@
-import React, { useCallback, useMemo } from "react";
+import React from "react";
 import { majorScale, Pane } from "evergreen-ui";
+
+import { UpdateProps } from "@underlay/tasl-codemirror";
+
 import dynamic from "next/dynamic";
 
-import styles from "./SchemaContent.module.scss";
-
-const CodeMirror = dynamic(
+const TaslEditor = dynamic(
 	async () => {
-		// @ts-ignore
-		await import("codemirror/lib/codemirror.css");
-		// @ts-ignore
-		await import("codemirror/theme/neat.css");
-		// @ts-ignore
-		await import("codemirror/mode/toml/toml.js");
-		const { UnControlled } = await import("react-codemirror2");
-		return UnControlled;
+		const { Editor } = await import("@underlay/tasl-codemirror");
+		return Editor;
 	},
 	{ ssr: false }
 );
 
+import styles from "./SchemaContent.module.scss";
+
 export interface SchemaContentProps {
 	initialValue: string;
+	onChange?: (props: UpdateProps) => void;
 	readOnly?: boolean;
-	onChange?: (value: string) => void;
 }
 
-const baseOptions = { mode: "toml", lineNumbers: true, theme: "neat" };
-
-const SchemaContent: React.FC<SchemaContentProps> = ({ initialValue, readOnly, onChange }) => {
-	const handleChange = useCallback(
-		({}: {}, {}: {}, value: string) => {
-			if (onChange !== undefined) {
-				onChange(value);
-			}
-		},
-		[onChange]
-	);
-
-	const options = useMemo(
-		() => (readOnly ? { ...baseOptions, readOnly: "nocursor" } : baseOptions),
-		[readOnly]
-	);
-
+const SchemaContent: React.FC<SchemaContentProps> = ({ initialValue, onChange, readOnly }) => {
 	return (
-		<Pane className={styles.editor} border="default" width={majorScale(64)}>
-			<CodeMirror value={initialValue} options={options} onChange={handleChange} />
+		<Pane
+			className={styles.editor}
+			width={majorScale(64)}
+			marginRight={majorScale(1)}
+			border="default"
+		>
+			<TaslEditor initialValue={initialValue} onChange={onChange} readOnly={!!readOnly} />
 		</Pane>
 	);
 };
 
 export default SchemaContent;
+
+export const initialSchemaContent = `# Welcome to the schema editor!
+# If you're new, you probably want to read
+# the schema language documentation here:
+# http://r1.underlay.org/docs/schemas
+
+namespace ex http://example.com#
+namespace ul http://underlay.org/ns/
+
+type foo {
+  ex:a -> ? uri ;
+  ex:b -> string ;
+  ex:c -> dateTime ;
+}
+
+edge ex:cool ==/ ex:map /=> ex:wau
+
+class ex:cool unit
+
+class ex:wau {
+  ex:bar -> foo ;
+  ex:age -> integer ;
+  ex:self -> * ex:wau ;
+}
+
+
+
+
+
+
+`;

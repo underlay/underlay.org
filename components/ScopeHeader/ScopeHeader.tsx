@@ -5,12 +5,12 @@ import { Badge } from "evergreen-ui";
 import { Avatar, Icon } from "components";
 
 import styles from "./ScopeHeader.module.scss";
+import { useLocationContext } from "utils/client/hooks";
+import { buildUrl } from "utils/shared/urls";
 
-export type Props = {
+export type ScopeHeaderProps = {
 	type: "collection" | "schema" | "org" | "user";
-	profileSlug: string;
 	profileTitle?: string;
-	contentSlug?: string;
 	detailsTop?: React.ReactNode;
 	detailsBottom?: React.ReactNode;
 	avatar?: string;
@@ -18,17 +18,17 @@ export type Props = {
 	isPrivate?: boolean;
 };
 
-const ScopeHeader: React.FC<Props> = function ({
+const ScopeHeader: React.FC<ScopeHeaderProps> = function ({
 	type,
-	profileSlug,
 	profileTitle = "",
-	contentSlug = "",
 	detailsTop = null,
 	detailsBottom = null,
 	avatar = "",
 	initial = "",
 	isPrivate = false,
 }) {
+	const { profileSlug, contentSlug, versionNumber } = useLocationContext();
+
 	const showAvatar = avatar || initial;
 	const isProfile = type === "org" || type === "user";
 	return (
@@ -38,14 +38,25 @@ const ScopeHeader: React.FC<Props> = function ({
 				<Avatar className={styles.avatarComponent} name={initial} src={avatar} size={100} />
 			)}
 			<div className={styles.title}>
-				{isProfile && <a href={`/${profileSlug}`}>{profileTitle}</a>}
-				{!isProfile && (
+				{isProfile ? (
+					<a href={buildUrl({ profileSlug })}>{profileTitle}</a>
+				) : contentSlug === undefined ? (
+					<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
+				) : versionNumber === undefined ? (
 					<React.Fragment>
-						<a href={`/${profileSlug}`}>{profileSlug}</a>
+						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
 						<span>/</span>
-						<a href={`/${profileSlug}/${type}s`}>{type}s</a>
+						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
+					</React.Fragment>
+				) : (
+					<React.Fragment>
+						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
 						<span>/</span>
-						<a href={`/${profileSlug}/${type}s/${contentSlug}`}>{contentSlug}</a>
+						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
+						<span>/</span>
+						<a href={buildUrl({ profileSlug, contentSlug, versionNumber })}>
+							{versionNumber}
+						</a>
 					</React.Fragment>
 				)}
 				{isPrivate && (

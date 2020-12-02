@@ -1,7 +1,8 @@
 import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
 
-import SchemaEditor, { initialSchemaContent } from "./SchemaEditor";
+import SchemaEditor from "./SchemaEditor";
+import { initialSchemaContent } from "components/SchemaContent/SchemaContent";
 
 export default {
 	title: "Components/SchemaEditor",

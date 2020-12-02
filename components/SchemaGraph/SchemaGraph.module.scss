@@ -1,11 +1,5 @@
-.graph svg {
-	width: 100%;
-}
-
-.graph .link {
-	display: none;
-}
-
-.graph:hover .link {
-	display: inline-flex;
+.graph :global(.tasl-cytoscape) {
+	width: 600px;
+	height: 600px;
+	background-color: whitesmoke;
 }
