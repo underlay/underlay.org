@@ -13,10 +13,10 @@ import {
 } from "utils/server/prisma";
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaSettingsModeProps = SchemaPageProps;
+type SchemaSettingsProps = SchemaPageProps;
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaSettingsModeProps,
+	SchemaSettingsProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps<
 	};
 };
 
-const SchemaSettings: React.FC<SchemaSettingsModeProps> = (props) => {
+const SchemaSettingsPage: React.FC<SchemaSettingsProps> = (props) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
 
@@ -55,4 +55,4 @@ const SchemaSettings: React.FC<SchemaSettingsModeProps> = (props) => {
 	);
 };
 
-export default SchemaSettings;
+export default SchemaSettingsPage;

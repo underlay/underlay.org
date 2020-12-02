@@ -31,7 +31,7 @@ export const buildUrl = ({
 		query.push(`mode=${mode}`);
 	}
 	if (subMode) {
-		query.push(`subMode=${subMode}`);
+		query.push(`submode=${subMode}`);
 	}
 
 	if (query.length > 0) {

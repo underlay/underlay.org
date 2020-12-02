@@ -21,11 +21,10 @@ const port = parseInt(process.env.PORT) || 3000;
 // (ie everything except schemas and collections and their versions)
 const topLevelRoutes = new Set(["_next"]);
 
-const pageDirectoryPattern = /^([a-zA-Z0-9]+)$/;
 const pageFilePattern = /^([a-zA-Z0-9]+)\.tsx$/;
 for (const name of fs.readdirSync(path.resolve(__dirname, "pages"))) {
 	const stat = fs.lstatSync(path.resolve(__dirname, "pages", name));
-	if (stat.isDirectory() && pageDirectoryPattern.test(name)) {
+	if (stat.isDirectory()) {
 		topLevelRoutes.add(name);
 	} else if (stat.isFile() && pageFilePattern.test(name)) {
 		const [_, fileName] = pageFilePattern.exec(name);
@@ -47,10 +46,17 @@ const findResource = (profileSlug, contentSlug) => ({
 	},
 });
 
+// type: "user" | "organization" | "schema" | "schemaVersion" | "collection" | "collectionVersion"
+// query: ParsedUrlQuery
 function render(req, res, type, id, query) {
 	if (typeof query.mode === "string") {
-		const route = `/resource/${type}/${id}/${query.mode}`;
-		app.render(req, res, route, query);
+		if (typeof query.submode === "string") {
+			const route = `/resource/${type}/${id}/${query.mode}/${query.submode}`;
+			app.render(req, res, route, query);
+		} else {
+			const route = `/resource/${type}/${id}/${query.mode}`;
+			app.render(req, res, route, query);
+		}
 	} else {
 		const route = `/resource/${type}/${id}`;
 		app.render(req, res, route, query);
@@ -74,42 +80,42 @@ app.prepare().then(() => {
 		} else if (components.length === 1) {
 			const [profileSlug] = components;
 
-			const user = await prisma.user.findUnique({
+			const profileQuery = {
 				where: { slug: profileSlug },
 				select: { id: true },
-			});
+			};
+
+			const [user, organization] = await Promise.all([
+				prisma.user.findUnique(profileQuery),
+				prisma.organization.findUnique(profileQuery),
+			]);
 
 			if (user !== null) {
-				return render(req, res, "user", user.id, query);
-			}
-
-			const organization = await prisma.organization.findUnique({
-				where: { slug: profileSlug },
-				select: { id: true },
-			});
-
-			if (organization !== null) {
-				return render(req, res, "organization", organization.id, query);
+				render(req, res, "user", user.id, query);
+			} else if (organization !== null) {
+				render(req, res, "organization", organization.id, query);
+			} else {
+				app.render(req, res, "/404", query);
 			}
 		} else if (components.length === 2) {
 			const [profileSlug, contentSlug] = components;
 
-			const schema = await prisma.schema.findFirst({
+			const contentQuery = {
 				where: findResource(profileSlug, contentSlug),
 				select: { id: true },
-			});
+			};
+
+			const [schema, collection] = await Promise.all([
+				prisma.schema.findFirst(contentQuery),
+				prisma.collection.findFirst(contentQuery),
+			]);
 
 			if (schema !== null) {
-				return render(req, res, "schema", schema.id, query);
-			}
-
-			const collection = await prisma.collection.findFirst({
-				where: findResource(profileSlug, contentSlug),
-				select: { id: true },
-			});
-
-			if (collection !== null) {
-				return render(req, res, "collection", collection.id, query);
+				render(req, res, "schema", schema.id, query);
+			} else if (collection !== null) {
+				render(req, res, "collection", collection.id, query);
+			} else {
+				app.render(req, res, "/404", query);
 			}
 		} else if (components.length === 3) {
 			const [profileSlug, contentSlug, versionNumber] = components;
@@ -117,32 +123,33 @@ app.prepare().then(() => {
 				return app.render(req, res, "/404", query);
 			}
 
-			const schemaVersion = await prisma.schemaVersion.findFirst({
-				where: {
-					versionNumber: versionNumber,
-					schema: findResource(profileSlug, contentSlug),
-				},
-				select: { id: true },
-			});
+			const [schemaVersion, collectionVersion] = await Promise.all([
+				prisma.schemaVersion.findFirst({
+					where: {
+						versionNumber: versionNumber,
+						schema: findResource(profileSlug, contentSlug),
+					},
+					select: { id: true },
+				}),
+				prisma.collectionVersion.findFirst({
+					where: {
+						versionNumber: versionNumber,
+						collection: findResource(profileSlug, contentSlug),
+					},
+					select: { id: true },
+				}),
+			]);
 
 			if (schemaVersion !== null) {
-				return render(req, res, "schemaVersion", schemaVersion.id, query);
+				render(req, res, "schemaVersion", schemaVersion.id, query);
+			} else if (collectionVersion !== null) {
+				render(req, res, "collectionVersion", collectionVersion.id, query);
+			} else {
+				app.render(req, res, "/404", query);
 			}
-
-			const collectionVersion = await prisma.collectionVersion.findFirst({
-				where: {
-					versionNumber: versionNumber,
-					collection: findResource(profileSlug, contentSlug),
-				},
-				select: { id: true },
-			});
-
-			if (collectionVersion !== null) {
-				return render(req, res, "collectionVersion", collectionVersion.id, query);
-			}
+		} else {
+			app.render(req, res, "/404", query);
 		}
-
-		app.render(req, res, "/404", query);
 	}).listen(port, (err) => {
 		if (err) throw err;
 		console.log(`> Ready on http://localhost:${port}`);

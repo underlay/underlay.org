@@ -15,10 +15,10 @@ import { getProfileSlug, ResourcePageParams, SchemaPageProps } from "utils/share
 
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaVersionsModeProps = SchemaPageProps;
+type SchemaVersionsProps = SchemaPageProps;
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaVersionsModeProps,
+	SchemaVersionsProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<
 	};
 };
 
-const SchemaPage: React.FC<SchemaVersionsModeProps> = (props) => {
+const SchemaVersionsPage: React.FC<SchemaVersionsProps> = (props) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
 
@@ -56,4 +56,4 @@ const SchemaPage: React.FC<SchemaVersionsModeProps> = (props) => {
 	);
 };
 
-export default SchemaPage;
+export default SchemaVersionsPage;

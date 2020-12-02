@@ -67,7 +67,7 @@ export const getServerSideProps: GetServerSideProps<
 	};
 };
 
-const SchemaEdit: React.FC<SchemaEditModeProps> = (props) => {
+const SchemaEditPage: React.FC<SchemaEditModeProps> = (props) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
 	return (
@@ -79,4 +79,4 @@ const SchemaEdit: React.FC<SchemaEditModeProps> = (props) => {
 	);
 };
 
-export default SchemaEdit;
+export default SchemaEditPage;
