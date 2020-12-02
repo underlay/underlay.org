@@ -19,7 +19,6 @@ import {
 	getProfileSlug,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 
 export type SchemaVersionPageProps = SchemaPageProps & {
 	schemaVersion: SchemaVersionProps;
