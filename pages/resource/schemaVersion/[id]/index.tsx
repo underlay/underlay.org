@@ -19,6 +19,7 @@ import {
 	getProfileSlug,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
+import { schemaVersonPageSize } from "utils/shared/schemas/versions";
 
 export type SchemaVersionPageProps = SchemaPageProps & {
 	schemaVersion: SchemaVersionProps;
@@ -65,9 +66,9 @@ export const getServerSideProps: GetServerSideProps<
 const SchemaVersionPage: React.FC<SchemaVersionPageProps> = ({ schemaVersion, ...props }) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
-
+	const versionNumber = schemaVersion.versionNumber;
 	return (
-		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
+		<LocationContext.Provider value={{ profileSlug, contentSlug, versionNumber }}>
 			<SchemaPageFrame {...props}>
 				<SchemaVersionOverview {...schemaVersion} />
 			</SchemaPageFrame>

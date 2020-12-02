@@ -27,7 +27,7 @@ const ScopeHeader: React.FC<ScopeHeaderProps> = function ({
 	initial = "",
 	isPrivate = false,
 }) {
-	const { profileSlug, contentSlug } = useLocationContext();
+	const { profileSlug, contentSlug, versionNumber } = useLocationContext();
 
 	const showAvatar = avatar || initial;
 	const isProfile = type === "org" || type === "user";
@@ -42,11 +42,21 @@ const ScopeHeader: React.FC<ScopeHeaderProps> = function ({
 					<a href={buildUrl({ profileSlug })}>{profileTitle}</a>
 				) : contentSlug === undefined ? (
 					<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
+				) : versionNumber === undefined ? (
+					<React.Fragment>
+						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
+						<span>/</span>
+						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
+					</React.Fragment>
 				) : (
 					<React.Fragment>
 						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
 						<span>/</span>
 						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
+						<span>/</span>
+						<a href={buildUrl({ profileSlug, contentSlug, versionNumber })}>
+							{versionNumber}
+						</a>
 					</React.Fragment>
 				)}
 				{isPrivate && (
