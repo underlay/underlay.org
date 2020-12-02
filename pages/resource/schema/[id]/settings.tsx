@@ -2,31 +2,27 @@ import React from "react";
 import { GetServerSideProps } from "next";
 
 import { SchemaPageFrame, Section } from "components";
-import { SchemaPageHeaderProps } from "components/SchemaPageFrame/SchemaPageFrame";
+import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
 
 import { getSchemaPagePermissions } from "utils/server/permissions";
 import {
 	countSchemaVersions,
-	findResourceWhere,
 	prisma,
 	selectSchemaPageProps,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
+import { LocationContext } from "utils/client/hooks";
 
-type SchemaPageParams = {
-	profileSlug: string;
-	contentSlug: string;
-};
+type SchemaSettingsModeProps = SchemaPageProps;
 
-type SchemaSettingsProps = SchemaPageHeaderProps;
-
-export const getServerSideProps: GetServerSideProps<SchemaSettingsProps, SchemaPageParams> = async (
-	context
-) => {
-	const { profileSlug, contentSlug } = context.params!;
+export const getServerSideProps: GetServerSideProps<
+	SchemaSettingsModeProps,
+	ResourcePageParams
+> = async (context) => {
+	const { id } = context.params!;
 
 	const schema = await prisma.schema.findFirst({
-		where: findResourceWhere(profileSlug, contentSlug),
+		where: { id },
 		select: selectSchemaPageProps,
 	});
 
@@ -40,20 +36,23 @@ export const getServerSideProps: GetServerSideProps<SchemaSettingsProps, SchemaP
 
 	return {
 		props: {
-			mode: "settings",
-			profileSlug,
-			contentSlug,
 			versionCount,
 			schema: serializeUpdatedAt(schema),
 		},
 	};
 };
 
-const SchemaSettings: React.FC<SchemaSettingsProps> = (props) => {
+const SchemaSettings: React.FC<SchemaSettingsModeProps> = (props) => {
+	const profileSlug = getProfileSlug(props.schema.agent);
+	const contentSlug = props.schema.slug;
+
 	return (
-		<SchemaPageFrame {...props}>
-			<Section title="Settings" />
-		</SchemaPageFrame>
+		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "settings" }}>
+			<SchemaPageFrame {...props}>
+				<Section title="Settings" />
+			</SchemaPageFrame>
+		</LocationContext.Provider>
 	);
 };
+
 export default SchemaSettings;

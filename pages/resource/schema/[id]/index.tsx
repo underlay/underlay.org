@@ -4,7 +4,6 @@ import { GetServerSideProps } from "next";
 import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import {
 	prisma,
-	findResourceWhere,
 	selectSchemaPageProps,
 	selectVersionOverviewProps,
 	countSchemaVersions,
@@ -14,7 +13,8 @@ import {
 import { getSchemaPagePermissions } from "utils/server/permissions";
 import { buildUrl } from "utils/shared/urls";
 import { SchemaVersionOverviewProps } from "components/SchemaVersionOverview/SchemaVersionOverview";
-import { SchemaPageProps, SchemaPageParams } from "utils/server/propTypes";
+import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
+import { LocationContext } from "utils/client/hooks";
 
 /** Data fetching!
  * We have two basic goals: try to fetch everything
@@ -44,13 +44,14 @@ import { SchemaPageProps, SchemaPageParams } from "utils/server/propTypes";
 
 type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionOverviewProps };
 
-export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaPageParams> = async (
-	context
-) => {
-	const { profileSlug, contentSlug } = context.params!;
+export const getServerSideProps: GetServerSideProps<
+	SchemaOverviewProps,
+	ResourcePageParams
+> = async (context) => {
+	const { id } = context.params!;
 
-	const schemaWithVersion = await prisma.schema.findFirst({
-		where: findResourceWhere(profileSlug, contentSlug),
+	const schemaWithVersion = await prisma.schema.findUnique({
+		where: { id },
 		select: {
 			...selectSchemaPageProps,
 			versions: {
@@ -72,9 +73,14 @@ export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaP
 	const versionCount = await countSchemaVersions(schemaWithVersion);
 
 	if (versionCount < 1) {
+		const profileSlug = getProfileSlug(schemaWithVersion.agent);
 		return {
 			redirect: {
-				destination: buildUrl({ profileSlug, contentSlug, mode: "edit", type: "schema" }),
+				destination: buildUrl({
+					profileSlug,
+					contentSlug: schemaWithVersion.slug,
+					mode: "edit",
+				}),
 				permanent: false,
 			},
 		};
@@ -90,8 +96,6 @@ export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaP
 
 	return {
 		props: {
-			profileSlug,
-			contentSlug,
 			versionCount,
 			schema: serializeUpdatedAt(schema),
 			latestVersion: serializeCreatedAt(latestVersion),
@@ -100,10 +104,14 @@ export const getServerSideProps: GetServerSideProps<SchemaOverviewProps, SchemaP
 };
 
 const SchemaOverview: React.FC<SchemaOverviewProps> = ({ latestVersion, ...props }) => {
+	const profileSlug = getProfileSlug(props.schema.agent);
+	const contentSlug = props.schema.slug;
 	return (
-		<SchemaPageFrame {...props}>
-			<SchemaVersionOverview {...latestVersion} />
-		</SchemaPageFrame>
+		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
+			<SchemaPageFrame {...props}>
+				<SchemaVersionOverview {...latestVersion} />
+			</SchemaPageFrame>
+		</LocationContext.Provider>
 	);
 };
 

@@ -7,28 +7,37 @@
  * that didn't come from the database.
  */
 
-export type SchemaPageParams = {
-	profileSlug: string;
-	contentSlug: string;
-};
+export type ResourcePageParams = { id: string };
 
+// These are the basic properties that every schema page needs
 export type SchemaPageProps = {
-	profileSlug: string;
-	contentSlug: string;
-	mode?: string;
-	submode?: string;
 	versionCount: number;
 	schema: SchemaProps;
 };
 
+// These are the basic schema properties that every schema page needs
 export type SchemaProps = {
+	id: string;
 	description: string;
-	agent: { userId: string | null };
+	slug: string;
+	agent: AgentProps;
 	isPublic: boolean;
 	updatedAt: string;
 };
 
-export type SchemaVersionPageParams = SchemaPageParams & { versionNumber: string };
+// These are the basic agent properties that every resource page needs
+export type AgentProps = {
+	user: { id: string; slug: string | null } | null;
+	organization: { id: string; slug: string | null } | null;
+};
+
+export const getProfileSlug = ({
+	user,
+	organization,
+}: {
+	user: null | { slug: null | string };
+	organization: null | { slug: null | string };
+}) => user?.slug || organization?.slug || undefined;
 
 export type SchemaVersionProps = {
 	versionNumber: string;

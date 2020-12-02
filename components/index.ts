@@ -17,5 +17,7 @@ export { default as SchemaContent } from "./SchemaContent/SchemaContent";
 export { default as SchemaGraph } from "./SchemaGraph/SchemaGraph";
 export { default as SchemaPageFrame } from "./SchemaPageFrame/SchemaPageFrame";
 export { default as SchemaVersionOverview } from "./SchemaVersionOverview/SchemaVersionOverview";
+export { default as SchemaVersionHistory } from "./SchemaVersionHistory/SchemaVersionHistory";
+export { default as SchemaVersionEditor } from "./SchemaVersionEditor/SchemaVersionEditor";
 export { default as ReadmeViewer } from "./ReadmeViewer/ReadmeViewer";
 export { default as ReadmeEditor } from "./ReadmeEditor/ReadmeEditor";

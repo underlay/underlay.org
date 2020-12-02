@@ -25,7 +25,7 @@ const SchemaContent: React.FC<SchemaContentProps> = ({ initialValue, onChange, r
 	return (
 		<Pane
 			className={styles.editor}
-			width={majorScale(60)}
+			width={majorScale(64)}
 			marginRight={majorScale(1)}
 			border="default"
 		>

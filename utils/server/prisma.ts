@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 export const prisma = new PrismaClient();
 
@@ -18,22 +18,18 @@ export const countSchemaVersions = async ({ id }: { id: string }) =>
 export const countCollectionVersions = async ({ id }: { id: string }) =>
 	prisma.schemaVersion.count({ where: { schemaId: id } });
 
-export const findResourceWhere = (
-	profileSlug: string,
-	contentSlug: string
-): Prisma.SchemaWhereInput & Prisma.CollectionWhereInput => ({
-	slug: contentSlug,
-	agent: {
-		OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
-	},
-});
-
 export const selectSchemaPageProps = {
 	id: true,
 	description: true,
-	agent: true,
 	isPublic: true,
 	updatedAt: true,
+	slug: true,
+	agent: {
+		select: {
+			user: { select: { id: true, slug: true } },
+			organization: { select: { id: true, slug: true } },
+		},
+	},
 };
 
 export const selectVersionOverviewProps = {

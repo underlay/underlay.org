@@ -6,18 +6,18 @@ import { getCachedSession } from "utils/server/session";
 // (different routes will have fetched different properties)
 export const getSchemaPagePermissions = (
 	context: GetServerSidePropsContext,
-	schema: { isPublic: boolean; agent: { userId: string | null } }
+	schema: { isPublic: boolean; agent: { user: { id: string } | null } }
 ) => {
 	const session = getCachedSession(context);
 
 	if (!schema.isPublic) {
-		if (session === null) {
-			return false;
-		}
-
 		// For now, a private schema is only accessible by the user that created it.
 		// We'll have to update this with more expressive access control logic
-		if (session.user.id !== schema.agent.userId) {
+		if (session === null) {
+			return false;
+		} else if (schema.agent.user === null) {
+			return false;
+		} else if (schema.agent.user.id !== session.user.id) {
 			return false;
 		}
 	}

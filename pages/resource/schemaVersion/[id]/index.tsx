@@ -1,11 +1,9 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import semverValid from "semver/functions/valid";
 
 import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import {
 	countSchemaVersions,
-	findResourceWhere,
 	prisma,
 	selectSchemaPageProps,
 	selectVersionOverviewProps,
@@ -17,25 +15,23 @@ import { getSchemaPagePermissions } from "utils/server/permissions";
 import {
 	SchemaPageProps,
 	SchemaVersionProps,
-	SchemaVersionPageParams,
-} from "utils/server/propTypes";
+	ResourcePageParams,
+	getProfileSlug,
+} from "utils/shared/propTypes";
+import { LocationContext } from "utils/client/hooks";
 
-type SchemaVersionPageProps = SchemaPageProps & {
+export type SchemaVersionPageProps = SchemaPageProps & {
 	schemaVersion: SchemaVersionProps;
 };
 
 export const getServerSideProps: GetServerSideProps<
 	SchemaVersionPageProps,
-	SchemaVersionPageParams
+	ResourcePageParams
 > = async (context) => {
-	const { profileSlug, contentSlug, versionNumber } = context.params!;
-
-	if (semverValid(versionNumber) === null) {
-		return { notFound: true };
-	}
+	const { id } = context.params!;
 
 	const schemaVersionWithSchema = await prisma.schemaVersion.findFirst({
-		where: { schema: findResourceWhere(profileSlug, contentSlug), versionNumber },
+		where: { id },
 		select: {
 			...selectVersionOverviewProps,
 			schema: { select: selectSchemaPageProps },
@@ -58,9 +54,7 @@ export const getServerSideProps: GetServerSideProps<
 	return {
 		props: {
 			mode: "versions",
-			profileSlug,
-			contentSlug,
-			versionNumber,
+			versionNumber: schemaVersion.versionNumber,
 			versionCount,
 			schema: serializeUpdatedAt(schema),
 			schemaVersion: serializeCreatedAt(schemaVersion),
@@ -68,12 +62,17 @@ export const getServerSideProps: GetServerSideProps<
 	};
 };
 
-const SchemaOverview: React.FC<SchemaVersionPageProps> = ({ schemaVersion, ...props }) => {
+const SchemaVersionPage: React.FC<SchemaVersionPageProps> = ({ schemaVersion, ...props }) => {
+	const profileSlug = getProfileSlug(props.schema.agent);
+	const contentSlug = props.schema.slug;
+
 	return (
-		<SchemaPageFrame {...props}>
-			<SchemaVersionOverview {...schemaVersion} />
-		</SchemaPageFrame>
+		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
+			<SchemaPageFrame {...props}>
+				<SchemaVersionOverview {...schemaVersion} />
+			</SchemaPageFrame>
+		</LocationContext.Provider>
 	);
 };
 
-export default SchemaOverview;
+export default SchemaVersionPage;

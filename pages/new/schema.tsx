@@ -21,6 +21,7 @@ import StatusCodes from "http-status-codes";
 
 import { slugPattern } from "utils/shared/slug";
 import { usePageContext } from "utils/client/hooks";
+import { buildUrl } from "utils/shared/urls";
 
 type Privacy = "private" | "public";
 const privacyOptions: { label: string; value: Privacy }[] = [
@@ -30,7 +31,7 @@ const privacyOptions: { label: string; value: Privacy }[] = [
 
 const NewSchema: React.FC<{}> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);
-	const [schemaSlug, setSchemaSlug] = useState("");
+	const [contentSlug, setContentSlug] = useState("");
 	const [description, setDescription] = useState("");
 	const [privacy, setPrivacy] = useState<Privacy>("public");
 
@@ -38,7 +39,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 	const router = useRouter();
 
 	const handleSchemaSlugChange = useCallback(
-		({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => setSchemaSlug(value),
+		({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => setContentSlug(value),
 		[]
 	);
 
@@ -48,12 +49,12 @@ const NewSchema: React.FC<{}> = ({}) => {
 	);
 
 	const handleSubmit = useCallback(
-		(userSlug: string) => {
+		(profileSlug: string) => {
 			setIsLoading(true);
 			const isPublic = privacy === "public";
-			const body = { slug: schemaSlug, description, isPublic };
+			const body = { slug: contentSlug, description, isPublic };
 			api.post("/api/schema", {}, { "content-type": "application/json" }, body)
-				.then(([{}]) => router.push(`/${userSlug}/schemas/${schemaSlug}`))
+				.then(([{}]) => router.push(buildUrl({ profileSlug, contentSlug })))
 				.catch((error) => {
 					setIsLoading(false);
 					if (error === StatusCodes.CONFLICT) {
@@ -63,7 +64,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 					}
 				});
 		},
-		[schemaSlug, description, privacy, router]
+		[contentSlug, description, privacy, router]
 	);
 
 	if (session === null) {
@@ -71,14 +72,14 @@ const NewSchema: React.FC<{}> = ({}) => {
 		return null;
 	}
 
-	const { id: userId, slug: userSlug } = session.user;
+	const { id: userId, slug: profileSlug } = session.user;
 
-	if (userSlug === null) {
+	if (profileSlug === null) {
 		signIn();
 		return null;
 	}
 
-	const nameIsValid = slugPattern.test(schemaSlug);
+	const nameIsValid = slugPattern.test(contentSlug);
 
 	return (
 		<Pane width={majorScale(80)} margin="auto">
@@ -91,7 +92,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 				<Pane>
 					<Heading marginY={majorScale(1)}>Owner</Heading>
 					<Select disabled={true} value={userId} minWidth={majorScale(12)}>
-						<option value={userId}>{userSlug}</option>
+						<option value={userId}>{profileSlug}</option>
 					</Select>
 				</Pane>
 				<Pane marginX={majorScale(4)}>
@@ -100,7 +101,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 						width={majorScale(24)}
 						autoFocus={true}
 						placeholder="[a-z0-9-]"
-						value={schemaSlug}
+						value={contentSlug}
 						onChange={handleSchemaSlugChange}
 						isInvalid={!nameIsValid}
 					/>
@@ -124,7 +125,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 			</Pane>
 			<Button
 				appearance="primary"
-				onClick={() => handleSubmit(userSlug)}
+				onClick={() => handleSubmit(profileSlug)}
 				disabled={!nameIsValid || isLoading}
 				isLoading={isLoading}
 			>

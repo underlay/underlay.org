@@ -1,56 +1,46 @@
 import React from "react";
 import classNames from "classnames";
 import { Button } from "evergreen-ui";
-import { useRouter } from "next/router";
 
 import { buildUrl } from "utils/shared/urls";
 
 import styles from "./ScopeNav.module.scss";
+import { useLocationContext } from "utils/client/hooks";
 
-export type NavChild = {
-	slug: string;
+export interface NavChild {
+	subMode?: string;
 	title: string;
-};
+}
 
-export type NavItem = {
-	slug: string;
+export interface NavItem {
+	mode?: string;
 	title: string;
 	children?: NavChild[];
-};
+}
 
-export type Props = {
+export interface ScopeNavProps {
 	navItems: NavItem[];
-	contentType?: "collection" | "schema";
-	activeMode?: string;
-	activeSubmode?: string;
-};
+}
 
-const ScopeNav: React.FC<Props> = function ({ navItems, contentType, activeMode, activeSubmode }) {
-	const router = useRouter();
+const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
+	const { mode: activeMode, subMode: activeSubmode, ...locationData } = useLocationContext();
 
-	const { profileSlug, contentSlug } = router.query as Record<string, string>;
-	const activeModeData = navItems.find((item) => item.slug === activeMode);
+	const activeModeData = navItems.find(({ mode }) => mode === activeMode);
 	const activeChildren = activeModeData?.children;
 
 	return (
 		<div className={styles.scopeNav}>
 			<div className={styles.primary}>
-				{navItems.map((item) => {
-					const { slug: modeSlug, title } = item;
-					const isActive = activeMode === modeSlug || (!activeMode && !modeSlug);
+				{navItems.map(({ mode, title }) => {
+					const isActive = activeMode === mode;
 					return (
 						<Button
 							className={classNames(styles.button, isActive && styles.active)}
 							appearance="minimal"
-							key={modeSlug}
+							key={mode || ""}
 							is="a"
 							height={40}
-							href={buildUrl({
-								profileSlug: profileSlug,
-								contentSlug: contentSlug,
-								mode: modeSlug,
-								type: contentType,
-							})}
+							href={buildUrl({ ...locationData, mode })}
 						>
 							{title}
 						</Button>
@@ -60,23 +50,18 @@ const ScopeNav: React.FC<Props> = function ({ navItems, contentType, activeMode,
 			{activeChildren && (
 				<div className={styles.secondary}>
 					{activeChildren.map((item) => {
-						const { slug: subModeSlug, title } = item;
-						const isActive = activeSubmode === subModeSlug;
-						const modeSlug = activeModeData?.slug;
+						const { subMode: subMode, title } = item;
+						const isActive = activeSubmode === subMode;
+						const mode = activeModeData?.mode;
+						const url = buildUrl({ ...locationData, mode, subMode });
 						return (
 							<Button
 								className={classNames(styles.button, isActive && styles.active)}
 								appearance="minimal"
 								height={32}
-								key={subModeSlug}
+								key={subMode}
 								is="a"
-								href={buildUrl({
-									profileSlug: profileSlug,
-									contentSlug: contentSlug,
-									mode: modeSlug,
-									subMode: subModeSlug,
-									type: contentType,
-								})}
+								href={url}
 							>
 								{title}
 							</Button>

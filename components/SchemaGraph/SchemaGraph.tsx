@@ -23,7 +23,7 @@ export interface SchemaGraphProps {
 const SchemaGraph = (props: SchemaGraphProps) => {
 	return (
 		<Pane className={styles.graph} border="default">
-			<TaslGraph {...props} />
+			<TaslGraph {...props} style={{ fit: true, padding: 40 }} />
 		</Pane>
 	);
 };
