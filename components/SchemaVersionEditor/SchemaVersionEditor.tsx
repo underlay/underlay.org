@@ -146,6 +146,7 @@ const SchemaVersionEditor: React.FC<SchemaVersionEditorProps> = ({
 			publishVersion(id, versionNumber, content, readmeContent)
 				.then(() => {
 					setPublishing(false);
+					cleanRef.current = true;
 					toaster.success(
 						`${profileSlug}/${contentSlug}/${versionNumber} published successfully`
 					);
