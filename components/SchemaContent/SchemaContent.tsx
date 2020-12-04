@@ -42,7 +42,6 @@ export const initialSchemaContent = `# Welcome to the schema editor!
 # http://r1.underlay.org/docs/schemas
 
 namespace ex http://example.com#
-namespace ul http://underlay.org/ns/
 
 type foo {
   ex:a -> ? uri ;
