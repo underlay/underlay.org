@@ -28,7 +28,7 @@ export default function SchemaEditor({ initialValue, onChange, readOnly }: Schem
 	);
 
 	return (
-		<Pane display="flex" flexWrap="wrap">
+		<Pane>
 			<Pane marginRight={majorScale(1)} marginBottom={majorScale(1)}>
 				<SchemaContent
 					initialValue={initialValue}

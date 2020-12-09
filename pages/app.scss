@@ -4,16 +4,18 @@
 
 body {
 	background: #ede9e4;
+	overflow-x: scroll;
 	margin: 0;
 	padding: 0;
 	max-width: 100vw;
-	overflow-x: hidden;
 	color: #333;
 	font-size: 16px;
 }
 .app {
-	max-width: 1200px;
-	padding: 0em 0.5em;
+	max-width: $content-width;
+	min-width: $min-content-width;
+
+	padding: 0 $gutter-padding;
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;

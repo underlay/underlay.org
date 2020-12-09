@@ -1,5 +1,9 @@
 @import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css);
 
+.editor pre {
+	margin: 0;
+}
+
 .editor :global(.cm-scroller) {
 	font-family: "Fira Code", monospace;
 	background-color: white;

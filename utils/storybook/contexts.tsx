@@ -10,6 +10,7 @@ import { NextRouter } from "next/dist/next-server/lib/router/router";
 import { PageData } from "utils/shared/session";
 
 const loggedIn: PageData = {
+	isStatic: false,
 	session: {
 		user: {
 			id: "1",

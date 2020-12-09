@@ -1,7 +1,6 @@
-@import 'pages/variables.scss';
+@import "pages/variables.scss";
 
 .scopeHeader {
-	margin-left: $scope-margin-left;
 	position: relative;
 
 	.typeIcon {
@@ -30,7 +29,7 @@
 	.details {
 		font-size: 16px;
 		&.top {
-			margin-bottom: 7px;	
+			margin-bottom: 7px;
 		}
 	}
 }

@@ -1,5 +1,12 @@
+@import "pages/variables.scss";
+
+.graph {
+	overflow-x: hidden;
+}
+
 .graph :global(.tasl-cytoscape) {
-	width: 600px;
-	height: 600px;
+	max-width: 100%;
+	height: 640px;
 	background-color: whitesmoke;
+	position: relative;
 }

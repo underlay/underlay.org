@@ -7,22 +7,33 @@ import { usePageContext } from "utils/client/hooks";
 
 import styles from "./Header.module.scss";
 
-
 const Header = () => {
-	const { session } = usePageContext();
+	const { session, isStatic } = usePageContext();
 	const user = session?.user;
 	return (
 		<nav className={styles.header}>
 			<div className={styles.content}>
 				<Pane>
-					<Button className={styles.title} height={40} appearance="minimal" is="a" href="/">
+					<Button
+						className={styles.title}
+						height={40}
+						appearance="minimal"
+						is="a"
+						href="/"
+					>
 						<img src="/headerLogo.svg" alt="Underlay r1 logo" />
 					</Button>
 				</Pane>
 				<Pane display="flex" alignItems="center">
 					{user ? (
 						<>
-							<Button is="a" href="/new/schema" marginRight={12} height={40} appearance="minimal">
+							<Button
+								is="a"
+								href="/new/schema"
+								marginRight={12}
+								height={40}
+								appearance="minimal"
+							>
 								New schema
 							</Button>
 							<Popover
@@ -67,11 +78,11 @@ const Header = () => {
 								/>
 							</Popover>
 						</>
-					) : (
+					) : isStatic === false ? (
 						<Button is="a" href="/login" appearance="minimal" height={40}>
 							Login
 						</Button>
-					)}
+					) : null}
 				</Pane>
 			</div>
 		</nav>
