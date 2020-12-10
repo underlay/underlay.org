@@ -1,6 +1,7 @@
 import { defaultTheme } from "evergreen-ui";
 
 import getButtonClassName from "./getButtonClassName";
+import getTabClassName from "./getTabClassName";
 import getTextSizeForControlHeight from "./getTextSizeForControlHeight";
 import getTextStyle from './getTextStyle';
 
@@ -15,6 +16,7 @@ defaultTheme.typography.fontFamilies.ui = defaultFonts;
 export const theme = {
 	...defaultTheme,
 	getButtonClassName,
+	getTabClassName,
 	getTextSizeForControlHeight,
 	getTextStyle,
 	getAvatarProps: () => {

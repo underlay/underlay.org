@@ -3,9 +3,8 @@ import { GetStaticProps } from "next";
 
 import { readdirSync, lstatSync, existsSync, readFileSync } from "fs";
 import { resolve } from "path";
-import { ReadmeViewer } from "components";
+import { DocFrame } from "components";
 import { useRouter } from "next/router";
-import { Heading, Link, minorScale, Text } from "evergreen-ui";
 
 const docsRoot = resolve("docs");
 
@@ -31,6 +30,8 @@ export async function getStaticPaths() {
 
 interface DocsProps {
 	content: string;
+	sections: string[];
+	subSections: string[];
 }
 
 type DocsParams = { path?: string[] };
@@ -47,6 +48,21 @@ function getFilePath(path: string[]): string | null {
 	}
 }
 
+/* Gets all top-level sections in the docs folder */
+function getSections(): string[] {
+	const sections = readdirSync(docsRoot).filter((x) => x !== "index.md");
+	return ["overview", ...sections];
+}
+
+/* Gets all subSections  in the docs folder for the current top-level section */
+function getSubSections(section: string): string[] {
+	const directory = resolve(docsRoot, section);
+	const subSections = readdirSync(directory)
+		.filter((x) => x !== "index.md")
+		.map((x) => x.replace(".md", ""));
+	return subSections;
+}
+
 export const getStaticProps: GetStaticProps<DocsProps, DocsParams> = async ({ params }) => {
 	if (params === undefined) {
 		return { notFound: true };
@@ -54,29 +70,25 @@ export const getStaticProps: GetStaticProps<DocsProps, DocsParams> = async ({ pa
 	const filePath = getFilePath(params.path || []);
 	if (filePath !== null && existsSync(filePath) && lstatSync(filePath).isFile()) {
 		const content = readFileSync(filePath, "utf-8");
-		return { props: { content } };
+		const sections = getSections();
+		const subSections = params.path ? getSubSections(params.path[0]) : [];
+		return { props: { content, sections, subSections } };
 	} else {
 		return { notFound: true };
 	}
 };
 
-const DocsPage: React.FC<DocsProps> = ({ content }) => {
+const DocsPage: React.FC<DocsProps> = ({ content, sections, subSections }) => {
 	const router = useRouter();
 	const path = (router.query.path || []) as string[];
 	return (
-		<>
-			<Heading>
-				<Link href="/docs">docs</Link>
-				{path.map((name, i) => (
-					<React.Fragment key={i}>
-						<Text marginX={minorScale(1)}>/</Text>
-						<Link href={`/docs/${path.slice(0, i + 1).join("/")}`}>{name}</Link>
-					</React.Fragment>
-				))}
-			</Heading>
-			<hr />
-			<ReadmeViewer source={content} />
-		</>
+		<DocFrame
+			sections={sections}
+			subSections={subSections}
+			activeSection={path[0]}
+			activeSubSection={path[1]}
+			content={content}
+		/>
 	);
 };
 
