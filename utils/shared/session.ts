@@ -4,7 +4,6 @@ import { Session } from "next-auth/client";
 
 export interface PageData {
 	session: ClientSession | null;
-	isStatic: boolean;
 }
 
 export interface ClientUser {
