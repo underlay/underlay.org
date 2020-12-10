@@ -58,7 +58,7 @@ const DocFrame: React.FC<Props> = function ({
 					})}
 				</TabNavigation>
 			</div>
-			<div>
+			<div className={styles.content}>
 				<ReadmeViewer source={content} />
 			</div>
 		</div>
