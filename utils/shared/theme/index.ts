@@ -23,5 +23,3 @@ export const theme = {
 		return { color: "white", backgroundColor: "#D3C9BD" };
 	},
 };
-
-console.log(theme);
