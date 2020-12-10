@@ -16,15 +16,23 @@ import dynamic from "next/dynamic";
 
 const ReadmeEditor = dynamic(
 	async () => {
-		const { EditorState, EditorView, basicSetup } = await import(
-			"@codemirror/next/basic-setup"
-		);
-		const { keymap } = await import("@codemirror/next/view");
-		const { defaultKeymap, indentMore, indentLess } = await import("@codemirror/next/commands");
-		const { linter } = await import("@codemirror/next/lint");
+		const [
+			{ EditorState, EditorView, basicSetup },
+			{ keymap },
+			{ defaultKeymap, indentMore, indentLess },
+			{ linter },
+			{ markdown },
+		] = await Promise.all([
+			import("@codemirror/next/basic-setup"),
+			import("@codemirror/next/view"),
+			import("@codemirror/next/commands"),
+			import("@codemirror/next/lint"),
+			import("@codemirror/next/lang-markdown"),
+		]);
 
 		const baseExtensions = [
 			basicSetup,
+			markdown(),
 			keymap([
 				...defaultKeymap,
 				{

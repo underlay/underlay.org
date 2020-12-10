@@ -24,11 +24,12 @@ import semverInc from "semver/functions/inc";
 import semverLt from "semver/functions/lt";
 import semverMajor from "semver/functions/major";
 
-import { SchemaEditor, ReadmeEditor, Section } from "components";
+import { SchemaEditor, SchemaGraph, ReadmeEditor, Section } from "components";
 import { useRouter } from "next/router";
 import { buildUrl } from "utils/shared/urls";
 
 import { useLocationContext } from "utils/client/hooks";
+import { APG } from "@underlay/apg";
 
 // We use an intersection to "augment" the nested schema type
 export interface SchemaVersionEditorProps {
@@ -209,9 +210,7 @@ const SchemaVersionEditor: React.FC<SchemaVersionEditorProps> = ({
 				)}
 			</Section>
 			<Section title="Content">
-				<Pane marginY={majorScale(2)}>
-					<SchemaEditor initialValue={draftContent} onChange={handleChange} />
-				</Pane>
+				<SchemaContent initialValue={draftContent} onChange={handleChange} />
 			</Section>
 			<Section title="Readme">
 				<Paragraph marginY={majorScale(1)}>
@@ -267,6 +266,31 @@ const SchemaVersionEditor: React.FC<SchemaVersionEditorProps> = ({
 		</Pane>
 	);
 };
+
+function SchemaContent(props: {
+	initialValue: string;
+	onChange: (updateProps: UpdateProps) => void;
+}) {
+	const [schema, setSchema] = useState<APG.Schema | null>(null);
+	const [namespaces, setNamespaces] = useState<Record<string, string>>({});
+
+	const handleChange = useCallback((updateProps: UpdateProps) => {
+		setSchema(updateProps.schema);
+		setNamespaces(updateProps.namespaces);
+		props.onChange(updateProps);
+	}, []);
+
+	return (
+		<>
+			<SchemaEditor
+				marginY={majorScale(2)}
+				initialValue={props.initialValue}
+				onChange={handleChange}
+			/>
+			<SchemaGraph marginY={majorScale(2)} schema={schema} namespaces={namespaces} />
+		</>
+	);
+}
 
 async function publishVersion(
 	id: string,

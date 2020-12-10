@@ -6,6 +6,7 @@
 
 .graph :global(.tasl-cytoscape) {
 	max-width: 100%;
+	min-width: 640px;
 	height: 640px;
 	background-color: whitesmoke;
 	position: relative;

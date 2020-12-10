@@ -1,8 +1,10 @@
-import React from "react";
-import { Pane, Paragraph } from "evergreen-ui";
+import React, { useMemo } from "react";
+import { majorScale, Pane, Paragraph } from "evergreen-ui";
 
-import { Section, SchemaEditor, ReadmeViewer } from "components";
+import { Section, SchemaViewer, ReadmeViewer } from "components";
 import { SchemaVersionProps } from "utils/shared/propTypes";
+import { parseSchema } from "utils/shared/schemas/parse";
+import SchemaGraph from "components/SchemaGraph/SchemaGraph";
 
 export type SchemaVersionOverviewProps = SchemaVersionProps;
 
@@ -13,6 +15,10 @@ const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
 	createdAt,
 }) => {
 	const date = new Date(createdAt);
+	const result = useMemo(() => parseSchema(content), [content]);
+	const schema = result._tag === "Left" ? null : result.right.schema;
+	const namespaces = result._tag === "Left" ? {} : result.right.namespaces;
+
 	return (
 		<React.Fragment>
 			<Section
@@ -38,7 +44,8 @@ const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
 			</Section>
 
 			<Section title="Content" useMargin>
-				<SchemaEditor initialValue={content} readOnly={true} />
+				<SchemaViewer marginY={majorScale(2)} value={content} />
+				<SchemaGraph marginY={majorScale(2)} schema={schema} namespaces={namespaces} />
 			</Section>
 		</React.Fragment>
 	);
