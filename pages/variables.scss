@@ -3,3 +3,9 @@ $base-font: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen",
 $content-width: 1024px;
 $min-content-width: 640px;
 $gutter-padding: 52px;
+
+@mixin for-mobile {
+	@media (max-width: 768px) {
+		@content;
+	}
+}

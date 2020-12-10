@@ -4,6 +4,7 @@ export { default as CollectionList } from "./CollectionList/CollectionList";
 export { default as CollectionPreview } from "./CollectionPreview/CollectionPreview";
 export { default as DiscussionList } from "./DiscussionList/DiscussionList";
 export { default as DiscussionPreview } from "./DiscussionPreview/DiscussionPreview";
+export { default as DocFrame } from "./DocFrame/DocFrame";
 export { default as Footer } from "./Footer/Footer";
 export { default as Header } from "./Header/Header";
 export { default as Icon } from "./Icon/Icon";

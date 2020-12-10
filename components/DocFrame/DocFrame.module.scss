@@ -1,0 +1,51 @@
+@import "pages/variables.scss";
+
+.docFrame {
+	display: flex;
+	width: 100%;
+	@include for-mobile {
+		display: block;
+	}
+	.sideHeader {
+		font-weight: 600;
+		margin-bottom: 1em;
+	}
+	.side {
+		width: 200px;
+		border-right: 1px solid #ccc;
+		flex: 0 0 auto;
+		padding-right: 1em;
+		margin-right: 2em;
+		@include for-mobile {
+			width: 100%;
+			border-right: 0px solid #ccc;
+			border-bottom: 1px solid #ccc;
+			padding-right: 0em;
+			margin-right: 0em;
+			padding-bottom: 1em;
+			margin-bottom: 2em;
+		}
+		nav {
+			margin-left: -8px;
+			a {
+				font-weight: 300;
+				font-size: 16px;
+				text-transform: capitalize;
+			}
+		}
+	}
+	.subSection {
+		margin-left: 1.5em;
+		width: calc(100% - 1.5em);
+		position: relative;
+		&:before {
+			content: "";
+			position: absolute;
+			width: 1px;
+			background: #ccc;
+			left: -14px;
+			top: -3px;
+			bottom: -1px;
+		}
+	}
+}
