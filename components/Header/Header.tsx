@@ -8,7 +8,7 @@ import { usePageContext } from "utils/client/hooks";
 import styles from "./Header.module.scss";
 
 const Header = () => {
-	const { session, isStatic } = usePageContext();
+	const { session } = usePageContext();
 	const user = session?.user;
 	return (
 		<nav className={styles.header}>
@@ -78,11 +78,11 @@ const Header = () => {
 								/>
 							</Popover>
 						</>
-					) : isStatic === false ? (
+					) : (
 						<Button is="a" href="/login" appearance="minimal" height={40}>
 							Login
 						</Button>
-					) : null}
+					)}
 				</Pane>
 			</div>
 		</nav>

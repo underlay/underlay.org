@@ -1,5 +1,5 @@
 import React from "react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
 import { readdirSync, lstatSync, existsSync, readFileSync } from "fs";
 import { resolve } from "path";
@@ -7,26 +7,6 @@ import { DocFrame } from "components";
 import { useRouter } from "next/router";
 
 const docsRoot = resolve("docs");
-
-function* traverseDocsDirectory(
-	path: string[]
-): Generator<{ params: DocsParams }, void, undefined> {
-	for (const name of readdirSync(resolve(docsRoot, ...path))) {
-		const stat = lstatSync(resolve(docsRoot, ...path, name));
-		if (stat.isDirectory()) {
-			yield* traverseDocsDirectory([...path, name]);
-		} else if (name.endsWith(".md")) {
-			const urlPath =
-				name === "index.md" ? [...path] : [...path, name.slice(0, name.lastIndexOf(".md"))];
-			yield { params: { path: urlPath } };
-		}
-	}
-}
-
-export async function getStaticPaths() {
-	const paths = Array.from(traverseDocsDirectory([]));
-	return { paths, fallback: false };
-}
 
 interface DocsProps {
 	content: string;
@@ -63,7 +43,7 @@ function getSubSections(section: string): string[] {
 	return subSections;
 }
 
-export const getStaticProps: GetStaticProps<DocsProps, DocsParams> = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps<DocsProps, DocsParams> = async ({ params }) => {
 	if (params === undefined) {
 		return { notFound: true };
 	}
