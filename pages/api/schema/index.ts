@@ -8,8 +8,7 @@ import { makeHandler } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma } from "utils/server/prisma";
-
-import { initialSchemaContent } from "components/SchemaContent/SchemaContent";
+import { initialSchemaContent } from "utils/shared/schemas/initialContent";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
