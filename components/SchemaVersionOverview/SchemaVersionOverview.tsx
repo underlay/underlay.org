@@ -5,6 +5,7 @@ import { Section, SchemaViewer, ReadmeViewer } from "components";
 import { SchemaVersionProps } from "utils/shared/propTypes";
 import { parseSchema } from "utils/shared/schemas/parse";
 import SchemaGraph from "components/SchemaGraph/SchemaGraph";
+import { defaultNamespaces } from "@underlay/tasl-lezer";
 
 export type SchemaVersionOverviewProps = SchemaVersionProps;
 
@@ -17,7 +18,10 @@ const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = ({
 	const date = new Date(createdAt);
 	const result = useMemo(() => parseSchema(content), [content]);
 	const schema = result._tag === "Left" ? null : result.right.schema;
-	const namespaces = result._tag === "Left" ? {} : result.right.namespaces;
+	const namespaces =
+		result._tag === "Left"
+			? defaultNamespaces
+			: { ...defaultNamespaces, ...result.right.namespaces };
 
 	return (
 		<React.Fragment>
