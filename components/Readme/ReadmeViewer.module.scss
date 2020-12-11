@@ -8,10 +8,11 @@
 		margin-bottom: 1em;
 	}
 
-	pre {
-		background-color: #ddd8d8;
-		border-radius: 2px;
-		padding: 0.5em;
+	pre code {
+		// background-color: #ddd8d8;
+		// border-radius: 2px;
+		padding: 1em;
+		display: block;
 	}
 
 	h2 {
@@ -21,9 +22,12 @@
 
 	code {
 		font-family: SFMono-Regular, Menlo, Consolas, monospace;
-		background-color: #ddd8d8;
+		background-color: whitesmoke;
 		border-radius: 2px;
-		padding: 0 4px;
+		// border: 1px solid lightgrey;
+		// padding: 0 4px;
+		box-shadow: 0px 0px 0px 1px lightgrey inset;
+		padding: 0 6px;
 		display: inline-block;
 		font-size: 15px;
 	}
