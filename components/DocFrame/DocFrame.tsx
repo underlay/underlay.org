@@ -5,52 +5,50 @@ import { ReadmeViewer } from "components";
 
 import styles from "./DocFrame.module.scss";
 
-type Props = {
-	sections: string[];
-	subSections: string[];
-	activeSection?: string;
-	activeSubSection?: string;
+interface DocFrameProps {
+	sections: { slug: string; title: string }[];
+	subSections: { slug: string; title: string }[];
+	activeSection: string | null;
+	activeSubSection: string | null;
 	content: string;
-};
+}
 
-const fixTitles = (title: string): string => {
-	return title.replace("uri", "URI").replace(/-/gi, " ");
-};
-
-const DocFrame: React.FC<Props> = function ({
+const DocFrame: React.FC<DocFrameProps> = ({
 	sections,
 	subSections,
-	activeSection = "overview",
-	activeSubSection = "",
+	activeSection,
+	activeSubSection,
 	content,
-}) {
+}) => {
 	return (
 		<div className={styles.docFrame}>
 			<div className={styles.side}>
 				<div className={styles.sideHeader}>Documentation</div>
 				<TabNavigation>
+					<SidebarTab is="a" href="/docs" isSelected={activeSection === null}>
+						Overview
+					</SidebarTab>
 					{sections.map((item) => {
-						const sectionIsActive = activeSection === item;
-						const href = item === "overview" ? "/docs" : `/docs/${item}`;
+						const sectionIsActive = activeSection === item.slug;
 						return (
-							<React.Fragment key={item}>
+							<React.Fragment key={item.slug}>
 								<SidebarTab
 									is="a"
-									href={href}
-									isSelected={sectionIsActive && !activeSubSection}
+									href={`/docs/${item.slug}`}
+									isSelected={sectionIsActive && activeSubSection === null}
 								>
-									{fixTitles(item)}
+									{item.title}
 								</SidebarTab>
 								{sectionIsActive &&
 									subSections.map((subItem) => (
 										<SidebarTab
-											key={subItem}
+											key={subItem.slug}
 											is="a"
-											href={`/docs/${item}/${subItem}`}
-											isSelected={activeSubSection === subItem}
+											href={`/docs/${item.slug}/${subItem.slug}`}
+											isSelected={activeSubSection === subItem.slug}
 											className={styles.subSection}
 										>
-											{fixTitles(subItem)}
+											{subItem.title}
 										</SidebarTab>
 									))}
 							</React.Fragment>

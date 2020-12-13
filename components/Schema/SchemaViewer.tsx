@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useRef } from "react";
-import { BoxOwnProps, majorScale, Pane, PaneOwnProps } from "evergreen-ui";
+import { BoxOwnProps, Pane, PaneOwnProps } from "evergreen-ui";
 
 import dynamic from "next/dynamic";
 
@@ -59,7 +59,6 @@ const SchemaViewer: React.FC<SchemaViewerProps & BoxOwnProps<"div", PaneOwnProps
 		return (
 			<Pane
 				className={styles.container}
-				width={majorScale(80)}
 				border="default"
 				style={{ height: normalizedHeight }}
 				{...rest}

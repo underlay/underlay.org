@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { readdirSync, lstatSync, existsSync, readFileSync } from "fs";
+import { readdirSync, lstatSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { DocFrame } from "components";
 import { useRouter } from "next/router";
@@ -10,49 +10,82 @@ const docsRoot = resolve("docs");
 
 interface DocsProps {
 	content: string;
-	sections: string[];
-	subSections: string[];
+	sections: { slug: string; title: string }[];
+	subSections: { slug: string; title: string }[];
 }
 
 type DocsParams = { path?: string[] };
 
-function getFilePath(path: string[]): string | null {
-	const directory = resolve(docsRoot, ...path);
-	if (existsSync(directory) && lstatSync(directory).isDirectory()) {
-		return resolve(docsRoot, ...path, "index.md");
-	} else if (path.length > 0) {
-		const tail = path[path.length - 1];
-		return resolve(docsRoot, ...path.slice(0, -1), `${tail}.md`);
-	} else {
-		return null;
+const sectionPattern = /^\d+\. ([a-zA-Z ]+)$/;
+
+/* Gets all top-level sections in the docs folder 
+   The returned map is from slug keys to absolute file paths. */
+function getSectionMap(): Map<string, { path: string; title: string }> {
+	const map = new Map<string, { path: string; title: string }>();
+	for (const name of readdirSync(docsRoot)) {
+		if (name === "index.md") {
+			continue;
+		}
+		const path = resolve(docsRoot, name);
+
+		if (sectionPattern.test(name) && lstatSync(path).isDirectory()) {
+			const [{}, title] = sectionPattern.exec(name)!;
+			const slug = title.replace(/ /g, "-").toLowerCase();
+			map.set(slug, { path, title });
+		}
 	}
+
+	return map;
 }
 
-/* Gets all top-level sections in the docs folder */
-function getSections(): string[] {
-	const sections = readdirSync(docsRoot).filter((x) => x !== "index.md");
-	return ["overview", ...sections];
+const subSectionPattern = /^\d+\. ([a-zA-Z ]+)\.md$/;
+
+/* Gets all subSections in the docs folder for the current top-level section.
+   The returned map is from slug keys to absolute file paths. */
+function getSubSectionMap(sectionPath: string): Map<string, { path: string; title: string }> {
+	const map = new Map<string, { path: string; title: string }>();
+	for (const name of readdirSync(sectionPath)) {
+		if (name === "index.md") {
+			continue;
+		}
+		const path = resolve(sectionPath, name);
+		if (subSectionPattern.test(name) && lstatSync(path).isFile()) {
+			const [{}, title] = subSectionPattern.exec(name)!;
+			const slug = title.replace(/ /g, "-").toLowerCase();
+			map.set(slug, { path, title });
+		}
+	}
+	return map;
 }
 
-/* Gets all subSections  in the docs folder for the current top-level section */
-function getSubSections(section: string): string[] {
-	const directory = resolve(docsRoot, section);
-	const subSections = readdirSync(directory)
-		.filter((x) => x !== "index.md")
-		.map((x) => x.replace(".md", ""));
-	return subSections;
-}
+const toEntries = ([slug, { title }]: [string, { title: string }]) => ({ slug, title });
 
 export const getServerSideProps: GetServerSideProps<DocsProps, DocsParams> = async ({ params }) => {
 	if (params === undefined) {
 		return { notFound: true };
 	}
-	const filePath = getFilePath(params.path || []);
-	if (filePath !== null && existsSync(filePath) && lstatSync(filePath).isFile()) {
-		const content = readFileSync(filePath, "utf-8");
-		const sections = getSections();
-		const subSections = params.path ? getSubSections(params.path[0]) : [];
-		return { props: { content, sections, subSections } };
+
+	const sectionMap = getSectionMap();
+	const sections = Array.from(sectionMap.entries()).map(toEntries);
+
+	const path = params.path || [];
+	if (path.length === 0) {
+		const content = readFileSync(resolve(docsRoot, "index.md"), "utf-8");
+		return { props: { content, sections, subSections: [] } };
+	} else if (sectionMap.has(path[0])) {
+		const { path: sectionPath } = sectionMap.get(path[0])!;
+		const subSectionMap = getSubSectionMap(sectionPath);
+		const subSections = Array.from(subSectionMap.entries()).map(toEntries);
+		if (path.length === 1) {
+			const content = readFileSync(resolve(sectionPath, "index.md"), "utf-8");
+			return { props: { content, sections, subSections } };
+		} else if (subSectionMap.has(path[1])) {
+			const { path: subSectionPath } = subSectionMap.get(path[1])!;
+			const content = readFileSync(subSectionPath, "utf-8");
+			return { props: { content, sections, subSections } };
+		} else {
+			return { notFound: true };
+		}
 	} else {
 		return { notFound: true };
 	}
@@ -61,12 +94,13 @@ export const getServerSideProps: GetServerSideProps<DocsProps, DocsParams> = asy
 const DocsPage: React.FC<DocsProps> = ({ content, sections, subSections }) => {
 	const router = useRouter();
 	const path = (router.query.path || []) as string[];
+
 	return (
 		<DocFrame
 			sections={sections}
 			subSections={subSections}
-			activeSection={path[0]}
-			activeSubSection={path[1]}
+			activeSection={path.length < 1 ? null : path[0]}
+			activeSubSection={path.length < 2 ? null : path[1]}
 			content={content}
 		/>
 	);

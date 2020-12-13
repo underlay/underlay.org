@@ -10,8 +10,16 @@ export default {
 
 export const Primary: React.FC<{}> = () => (
 	<DocFrame
-		sections={["schemas", "collections"]}
-		subSections={["values", "literals", "uris", "name-with-spaces"]}
+		sections={[
+			{ slug: "schemas", title: "Schemas" },
+			{ slug: "collections", title: "Collections" },
+		]}
+		subSections={[
+			{ slug: "values", title: "Values" },
+			{ slug: "literals", title: "Literals" },
+			{ slug: "uris", title: "URIs" },
+			{ slug: "name-with-spaces", title: "Name with Spaces" },
+		]}
 		activeSection="schemas"
 		activeSubSection="values"
 		content={`# Hello
