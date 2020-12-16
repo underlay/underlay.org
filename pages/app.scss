@@ -12,7 +12,7 @@ body {
 	font-size: 16px;
 }
 .app {
-	max-width: $content-width;
+	max-width: $max-content-width;
 	min-width: $min-content-width;
 
 	padding: 0 $gutter-padding;
