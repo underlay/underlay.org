@@ -4,12 +4,12 @@ Schemas in the Underlay are written in a tiny algebraic schema language called t
 
 A tasl _schema_ defines a set of _classes_. Each class is associated with a URI key and a _type_. A _type_ is one of six kinds of types:
 
--   a [literal type](docs/schemas/literals)
--   the [URI type](docs/schemas/uris)
--   the [unit type](docs/schemas/units)
--   a [product type](docs/schemas/products)
--   a [coproduct type](docs/schemas/coproducts)
--   a [reference type](docs/schemas/references)
+-   a [literal type](schemas/literals)
+-   the [URI type](schemas/uris)
+-   the [unit type](schemas/units)
+-   a [product type](schemas/products)
+-   a [coproduct type](schemas/coproducts)
+-   a [reference type](schemas/references)
 
 Two of these - products and coproducts - are _composite types_, which means that they have other types inside of them.
 
