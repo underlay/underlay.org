@@ -20,7 +20,11 @@
 		left: calc(min(-#{$gutter-padding}, (100% - 100vw) / 2));
 		height: 140px;
 		z-index: 0;
-		background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(237, 233, 228, 1) 100%);
+		background: linear-gradient(
+			180deg,
+			rgba($background-color, 0) 0%,
+			rgba($background-color, 1) 100%
+		);
 	}
 	.left {
 		flex: 1 1 auto;

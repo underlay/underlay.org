@@ -4,6 +4,8 @@ $content-width: 1024px;
 $min-content-width: 640px;
 $gutter-padding: 52px;
 
+$background-color: #ede9e4;
+
 @mixin for-mobile {
 	@media (max-width: 768px) {
 		@content;
