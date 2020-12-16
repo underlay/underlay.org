@@ -12,11 +12,16 @@ import {
 } from "utils/server/prisma";
 import { getSchemaPagePermissions } from "utils/server/permissions";
 import { buildUrl } from "utils/shared/urls";
-import { SchemaVersionOverviewProps } from "components/SchemaVersionOverview/SchemaVersionOverview";
-import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
+
+import {
+	SchemaPageProps,
+	ResourcePageParams,
+	getProfileSlug,
+	SchemaVersionProps,
+} from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionOverviewProps };
+type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionProps };
 
 export const getServerSideProps: GetServerSideProps<
 	SchemaOverviewProps,

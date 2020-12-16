@@ -8,4 +8,4 @@ export default {
 	component: Profile,
 } as Meta;
 
-export const Primary: React.FC<{}> = () => <Profile organizationData={{}} />;
+export const Primary: React.FC<{}> = () => <Profile schemas={[]} />;

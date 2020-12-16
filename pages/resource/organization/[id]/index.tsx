@@ -7,8 +7,7 @@ import { prisma } from "utils/server/prisma";
 
 export interface OrganizationProfilePageProps {
 	organization: {
-		id: string;
-		slug: string | null;
+		slug: string;
 	};
 }
 
@@ -20,22 +19,23 @@ export const getServerSideProps: GetServerSideProps<
 
 	const organization = await prisma.organization.findUnique({
 		where: { id },
-		select: { id: true, slug: true },
+		select: { slug: true },
 	});
 
 	if (organization === null) {
 		return { notFound: true };
+	} else if (organization.slug === null) {
+		return { notFound: true };
 	}
 
-	return { props: { organization } };
+	return { props: { organization: { slug: organization.slug } } };
 };
 
 const UserProfilePage: React.FC<OrganizationProfilePageProps> = ({ organization }) => {
 	const profileSlug = organization.slug || undefined;
-
 	return (
 		<LocationContext.Provider value={{ profileSlug }}>
-			<Profile organizationData={{}} />
+			<Profile schemas={[]} />
 		</LocationContext.Provider>
 	);
 };

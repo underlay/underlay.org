@@ -72,7 +72,7 @@ const options: InitOptions = {
 		verifyRequest: "/login?requested=true",
 	},
 	callbacks: {
-		session: async (session: SessionBase, user: unknown) => {
+		session: async (session: SessionBase, user) => {
 			if (user) {
 				const { id, slug, name, email, avatar } = user as User;
 				const clientUser: ClientUser = { id, slug, name, email, avatar };

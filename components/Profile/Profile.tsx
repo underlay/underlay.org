@@ -1,20 +1,62 @@
-
 // import { PrismaClient } from '@prisma/client';
 // const prisma = new PrismaClient();
+import ScopeHeader from "components/ScopeHeader/ScopeHeader";
+import Section from "components/Section/Section";
+
+import { Card, majorScale, Pane, Text } from "evergreen-ui";
 import React from "react";
+import { useLocationContext } from "utils/client/hooks";
+import { buildUrl } from "utils/shared/urls";
 
 // import OverviewFrame from "components/OverviewFrame";
 // import { Main, Side } from "components/ProfileOverview";
 // import { usePageContext } from "utils/client/hooks";
 // import { buildUrl } from "utils/shared/urls";
 
-type Props = {
-	organizationData: {};
-};
+import styles from "./Profile.module.scss";
 
-const Profile: React.FC<Props> = function ({ organizationData }) {
-	console.log(organizationData);
-	return <h1>Profile Component</h1>
+export interface ProfileProps {
+	avatar?: string;
+	schemas: {
+		slug: string;
+		description: string;
+		avatar: string | null;
+		isPublic: boolean;
+		updatedAt: string;
+	}[];
+}
+
+const Profile: React.FC<ProfileProps> = ({ avatar, schemas }) => {
+	const { profileSlug } = useLocationContext();
+	return (
+		<Pane className={styles.profile}>
+			<ScopeHeader type="user" profileTitle={profileSlug} avatar={avatar} />
+			<Section title="Schemas">
+				{schemas.map((schema) => (
+					<Card
+						key={schema.slug}
+						className={styles.schema}
+						is="a"
+						textDecoration="none"
+						href={buildUrl({ profileSlug, contentSlug: schema.slug })}
+						border="default"
+						padding={majorScale(2)}
+						margin={majorScale(1)}
+						backgroundColor="#E3DCD3"
+						display="inline-block"
+					>
+						<h3>
+							<span>{profileSlug}</span>
+							<span style={{ margin: "0 4px" }}>/</span>
+							<span>{schema.slug}</span>
+						</h3>
+						<Text>Last updated {new Date(schema.updatedAt).toDateString()}</Text>
+					</Card>
+				))}
+			</Section>
+		</Pane>
+	);
+
 	// const { title, avatar, slug, collections, discussions, members } = organizationData;
 	// const { locationData } = usePageContext();
 	// const { mode } = locationData.query;
@@ -67,4 +109,3 @@ const Profile: React.FC<Props> = function ({ organizationData }) {
 };
 
 export default Profile;
-
