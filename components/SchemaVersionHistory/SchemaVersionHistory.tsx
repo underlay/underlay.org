@@ -75,7 +75,7 @@ const SchemaVersionList: React.FC<SchemaVersionListProps> = ({ schema: { id } })
 	}, [versions, loading]);
 
 	return (
-		<Pane width={majorScale(80)}>
+		<Pane>
 			<Section title="Version history">
 				<Table>
 					<Table.Body>
@@ -85,13 +85,14 @@ const SchemaVersionList: React.FC<SchemaVersionListProps> = ({ schema: { id } })
 								is="a"
 								href={buildUrl({ profileSlug, contentSlug, versionNumber })}
 							>
-								<Table.TextHeaderCell>{versionNumber}</Table.TextHeaderCell>
-								<Table.TextCell>
+								<Table.TextHeaderCell flexBasis={120} flexGrow={0}>
+									{versionNumber}
+								</Table.TextHeaderCell>
+								<Table.TextCell flexBasis={240} flexGrow={0}>
 									{agentSlug ? `@${agentSlug}` : null}
 								</Table.TextCell>
 								<Table.TextCell>
-									{createdAt.toLocaleDateString()} at{" "}
-									{createdAt.toLocaleTimeString()}
+									{createdAt.toDateString()} at {createdAt.toLocaleTimeString()}
 								</Table.TextCell>
 							</Table.Row>
 						))}

@@ -22,3 +22,6 @@ export { default as SchemaVersionHistory } from "./SchemaVersionHistory/SchemaVe
 export { default as SchemaVersionEditor } from "./SchemaVersionEditor/SchemaVersionEditor";
 export { default as ReadmeViewer } from "./Readme/ReadmeViewer";
 export { default as ReadmeEditor } from "./Readme/ReadmeEditor";
+export { default as CollectionPageFrame } from "./CollectionPageFrame/CollectionPageFrame";
+export { default as CollectionVersionOverview } from "./CollectionVersionOverview/CollectionVersionOverview";
+export { default as CollectionVersionEditor } from "./CollectionVersionEditor/CollectionVersionEditor";

@@ -9,20 +9,25 @@
 
 export type ResourcePageParams = { id: string };
 
-// These are the basic properties that every schema page needs
-export type SchemaPageProps = {
-	versionCount: number;
-	schema: SchemaProps;
-};
-
-// These are the basic schema properties that every schema page needs
-export type SchemaProps = {
+// These are the basic properties that every schema and collection page needs
+export type ResourceProps = {
 	id: string;
 	description: string;
 	slug: string;
 	agent: AgentProps;
 	isPublic: boolean;
 	updatedAt: string;
+};
+
+// These are the basic properties that every schema page needs
+export type SchemaPageProps = {
+	versionCount: number;
+	schema: ResourceProps;
+};
+
+export type CollectionPageProps = {
+	versionCount: number;
+	collection: ResourceProps;
 };
 
 // These are the basic agent properties that every resource page needs
@@ -42,6 +47,12 @@ export const getProfileSlug = ({
 export type SchemaVersionProps = {
 	versionNumber: string;
 	content: string;
+	readme: string | null;
+	createdAt: string;
+};
+
+export type CollectionVersionProps = {
+	versionNumber: string;
 	readme: string | null;
 	createdAt: string;
 };

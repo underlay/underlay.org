@@ -18,7 +18,7 @@ export const countSchemaVersions = async ({ id }: { id: string }) =>
 export const countCollectionVersions = async ({ id }: { id: string }) =>
 	prisma.schemaVersion.count({ where: { schemaId: id } });
 
-export const selectSchemaPageProps = {
+export const selectResourcePageProps = {
 	id: true,
 	description: true,
 	isPublic: true,
@@ -32,9 +32,15 @@ export const selectSchemaPageProps = {
 	},
 };
 
-export const selectVersionOverviewProps = {
+export const selectSchemaVersionOverviewProps = {
 	createdAt: true,
 	versionNumber: true,
 	content: true,
+	readme: true,
+};
+
+export const selectCollectionVersionOverviewProps = {
+	createdAt: true,
+	versionNumber: true,
 	readme: true,
 };

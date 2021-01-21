@@ -5,12 +5,12 @@ import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import {
 	countSchemaVersions,
 	prisma,
-	selectSchemaPageProps,
-	selectVersionOverviewProps,
+	selectResourcePageProps,
+	selectSchemaVersionOverviewProps,
 	serializeUpdatedAt,
 	serializeCreatedAt,
 } from "utils/server/prisma";
-import { getSchemaPagePermissions } from "utils/server/permissions";
+import { getResourcePagePermissions } from "utils/server/permissions";
 
 import {
 	SchemaPageProps,
@@ -33,14 +33,14 @@ export const getServerSideProps: GetServerSideProps<
 	const schemaVersionWithSchema = await prisma.schemaVersion.findFirst({
 		where: { id },
 		select: {
-			...selectVersionOverviewProps,
-			schema: { select: selectSchemaPageProps },
+			...selectSchemaVersionOverviewProps,
+			schema: { select: selectResourcePageProps },
 		},
 	});
 
 	if (schemaVersionWithSchema === null) {
 		return { notFound: true };
-	} else if (!getSchemaPagePermissions(context, schemaVersionWithSchema.schema)) {
+	} else if (!getResourcePagePermissions(context, schemaVersionWithSchema.schema)) {
 		return { notFound: true };
 	}
 

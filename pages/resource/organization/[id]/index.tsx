@@ -35,7 +35,7 @@ const UserProfilePage: React.FC<OrganizationProfilePageProps> = ({ organization 
 	const profileSlug = organization.slug || undefined;
 	return (
 		<LocationContext.Provider value={{ profileSlug }}>
-			<Profile schemas={[]} />
+			<Profile schemas={[]} collections={[]} />
 		</LocationContext.Provider>
 	);
 };

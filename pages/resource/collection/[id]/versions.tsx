@@ -2,7 +2,7 @@ import React from "react";
 
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, SchemaVersionHistory } from "components";
+import { CollectionPageFrame } from "components";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 import {
@@ -11,47 +11,47 @@ import {
 	countSchemaVersions,
 	serializeUpdatedAt,
 } from "utils/server/prisma";
-import { getProfileSlug, ResourcePageParams, SchemaPageProps } from "utils/shared/propTypes";
+import { CollectionPageProps, getProfileSlug, ResourcePageParams } from "utils/shared/propTypes";
 
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaVersionsProps = SchemaPageProps;
+type CollectionVersionsProps = CollectionPageProps;
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaVersionsProps,
+	CollectionVersionsProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
 
-	const schema = await prisma.schema.findFirst({
+	const collection = await prisma.collection.findFirst({
 		where: { id },
 		select: selectResourcePageProps,
 	});
 
-	if (schema === null) {
+	if (collection === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schema)) {
+	} else if (!getResourcePagePermissions(context, collection)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(schema);
+	const versionCount = await countSchemaVersions(collection);
 	return {
 		props: {
-			schema: serializeUpdatedAt(schema),
+			collection: serializeUpdatedAt(collection),
 			versionCount,
 		},
 	};
 };
 
-const SchemaVersionsPage: React.FC<SchemaVersionsProps> = (props) => {
-	const profileSlug = getProfileSlug(props.schema.agent);
-	const contentSlug = props.schema.slug;
+const SchemaVersionsPage: React.FC<CollectionVersionsProps> = (props) => {
+	const profileSlug = getProfileSlug(props.collection.agent);
+	const contentSlug = props.collection.slug;
 
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "versions" }}>
-			<SchemaPageFrame {...props}>
-				<SchemaVersionHistory {...props} />
-			</SchemaPageFrame>
+			<CollectionPageFrame {...props}>
+				{/* <SchemaVersionHistory {...props} /> */}
+			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);
 };

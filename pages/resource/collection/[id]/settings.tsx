@@ -1,8 +1,8 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, Section } from "components";
-import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
+import { CollectionPageFrame, Section } from "components";
+import { ResourcePageParams, getProfileSlug, CollectionPageProps } from "utils/shared/propTypes";
 
 import { getResourcePagePermissions } from "utils/server/permissions";
 import {
@@ -13,46 +13,46 @@ import {
 } from "utils/server/prisma";
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaSettingsProps = SchemaPageProps;
+type CollectionSettingsProps = CollectionPageProps;
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaSettingsProps,
+	CollectionSettingsProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
 
-	const schema = await prisma.schema.findFirst({
+	const collection = await prisma.collection.findFirst({
 		where: { id },
 		select: selectResourcePageProps,
 	});
 
-	if (schema === null) {
+	if (collection === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schema)) {
+	} else if (!getResourcePagePermissions(context, collection)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(schema);
+	const versionCount = await countSchemaVersions(collection);
 
 	return {
 		props: {
 			versionCount,
-			schema: serializeUpdatedAt(schema),
+			collection: serializeUpdatedAt(collection),
 		},
 	};
 };
 
-const SchemaSettingsPage: React.FC<SchemaSettingsProps> = (props) => {
-	const profileSlug = getProfileSlug(props.schema.agent);
-	const contentSlug = props.schema.slug;
+const CollectionSettingsPage: React.FC<CollectionSettingsProps> = (props) => {
+	const profileSlug = getProfileSlug(props.collection.agent);
+	const contentSlug = props.collection.slug;
 
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "settings" }}>
-			<SchemaPageFrame {...props}>
+			<CollectionPageFrame {...props}>
 				<Section title="Settings" />
-			</SchemaPageFrame>
+			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);
 };
 
-export default SchemaSettingsPage;
+export default CollectionSettingsPage;

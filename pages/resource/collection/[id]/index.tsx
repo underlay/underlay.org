@@ -1,64 +1,65 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import {
 	prisma,
-	selectResourcePageProps,
-	selectSchemaVersionOverviewProps,
-	countSchemaVersions,
 	serializeUpdatedAt,
 	serializeCreatedAt,
+	selectResourcePageProps,
+	selectCollectionVersionOverviewProps,
+	countCollectionVersions,
 } from "utils/server/prisma";
 import { getResourcePagePermissions } from "utils/server/permissions";
-// import { buildUrl } from "utils/shared/urls";
 
 import {
-	SchemaPageProps,
 	ResourcePageParams,
 	getProfileSlug,
-	SchemaVersionProps,
+	CollectionPageProps,
+	CollectionVersionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
+import { CollectionPageFrame, CollectionVersionOverview } from "components";
 import { Paragraph } from "evergreen-ui";
 
-type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionProps | null };
+type CollectionOverviewProps = CollectionPageProps & {
+	latestVersion: CollectionVersionProps | null;
+};
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaOverviewProps,
+	CollectionOverviewProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
 
-	const schemaWithVersion = await prisma.schema.findUnique({
+	const collectionWithVersion = await prisma.collection.findUnique({
 		where: { id },
 		select: {
 			...selectResourcePageProps,
 			versions: {
 				take: 1,
 				orderBy: { createdAt: "desc" },
-				select: selectSchemaVersionOverviewProps,
+				select: selectCollectionVersionOverviewProps,
 			},
 		},
 	});
 
 	// The reason to check for null separately from getResourcePagePermissions
 	// is so that TypeScript know it's not null afterward
-	if (schemaWithVersion === null) {
+	if (collectionWithVersion === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schemaWithVersion)) {
+	} else if (!getResourcePagePermissions(context, collectionWithVersion)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(schemaWithVersion);
+	const versionCount = await countCollectionVersions(collectionWithVersion);
 
 	// if (versionCount < 1) {
-	// 	const profileSlug = getProfileSlug(schemaWithVersion.agent);
+	// 	const profileSlug = getProfileSlug(collectionWithVersion.agent);
 	// 	return {
 	// 		redirect: {
 	// 			destination: buildUrl({
 	// 				profileSlug,
-	// 				contentSlug: schemaWithVersion.slug,
+	// 				contentSlug: collectionWithVersion.slug,
 	// 				mode: "edit",
 	// 			}),
 	// 			permanent: false,
@@ -71,32 +72,32 @@ export const getServerSideProps: GetServerSideProps<
 	// complain about not being able to serialize Dates
 	const {
 		versions: [latestVersion],
-		...schema
-	} = schemaWithVersion;
+		...collection
+	} = collectionWithVersion;
 
 	return {
 		props: {
 			versionCount,
-			schema: serializeUpdatedAt(schema),
+			collection: serializeUpdatedAt(collection),
 			latestVersion: latestVersion === undefined ? null : serializeCreatedAt(latestVersion),
 		},
 	};
 };
 
-const SchemaOverviewPage: React.FC<SchemaOverviewProps> = ({ latestVersion, ...props }) => {
-	const profileSlug = getProfileSlug(props.schema.agent);
-	const contentSlug = props.schema.slug;
+const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ latestVersion, ...props }) => {
+	const profileSlug = getProfileSlug(props.collection.agent);
+	const contentSlug = props.collection.slug;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
-			<SchemaPageFrame {...props}>
+			<CollectionPageFrame {...props}>
 				{latestVersion === null ? (
 					<Paragraph>No versions</Paragraph>
 				) : (
-					<SchemaVersionOverview {...latestVersion} />
+					<CollectionVersionOverview {...latestVersion} />
 				)}
-			</SchemaPageFrame>
+			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);
 };
 
-export default SchemaOverviewPage;
+export default CollectionOverviewPage;

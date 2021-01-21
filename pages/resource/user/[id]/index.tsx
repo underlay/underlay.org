@@ -5,17 +5,42 @@ import { LocationContext } from "utils/client/hooks";
 import { ResourcePageParams } from "utils/shared/propTypes";
 import { prisma, serializeUpdatedAt } from "utils/server/prisma";
 import { getCachedSession } from "utils/server/session";
+import { ClientSession } from "utils/shared/session";
 
 export interface UserProfilePageProps {
 	user: { slug: string; avatar: string | null };
 	schemas: {
 		slug: string;
-		description: string;
-		avatar: string | null;
+		isPublic: boolean;
+		updatedAt: string;
+	}[];
+	collections: {
+		slug: string;
 		isPublic: boolean;
 		updatedAt: string;
 	}[];
 }
+
+const selectAgentResourceWhere = (session: ClientSession | null) => ({
+	where:
+		session === null
+			? { isPublic: true }
+			: {
+					OR: [
+						{ isPublic: true },
+						{
+							agent: {
+								user: { id: { equals: session.user.id } },
+							},
+						},
+					],
+			  },
+	select: {
+		slug: true,
+		isPublic: true,
+		updatedAt: true,
+	},
+});
 
 export const getServerSideProps: GetServerSideProps<
 	UserProfilePageProps,
@@ -25,38 +50,14 @@ export const getServerSideProps: GetServerSideProps<
 
 	const session = getCachedSession(context);
 
+	const resources = selectAgentResourceWhere(session);
 	const user = await prisma.user.findUnique({
 		where: { id },
 		select: {
 			id: true,
 			slug: true,
 			avatar: true,
-			Agent: {
-				select: {
-					schemas: {
-						where:
-							session === null
-								? { isPublic: true }
-								: {
-										OR: [
-											{ isPublic: true },
-											{
-												agent: {
-													user: { id: { equals: session.user.id } },
-												},
-											},
-										],
-								  },
-						select: {
-							slug: true,
-							description: true,
-							avatar: true,
-							isPublic: true,
-							updatedAt: true,
-						},
-					},
-				},
-			},
+			Agent: { select: { schemas: resources, collections: resources } },
 		},
 	});
 
@@ -72,14 +73,19 @@ export const getServerSideProps: GetServerSideProps<
 		props: {
 			user: { slug: user.slug, avatar: user.avatar },
 			schemas: user.Agent.schemas.map(serializeUpdatedAt),
+			collections: user.Agent.collections.map(serializeUpdatedAt),
 		},
 	};
 };
 
-const UserProfilePage: React.FC<UserProfilePageProps> = ({ user, schemas }) => {
+const UserProfilePage: React.FC<UserProfilePageProps> = ({ user, schemas, collections }) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug: user.slug }}>
-			<Profile avatar={user.avatar || undefined} schemas={schemas} />
+			<Profile
+				avatar={user.avatar || undefined}
+				schemas={schemas}
+				collections={collections}
+			/>
 		</LocationContext.Provider>
 	);
 };

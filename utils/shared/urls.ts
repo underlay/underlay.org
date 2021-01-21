@@ -1,4 +1,4 @@
-import { SchemaProps } from "utils/shared/propTypes";
+import { ResourceProps } from "utils/shared/propTypes";
 
 export interface LocationData {
 	profileSlug?: string;
@@ -44,7 +44,7 @@ export const buildUrl = ({
 export const getResourceLocation = ({
 	slug,
 	agent: { user, organization },
-}: Omit<SchemaProps, "createdAt">): LocationData => ({
+}: Omit<ResourceProps, "createdAt">): LocationData => ({
 	profileSlug: user?.slug || organization?.slug || undefined,
 	contentSlug: slug || undefined,
 });

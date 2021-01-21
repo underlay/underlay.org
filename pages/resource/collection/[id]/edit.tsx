@@ -4,39 +4,30 @@ import { GetServerSideProps } from "next";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 import {
-	countSchemaVersions,
 	selectResourcePageProps,
 	prisma,
 	serializeUpdatedAt,
+	countCollectionVersions,
 } from "utils/server/prisma";
-import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
+import { CollectionPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
 
-import { SchemaPageFrame, SchemaVersionEditor } from "components";
+import { CollectionPageFrame, CollectionVersionEditor } from "components";
 import { LocationContext } from "utils/client/hooks";
 
-// We use an intersection to "augment" the nested schema type
-type SchemaEditModeProps = SchemaPageProps & {
-	schema: {
-		draftVersionNumber: string;
-		draftContent: string;
-		draftReadme: string | null;
-	};
+type CollectionEditModeProps = CollectionPageProps & {
 	latestVersion: { versionNumber: string } | null;
 };
 
 export const getServerSideProps: GetServerSideProps<
-	SchemaEditModeProps,
+	CollectionEditModeProps,
 	ResourcePageParams
 > = async (context) => {
 	const { id } = context.params!;
 
-	const schemaWithVersion = await prisma.schema.findFirst({
+	const collectionWithVersion = await prisma.collection.findFirst({
 		where: { id },
 		select: {
 			...selectResourcePageProps,
-			draftVersionNumber: true,
-			draftContent: true,
-			draftReadme: true,
 			versions: {
 				take: 1,
 				orderBy: { createdAt: "desc" },
@@ -47,36 +38,36 @@ export const getServerSideProps: GetServerSideProps<
 
 	// The reason to check if schema === null separately from getSchemaPagePermissions
 	// is so that TypeScript know it's not null afterward
-	if (schemaWithVersion === null) {
+	if (collectionWithVersion === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schemaWithVersion)) {
+	} else if (!getResourcePagePermissions(context, collectionWithVersion)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(schemaWithVersion);
+	const versionCount = await countCollectionVersions(collectionWithVersion);
 
-	const { versions, ...schema } = schemaWithVersion;
+	const { versions, ...collection } = collectionWithVersion;
 	const latestVersion = versions.length > 0 ? versions[0] : null;
 
 	return {
 		props: {
 			versionCount,
 			latestVersion,
-			schema: serializeUpdatedAt(schema),
+			collection: serializeUpdatedAt(collection),
 		},
 	};
 };
 
-const SchemaEditPage: React.FC<SchemaEditModeProps> = (props) => {
-	const profileSlug = getProfileSlug(props.schema.agent);
-	const contentSlug = props.schema.slug;
+const CollectionEditPage: React.FC<CollectionEditModeProps> = (props) => {
+	const profileSlug = getProfileSlug(props.collection.agent);
+	const contentSlug = props.collection.slug;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "edit" }}>
-			<SchemaPageFrame {...props}>
-				<SchemaVersionEditor {...props} />
-			</SchemaPageFrame>
+			<CollectionPageFrame {...props}>
+				<CollectionVersionEditor {...props} />
+			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);
 };
 
-export default SchemaEditPage;
+export default CollectionEditPage;

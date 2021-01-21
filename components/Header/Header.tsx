@@ -29,6 +29,15 @@ const Header = () => {
 						<>
 							<Button
 								is="a"
+								href="/new/collection"
+								marginRight={12}
+								height={40}
+								appearance="minimal"
+							>
+								New collection
+							</Button>
+							<Button
+								is="a"
 								href="/new/schema"
 								marginRight={12}
 								height={40}
@@ -41,11 +50,7 @@ const Header = () => {
 								content={
 									<Menu>
 										<Menu.Group>
-											<Menu.Item
-												is="a"
-												href={`/${user.slug}`}
-												disabled={true}
-											>
+											<Menu.Item is="a" href={`/${user.slug}`}>
 												Profile
 											</Menu.Item>
 											<Menu.Item

@@ -8,7 +8,6 @@ import { makeHandler } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma } from "utils/server/prisma";
-import { initialSchemaContent } from "utils/shared/schemas/initialContent";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
@@ -21,7 +20,7 @@ const requestBody = t.type({
 
 declare module "next-rest" {
 	interface API {
-		"/api/schema": Route<{
+		"/api/collection": Route<{
 			params: {};
 			methods: {
 				POST: {
@@ -39,7 +38,7 @@ declare module "next-rest" {
 	}
 }
 
-export default makeHandler<"/api/schema">({
+export default makeHandler<"/api/collection">({
 	params: validateParams.is,
 	methods: {
 		POST: {
@@ -47,45 +46,39 @@ export default makeHandler<"/api/schema">({
 			body: requestBody.is,
 			exec: async (req, {}, {}, body) => {
 				const session = await getSession({ req });
+				console.log("EXECUTING POST /API/COLLECTION", session);
 				if (session === null) {
 					throw StatusCodes.UNAUTHORIZED;
 				}
 
 				const { slug, description, isPublic } = body;
 
-				const collectionCount = await prisma.collection.count({
+				const schemaCount = await prisma.schema.count({
 					where: { agent: { userId: session.user.id }, slug },
 				});
 
-				if (collectionCount > 0) {
+				if (schemaCount > 0) {
 					throw StatusCodes.CONFLICT;
 				}
 
-				const draftContent = initialSchemaContent;
-				const draftReadme = `# ${slug}\n\n> ${description}`;
-				const draftVersionNumber = "0.0.0";
-
-				// For now, we just create a schema that is linked to
+				// For now, we just create a collection that is linked to
 				// the session user as the agent.
-				const schema = await prisma.schema
+				const collection = await prisma.collection
 					.create({
 						data: {
 							agent: { connect: { userId: session.user.id } },
 							slug,
 							description,
 							isPublic,
-							draftContent,
-							draftReadme,
-							draftVersionNumber,
 						},
 					})
 					.catch(catchPrismaError);
 
-				if (schema === null) {
+				if (collection === null) {
 					throw StatusCodes.INTERNAL_SERVER_ERROR;
 				}
 
-				return [{ etag: schema.id }, undefined];
+				return [{ etag: collection.id }, undefined];
 			},
 		},
 	},
