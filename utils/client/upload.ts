@@ -35,7 +35,7 @@ export async function upload(session: Session, file: File) {
 	formData.append("X-Amz-Signature", signature);
 	formData.append("file", file);
 
-	const res = await fetch(`http://${bucket}.s3.amazonaws.com/`, {
+	const res = await fetch(`https://${bucket}.s3.amazonaws.com/`, {
 		method: "POST",
 		body: formData,
 	});
