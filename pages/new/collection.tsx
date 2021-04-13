@@ -22,12 +22,7 @@ import StatusCodes from "http-status-codes";
 import { slugPattern } from "utils/shared/slug";
 import { usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
-
-type Privacy = "private" | "public";
-const privacyOptions: { label: string; value: Privacy }[] = [
-	{ label: "Private", value: "private" },
-	{ label: "Public", value: "public" },
-];
+import { Privacy, privacyOptions } from "utils/client/privacy";
 
 const NewCollection: React.FC<{}> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);

@@ -1,7 +1,7 @@
 import React from "react";
 import { Meta } from "@storybook/react/types-6-0";
 
-import { initialSchemaContent } from "utils/shared/schemas/initialContent";
+import { initialSchemaContent } from "utils/server/initialSchemaContent";
 
 import SchemaEditor from "./SchemaEditor";
 

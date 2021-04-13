@@ -33,6 +33,8 @@ export const ThemedContext = (storyFn: any) => {
 };
 
 const router: NextRouter = {
+	isLocaleDomain: false,
+	isPreview: false,
 	isReady: true,
 	route: "",
 	pathname: "",

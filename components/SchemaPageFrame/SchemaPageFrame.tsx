@@ -1,31 +1,32 @@
 import React, { useMemo } from "react";
-import { Text } from "evergreen-ui";
 
 import { StandardFrame } from "components";
 import { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
 import { SchemaPageProps } from "utils/shared/propTypes";
+import { Text } from "evergreen-ui";
 
 type SchemaPageFrameProps = SchemaPageProps & { children: React.ReactNode };
+
+const ownerNavItems = (versionCount: number): NavItem[] => [
+	{ title: "Overview" },
+	{ mode: "edit", title: "Edit" },
+	{ mode: "versions", title: `Versions (${versionCount})` },
+	{ mode: "settings", title: "Settings" },
+];
+
+const nonOwnerNavItems = (versionCount: number): NavItem[] => [
+	{ title: "Overview" },
+	{ mode: "versions", title: `Versions (${versionCount})` },
+];
 
 const SchemaPageFrame = ({ schema, versionCount, children }: SchemaPageFrameProps) => {
 	const { session } = usePageContext();
 	const isOwner = session !== null && session.user.id === schema.agent.user?.id;
 	const updatedAt = useMemo(() => new Date(schema.updatedAt), [schema.updatedAt]);
 	const navItems = useMemo<NavItem[]>(
-		() =>
-			isOwner
-				? [
-						{ title: "Overview" },
-						{ mode: "edit", title: "Edit" },
-						{ mode: "versions", title: `Versions (${versionCount})` },
-						{ mode: "settings", title: "Settings" },
-				  ]
-				: [
-						{ title: "Overview" },
-						{ mode: "versions", title: `Versions (${versionCount})` },
-				  ],
+		() => (isOwner ? ownerNavItems(versionCount) : nonOwnerNavItems(versionCount)),
 		[isOwner, versionCount]
 	);
 
@@ -33,10 +34,8 @@ const SchemaPageFrame = ({ schema, versionCount, children }: SchemaPageFrameProp
 		<StandardFrame
 			scopeHeaderProps={{
 				type: "schema",
-				detailsTop: (
-					<Text color="muted">Last updated at {updatedAt.toLocaleDateString()}</Text>
-				),
-				detailsBottom: schema.description,
+				detailsTop: <Text>Last updated on {updatedAt.toDateString()}</Text>,
+				detailsBottom: <Text>{schema.description}</Text>,
 				isPrivate: !schema.isPublic,
 			}}
 			scopeNavProps={{ navItems }}

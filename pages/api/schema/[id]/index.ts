@@ -1,17 +1,23 @@
 import { StatusCodes } from "http-status-codes";
 
 import * as t from "io-ts";
+import { isLeft } from "fp-ts/lib/Either.js";
 
-import { makeHandler } from "next-rest/server";
+import { makeHandler, ApiError } from "next-rest/server";
 
-import semverValid from "semver/functions/valid";
-import semverLt from "semver/functions/lt";
+import { encode } from "@underlay/apg-format-binary";
+import schemaSchema, { fromSchema } from "@underlay/apg-schema-schema";
 
-import { prisma } from "utils/server/prisma";
-import { parseSchema } from "utils/shared/schemas/parse";
+import { prisma, selectAgentProps } from "utils/server/prisma";
+import { parseSchema } from "utils/server/parseSchema";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 import { slugPattern } from "utils/shared/slug";
 import { getSession } from "next-auth/client";
+import { getVersionNumber } from "utils/server/version";
+
+import { buildUrl } from "utils/shared/urls";
+import { checkSlugUniqueness } from "utils/server/resource";
+import { getProfileSlug } from "utils/shared/propTypes";
 
 const params = t.type({ id: t.string });
 
@@ -19,16 +25,14 @@ const patchRequestHeaders = t.type({ "content-type": t.literal("application/json
 const patchRequestBody = t.partial({
 	description: t.string,
 	slug: t.string,
-	draftVersionNumber: t.string,
-	draftContent: t.string,
-	draftReadme: t.union([t.string, t.null]),
+	content: t.string,
+	readme: t.string,
 });
 
 const postRequestHeaders = t.type({ "content-type": t.literal("application/json") });
 const postRequestBody = t.type({
-	versionNumber: t.string,
-	readme: t.union([t.null, t.string]),
 	content: t.string,
+	readme: t.string,
 });
 
 declare module "next-rest" {
@@ -52,7 +56,7 @@ declare module "next-rest" {
 						body: t.TypeOf<typeof postRequestBody>;
 					};
 					response: {
-						headers: { etag: string };
+						headers: { etag: string; location: string };
 						body: void;
 					};
 				};
@@ -70,119 +74,93 @@ export default makeHandler<"/api/schema/[id]">({
 			exec: async (req, { id }, {}, data) => {
 				const session = await getSession({ req });
 				if (session === null) {
-					throw StatusCodes.UNAUTHORIZED;
-				}
-
-				const schema = await prisma.schema.findUnique({
-					where: { id },
-					select: {
-						isPublic: true,
-						agent: { select: { userId: true } },
-					},
-				});
-
-				if (schema === null) {
-					throw StatusCodes.NOT_FOUND;
-				}
-
-				if (schema.agent.userId !== session.user.id) {
-					if (schema.isPublic) {
-						throw StatusCodes.UNAUTHORIZED;
-					} else {
-						throw StatusCodes.NOT_FOUND;
-					}
+					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
 				if (data.slug !== undefined) {
 					if (!slugPattern.test(data.slug)) {
-						throw StatusCodes.BAD_REQUEST;
+						throw new ApiError(StatusCodes.BAD_REQUEST);
 					}
+					await checkSlugUniqueness({ userId: session.user.id }, data.slug);
 				}
 
-				// Why not check if the slug is available first?
-				// Because even if we do, it might still fail because someone
-				// might have set that username in-between the check and the update.
-				// Better to just handle the error where it happens, since we'll have to anyway.
-				await prisma.schema.update({ where: { id }, data }).catch(catchPrismaError);
+				const { count } = await prisma.schema
+					.updateMany({ where: { id, agent: { userId: session.user.id } }, data })
+					.catch(catchPrismaError);
+
+				if (count === 0) {
+					throw new ApiError(StatusCodes.NOT_FOUND);
+				} else if (count > 1) {
+					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+				}
+
 				return [{}, undefined];
 			},
 		},
 		POST: {
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
-			exec: async (req, { id }, {}, { versionNumber, readme, content }) => {
-				if (semverValid(versionNumber) === null) {
-					throw StatusCodes.BAD_REQUEST;
-				}
-
+			exec: async (req, { id }, {}, { readme, content }) => {
 				const session = await getSession({ req });
 				if (session === null) {
-					throw StatusCodes.UNAUTHORIZED;
+					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
-				const schema = await prisma.schema.findUnique({
-					where: { id },
+				const schema = await prisma.schema.findFirst({
+					where: { id, agent: { userId: session.user.id } },
 					select: {
-						agent: { select: { userId: true } },
-						isPublic: true,
-						versions: {
-							take: 1,
-							orderBy: { createdAt: "desc" },
-							select: { versionNumber: true },
+						...selectAgentProps,
+						slug: true,
+						lastVersion: {
+							select: { id: true, versionNumber: true, schemaInstance: true },
 						},
 					},
 				});
 
 				if (schema === null) {
-					throw StatusCodes.NOT_FOUND;
-				}
-
-				// For now, users can only create versions for schemas that they created
-				if (schema.agent.userId !== session.user.id) {
-					if (schema.isPublic) {
-						throw StatusCodes.UNAUTHORIZED;
-					} else {
-						throw StatusCodes.NOT_FOUND;
-					}
-				}
-
-				if (schema.versions.length > 0) {
-					const [lastVersion] = schema.versions;
-					if (semverValid(lastVersion.versionNumber) !== null) {
-						if (!semverLt(lastVersion.versionNumber, versionNumber)) {
-							throw StatusCodes.CONFLICT;
-						}
-					}
+					throw new ApiError(StatusCodes.NOT_FOUND);
 				}
 
 				const result = parseSchema(content);
-				if (result._tag === "Left") {
-					throw StatusCodes.BAD_REQUEST;
+				if (isLeft(result)) {
+					throw new ApiError(StatusCodes.BAD_REQUEST);
 				}
 
-				const {
-					versions: [{ id: etag }],
-				} = await prisma.schema
+				const schemaInstance = encode(schemaSchema, fromSchema(result.right.schema));
+
+				const versionNumber = getVersionNumber(schema.lastVersion, result.right.schema);
+
+				const { lastVersion } = await prisma.schema
 					.update({
-						include: { versions: { take: 1, orderBy: { createdAt: "desc" } } },
+						include: { lastVersion: { select: { id: true } } },
 						where: { id },
 						data: {
-							draftVersionNumber: versionNumber,
-							draftContent: content,
-							draftReadme: readme,
-							versions: {
+							content: content,
+							readme: readme,
+							lastVersion: {
 								create: {
-									agent: { connect: { userId: session.user.id } },
+									schema: { connect: { id } },
+									user: { connect: { id: session.user.id } },
+									previousVersion:
+										schema.lastVersion === null
+											? undefined
+											: { connect: { id: schema.lastVersion.id } },
 									versionNumber,
 									readme,
 									content,
+									schemaInstance,
 								},
 							},
 						},
 					})
 					.catch(catchPrismaError);
 
-				return [{ etag }, undefined];
+				const etag = `"${lastVersion!.id}"`;
+
+				const profileSlug = getProfileSlug(schema.agent);
+				const location = buildUrl({ profileSlug, contentSlug: schema.slug, versionNumber });
+
+				return [{ etag, location }, undefined];
 			},
 		},
 	},

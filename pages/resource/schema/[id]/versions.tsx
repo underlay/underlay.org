@@ -2,20 +2,29 @@ import React from "react";
 
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, SchemaVersionHistory } from "components";
+import { SchemaPageFrame, VersionHistory } from "components";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 import {
 	prisma,
 	selectResourcePageProps,
-	countSchemaVersions,
 	serializeUpdatedAt,
+	serializeCreatedAt,
+	selectResourceVersionProps,
 } from "utils/server/prisma";
-import { getProfileSlug, ResourcePageParams, SchemaPageProps } from "utils/shared/propTypes";
+import {
+	getProfileSlug,
+	ResourcePageParams,
+	ResourceProps,
+	ResourceVersionProps,
+} from "utils/shared/propTypes";
 
 import { LocationContext } from "utils/client/hooks";
 
-type SchemaVersionsProps = SchemaPageProps;
+interface SchemaVersionsProps {
+	schema: ResourceProps;
+	schemaVersions: ResourceVersionProps[];
+}
 
 export const getServerSideProps: GetServerSideProps<
 	SchemaVersionsProps,
@@ -23,22 +32,28 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
 	const { id } = context.params!;
 
-	const schema = await prisma.schema.findFirst({
+	const schemaWithVersions = await prisma.schema.findFirst({
 		where: { id },
-		select: selectResourcePageProps,
+		select: {
+			...selectResourcePageProps,
+			versions: {
+				select: selectResourceVersionProps,
+			},
+		},
 	});
 
-	if (schema === null) {
+	if (schemaWithVersions === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schema)) {
+	} else if (!getResourcePagePermissions(context, schemaWithVersions, false)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(schema);
+	const { versions, ...schema } = serializeUpdatedAt(schemaWithVersions);
+
 	return {
 		props: {
-			schema: serializeUpdatedAt(schema),
-			versionCount,
+			schema,
+			schemaVersions: versions.map(serializeCreatedAt),
 		},
 	};
 };
@@ -46,11 +61,11 @@ export const getServerSideProps: GetServerSideProps<
 const SchemaVersionsPage: React.FC<SchemaVersionsProps> = (props) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
-
+	const versionCount = props.schemaVersions.length;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "versions" }}>
-			<SchemaPageFrame {...props}>
-				<SchemaVersionHistory {...props} />
+			<SchemaPageFrame {...props} versionCount={versionCount}>
+				<VersionHistory versions={props.schemaVersions} />
 			</SchemaPageFrame>
 		</LocationContext.Provider>
 	);

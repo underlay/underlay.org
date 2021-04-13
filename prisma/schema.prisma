@@ -60,10 +60,13 @@ model User {
     createdAt     DateTime  @default(now()) @map(name: "created_at")
     updatedAt     DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
+    executions         Execution[]
+    schemaVersions     SchemaVersion[]
+    collectionVersions CollectionVersion[]
+
     collections CollectionCollaborator[]
     schemas     SchemaCollaborator[]
-
-    Agent Agent?
+    agent       Agent?
     @@map(name: "users")
 }
 
@@ -76,21 +79,21 @@ model Organization {
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
-    Agent Agent?
+    agent Agent?
     @@map(name: "organizations")
 }
 
 model Agent {
     id String @id @default(uuid())
 
-    user               User?               @relation(fields: [userId], references: [id])
-    userId             String?             @unique @map(name: "user_id")
-    organization       Organization?       @relation(fields: [organizationId], references: [id])
-    organizationId     String?             @unique @map(name: "organization_id")
-    schemas            Schema[]
-    schemaVersions     SchemaVersion[]
-    collections        Collection[]
-    collectionVersions CollectionVersion[]
+    user           User?         @relation(fields: [userId], references: [id])
+    userId         String?       @unique @map(name: "user_id")
+    organization   Organization? @relation(fields: [organizationId], references: [id])
+    organizationId String?       @unique @map(name: "organization_id")
+
+    schemas     Schema[]
+    collections Collection[]
+    pipelines   Pipeline[]
 
     @@map(name: "agents")
 }
@@ -108,18 +111,22 @@ model Member {
 }
 
 model Schema {
-    id                 String   @id @default(uuid())
-    slug               String
-    description        String   @default("")
-    avatar             String?
-    agentId            String   @map(name: "agent_id")
-    agent              Agent    @relation(fields: [agentId], references: [id])
-    isPublic           Boolean  @map(name: "is_public")
-    draftVersionNumber String   @default("")
-    draftContent       String   @default("")
-    draftReadme        String?
-    createdAt          DateTime @default(now()) @map(name: "created_at")
-    updatedAt          DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    id      String @id @default(uuid())
+    slug    String
+    agent   Agent  @relation(fields: [agentId], references: [id])
+    agentId String @map(name: "agent_id")
+
+    avatar      String?
+    description String
+    isPublic    Boolean @map(name: "is_public")
+    content     String
+    readme      String
+
+    lastVersion   SchemaVersion? @relation(name: "last_version", fields: [lastVersionId], references: [id])
+    lastVersionId String?        @map(name: "last_version_id")
+
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
     versions      SchemaVersion[]
     collaborators SchemaCollaborator[]
@@ -129,17 +136,25 @@ model Schema {
 }
 
 model SchemaVersion {
-    id            String          @id @default(uuid())
-    versionNumber String          @map(name: "version_number")
-    readme        String?
-    content       String          @default("") // Raw .toml text
-    agentId       String          @map(name: "agent_id")
-    agent         Agent           @relation(fields: [agentId], references: [id])
-    schemaId      String          @map(name: "schema_id")
-    schema        Schema          @relation(fields: [schemaId], references: [id])
-    imports       SchemaVersion[] @relation("Import")
-    importedBy    SchemaVersion[] @relation("Import")
-    createdAt     DateTime        @default(now()) @map(name: "created_at")
+    id                String         @id @default(uuid())
+    schema            Schema         @relation(fields: [schemaId], references: [id])
+    schemaId          String         @map(name: "schema_id")
+    user              User           @relation(fields: [userId], references: [id])
+    userId            String         @map(name: "user_id")
+    previousVersion   SchemaVersion? @relation(name: "previous_schema_version", fields: [previousVersionId], references: [id])
+    previousVersionId String?        @map(name: "previous_version_id")
+
+    versionNumber  String          @map(name: "version_number")
+    readme         String
+    content        String
+    schemaInstance Bytes           @map(name: "schema_instance")
+    imports        SchemaVersion[] @relation("Import")
+    importedBy     SchemaVersion[] @relation("Import")
+
+    createdAt DateTime @default(now()) @map(name: "created_at")
+
+    isLastVersion Schema?        @relation(name: "last_version")
+    nextVersion   SchemaVersion? @relation(name: "previous_schema_version")
 
     @@unique([schemaId, versionNumber])
     @@map(name: "schema_versions")
@@ -158,34 +173,49 @@ model SchemaCollaborator {
 }
 
 model Collection {
-    id          String   @id @default(uuid())
-    slug        String
-    description String   @default("")
-    avatar      String?
-    agentId     String   @map(name: "agent_id")
-    agent       Agent    @relation(fields: [agentId], references: [id])
-    isPublic    Boolean  @map(name: "is_public")
-    pipeline    Json?
-    createdAt   DateTime @default(now()) @map(name: "created_at")
-    updatedAt   DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    id      String @id @default(uuid())
+    slug    String
+    agent   Agent  @relation(fields: [agentId], references: [id])
+    agentId String @map(name: "agent_id")
 
-    versions      CollectionVersion[]
+    description String
+    avatar      String?
+    isPublic    Boolean @map(name: "is_public")
+
+    lastVersion   CollectionVersion? @relation(name: "collection_last_version", fields: [lastVersionId], references: [id])
+    lastVersionId String?            @map(name: "last_version_id")
+
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+
     collaborators CollectionCollaborator[]
+    versions      CollectionVersion[]
 
     @@unique([agentId, slug])
     @@map(name: "collections")
 }
 
 model CollectionVersion {
-    id            String     @id @default(uuid())
-    hash          String
-    versionNumber String     @map(name: "version_number")
-    readme        String?
-    agentId       String     @map(name: "agent_id")
-    agent         Agent      @relation(fields: [agentId], references: [id])
-    collectionId  String     @map(name: "collection_id")
-    collection    Collection @relation(fields: [collectionId], references: [id])
-    createdAt     DateTime   @default(now()) @map(name: "created_at")
+    id                String             @id @default(uuid())
+    collection        Collection         @relation(fields: [collectionId], references: [id])
+    collectionId      String             @map(name: "collection_id")
+    user              User               @relation(fields: [userId], references: [id])
+    userId            String             @map(name: "user_id")
+    execution         Execution          @relation(fields: [executionId], references: [id])
+    executionId       String             @map(name: "execution_id")
+    previousVersion   CollectionVersion? @relation(name: "previous_collection_version", fields: [previousVersionId], references: [id])
+    previousVersionId String?            @map(name: "previous_version_id")
+
+    versionNumber  String @map(name: "version_number")
+    readme         String
+    schemaURI      String @map(name: "schema_uri")
+    instanceURI    String @map(name: "instance_uri")
+    schemaInstance Bytes  @map(name: "schema_instance")
+
+    createdAt DateTime @default(now()) @map(name: "created_at")
+
+    isLastVersion Collection?        @relation(name: "collection_last_version")
+    nextVersion   CollectionVersion? @relation(name: "previous_collection_version")
 
     @@unique([collectionId, versionNumber])
     @@map(name: "collection_versions")
@@ -195,10 +225,56 @@ model CollectionCollaborator {
     id           String     @id @default(uuid())
     userId       String     @map(name: "user_id")
     user         User       @relation(fields: [userId], references: [id])
-    collectionId String     @map(name: "collection_id")
     createdAt    DateTime   @default(now()) @map(name: "created_at")
     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
     collection   Collection @relation(fields: [collectionId], references: [id])
+    collectionId String     @map(name: "collection_id")
 
     @@map(name: "collection_collaborators")
+}
+
+model Pipeline {
+    id      String @id @default(uuid())
+    slug    String
+    agent   Agent  @relation(fields: [agentId], references: [id])
+    agentId String @map(name: "agent_id")
+
+    avatar          String?
+    description     String
+    isPublic        Boolean    @map(name: "is_public")
+    graph           Json
+    lastExecution   Execution? @relation(name: "last_execution", fields: [lastExecutionId], references: [id])
+    lastExecutionId String?    @map(name: "last_execution_id")
+
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    createdAt DateTime @default(now()) @map(name: "created_at")
+
+    executions Execution[]
+
+    @@unique([agentId, slug])
+    @@map(name: "pipelines")
+}
+
+model Execution {
+    id                  String     @id @default(uuid())
+    executionNumber     String
+    pipeline            Pipeline   @relation(fields: [pipelineId], references: [id])
+    pipelineId          String     @map(name: "pipeline_id")
+    user                User       @relation(fields: [userId], references: [id])
+    userId              String     @map(name: "user_id")
+    previousExecution   Execution? @relation(name: "previous_execution", fields: [previousExecutionId], references: [id])
+    previousExecutionId String?    @map(name: "previous_execution_id")
+
+    graph      Json
+    successful Boolean?
+
+    token     String   @default(uuid())
+    createdAt DateTime @default(now()) @map(name: "created_at")
+
+    isLastExecution    Pipeline?           @relation(name: "last_execution")
+    collectionVersions CollectionVersion[]
+    nextExecution      Execution?          @relation(name: "previous_execution")
+
+    @@unique([pipelineId, executionNumber])
+    @@map(name: "executions")
 }

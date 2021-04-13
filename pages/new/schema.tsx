@@ -20,20 +20,14 @@ import api from "next-rest/client";
 import StatusCodes from "http-status-codes";
 
 import { slugPattern } from "utils/shared/slug";
-import { usePageContext } from "utils/client/hooks";
-import { buildUrl } from "utils/shared/urls";
-
-type Privacy = "private" | "public";
-const privacyOptions: { label: string; value: Privacy }[] = [
-	{ label: "Private", value: "private" },
-	{ label: "Public", value: "public" },
-];
+import { usePageContext, useStateRef } from "utils/client/hooks";
+import { Privacy, privacyOptions } from "utils/client/privacy";
 
 const NewSchema: React.FC<{}> = ({}) => {
 	const [isLoading, setIsLoading] = useState(false);
-	const [contentSlug, setContentSlug] = useState("");
-	const [description, setDescription] = useState("");
-	const [privacy, setPrivacy] = useState<Privacy>("public");
+	const [contentSlug, setContentSlug, contentSlugRef] = useStateRef("");
+	const [description, setDescription, descriptionRef] = useStateRef("");
+	const [privacy, setPrivacy, privacyRef] = useStateRef<Privacy>("public");
 
 	const { session } = usePageContext();
 	const router = useRouter();
@@ -48,24 +42,23 @@ const NewSchema: React.FC<{}> = ({}) => {
 		[]
 	);
 
-	const handleSubmit = useCallback(
-		(profileSlug: string) => {
-			setIsLoading(true);
-			const isPublic = privacy === "public";
-			const body = { slug: contentSlug, description, isPublic };
-			api.post("/api/schema", {}, { "content-type": "application/json" }, body)
-				.then(([{}]) => router.push(buildUrl({ profileSlug, contentSlug })))
-				.catch((error) => {
-					setIsLoading(false);
-					if (error === StatusCodes.CONFLICT) {
-						toaster.danger(`Schema name unavailable`);
-					} else {
-						toaster.danger(error.toString());
-					}
-				});
-		},
-		[contentSlug, description, privacy, router]
-	);
+	const handleSubmit = useCallback(() => {
+		setIsLoading(true);
+		const slug = contentSlugRef.current;
+		const description = descriptionRef.current;
+		const isPublic = privacyRef.current === "public";
+		const body = { slug, description, isPublic };
+		api.post("/api/schema", {}, { "content-type": "application/json" }, body)
+			.then(([{ location }]) => router.push(location))
+			.catch((error) => {
+				setIsLoading(false);
+				if (error === StatusCodes.CONFLICT) {
+					toaster.danger(`Schema name unavailable`);
+				} else {
+					toaster.danger(error.toString());
+				}
+			});
+	}, []);
 
 	if (session === null) {
 		signIn();
@@ -125,7 +118,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 			</Pane>
 			<Button
 				appearance="primary"
-				onClick={() => handleSubmit(profileSlug)}
+				onClick={handleSubmit}
 				disabled={!nameIsValid || isLoading}
 				isLoading={isLoading}
 			>

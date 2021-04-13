@@ -1,28 +1,29 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth, { InitOptions } from "next-auth";
+import type { NextApiRequest, NextApiResponse } from "next";
+import NextAuth, { NextAuthOptions, Session, User as NextAuthUser } from "next-auth";
+
 import Providers from "next-auth/providers";
 import Adapters from "next-auth/adapters";
-import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import stripIndent from "strip-indent";
-import { SessionBase } from "next-auth/_utils";
 
 import { prisma } from "utils/server/prisma";
 
-import { ClientUser } from "utils/shared/session";
+declare module "next-auth" {
+	interface User {
+		id: string;
+		slug: string | null;
+		avatar: string | null;
+	}
+}
 
-const options: InitOptions = {
+const options: NextAuthOptions = {
 	// Configure one or more authentication providers
 	providers: [
-		// Providers.GitHub({
-		//   clientId: process.env.GITHUB_ID,
-		//   clientSecret: process.env.GITHUB_SECRET
-		// }),
 		Providers.Email({
 			server: process.env.EMAIL_SERVER,
 			from: process.env.EMAIL_FROM,
-			sendVerificationRequest: ({ identifier: email, url, provider }) => {
-				return new Promise((resolve, reject) => {
+			sendVerificationRequest: ({ identifier: email, url, provider }) =>
+				new Promise((resolve, reject) => {
 					const { server, from } = provider;
 
 					nodemailer.createTransport(server).sendMail(
@@ -51,8 +52,7 @@ const options: InitOptions = {
 							}
 						}
 					);
-				});
-			},
+				}),
 		}),
 	],
 	secret: process.env.PRISMA_SECRET,
@@ -72,19 +72,17 @@ const options: InitOptions = {
 		verifyRequest: "/login?requested=true",
 	},
 	callbacks: {
-		session: async (session: SessionBase, user) => {
-			if (user) {
-				const { id, slug, name, email, avatar } = user as User;
-				const clientUser: ClientUser = { id, slug, name, email, avatar };
-				return { ...session, user: clientUser };
+		async session(session: Session, userOrToken) {
+			if (userOrToken) {
+				const { id, slug, name, email, avatar } = userOrToken as NextAuthUser;
+				return { ...session, user: { id, slug, name, email, avatar } };
 			} else {
-				return session;
+				return { ...session };
 			}
 		},
 	},
 	events: {
-		createUser: async ({ id }: User) => {
-			// Create the user agent
+		async createUser({ id }: NextAuthUser) {
 			await prisma.agent.create({ data: { user: { connect: { id } } } });
 		},
 	},

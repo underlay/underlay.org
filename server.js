@@ -3,8 +3,6 @@ const { parse } = require("url");
 const fs = require("fs");
 const path = require("path");
 
-const semverValid = require("semver/functions/valid");
-
 const next = require("next");
 
 const { PrismaClient } = require("@prisma/client");
@@ -46,7 +44,7 @@ const findResource = (profileSlug, contentSlug) => ({
 	},
 });
 
-// type: "user" | "organization" | "schema" | "schemaVersion" | "collection" | "collectionVersion"
+// type: "user" | "organization" | "schema" | "schemaVersion" | "collection" | "collectionVersion" | "pipeline" | "execution"
 // query: ParsedUrlQuery
 function render(req, res, type, id, query) {
 	if (typeof query.mode === "string") {
@@ -105,37 +103,36 @@ app.prepare().then(() => {
 				select: { id: true },
 			};
 
-			const [schema, collection] = await Promise.all([
+			const [schema, collection, pipeline] = await Promise.all([
 				prisma.schema.findFirst(contentQuery),
 				prisma.collection.findFirst(contentQuery),
+				prisma.pipeline.findFirst(contentQuery),
 			]);
 
 			if (schema !== null) {
 				render(req, res, "schema", schema.id, query);
 			} else if (collection !== null) {
 				render(req, res, "collection", collection.id, query);
+			} else if (pipeline !== null) {
+				render(req, res, "pipeline", pipeline.id, query);
 			} else {
 				app.render(req, res, "/404", query);
 			}
 		} else if (components.length === 3) {
 			const [profileSlug, contentSlug, versionNumber] = components;
-			if (semverValid(versionNumber) === null) {
-				return app.render(req, res, "/404", query);
-			}
 
-			const [schemaVersion, collectionVersion] = await Promise.all([
+			const resource = findResource(profileSlug, contentSlug);
+			const [schemaVersion, collectionVersion, execution] = await Promise.all([
 				prisma.schemaVersion.findFirst({
-					where: {
-						versionNumber: versionNumber,
-						schema: findResource(profileSlug, contentSlug),
-					},
+					where: { versionNumber, schema: resource },
 					select: { id: true },
 				}),
 				prisma.collectionVersion.findFirst({
-					where: {
-						versionNumber: versionNumber,
-						collection: findResource(profileSlug, contentSlug),
-					},
+					where: { versionNumber, collection: resource },
+					select: { id: true },
+				}),
+				prisma.execution.findFirst({
+					where: { executionNumber: versionNumber, pipeline: resource },
 					select: { id: true },
 				}),
 			]);
@@ -144,6 +141,8 @@ app.prepare().then(() => {
 				render(req, res, "schemaVersion", schemaVersion.id, query);
 			} else if (collectionVersion !== null) {
 				render(req, res, "collectionVersion", collectionVersion.id, query);
+			} else if (execution !== null) {
+				render(req, res, "execution", execution.id, query);
 			} else {
 				app.render(req, res, "/404", query);
 			}

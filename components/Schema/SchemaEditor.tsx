@@ -1,65 +1,54 @@
-import React, { memo, useEffect, useRef } from "react";
-import { BoxOwnProps, Pane, PaneOwnProps } from "evergreen-ui";
+import React, { useEffect, useRef } from "react";
+
+import { Schema } from "@underlay/apg";
 
 import dynamic from "next/dynamic";
 
-// Only import types here! Otherwise tree shaking breaks.
-import { UpdateProps } from "@underlay/tasl-codemirror";
-
 import styles from "./style.module.scss";
 
-const TaslEditor = dynamic(
+export interface SchemaEditorProps {
+	initialValue: string;
+	onChange: (value: string, schema: Schema.Schema, errorCount: number) => void;
+}
+
+const SchemaEditor = dynamic(
 	async () => {
-		const {
-			editableConfig,
-			makeSchemaLinter,
-			EditorView,
-			EditorState,
-			openLintPanel,
-		} = await import("@underlay/tasl-codemirror");
+		const { editableConfig, SchemaState } = await import("@underlay/tasl-codemirror");
+		const { useCodeMirror } = await import("utils/client/codemirror");
+		const { openLintPanel } = await import("@codemirror/next/lint");
 
-		interface TaslEditorProps {
-			initialValue: string;
-			onChange: (props: UpdateProps) => void;
-		}
+		return function SchemaEditor({ initialValue, onChange }: SchemaEditorProps) {
+			const [state, view, div] = useCodeMirror<HTMLDivElement>({
+				doc: initialValue,
+				extensions: editableConfig,
+			});
 
-		return function TaslEditor({ initialValue, onChange }: TaslEditorProps) {
-			const div = useRef<HTMLDivElement>(null);
-			const view = useRef<InstanceType<typeof EditorView> | null>(null);
+			const valueRef = useRef<string>(initialValue);
+			const schemaRef = useRef<Schema.Schema>({});
 
 			useEffect(() => {
-				if (div.current) {
-					const extensions = [editableConfig, makeSchemaLinter(onChange)];
-					const state = EditorState.create({ doc: initialValue, extensions });
-					view.current = new EditorView({
-						state: state,
-						parent: div.current,
-					});
-
+				if (view.current !== null) {
 					openLintPanel(view.current);
 					view.current.focus();
 				}
 			}, []);
 
+			useEffect(() => {
+				if (onChange !== undefined && state !== null) {
+					const value = state.doc.toString();
+					const { schema, errorCount } = state.field(SchemaState);
+					if (value !== valueRef.current || schema !== schemaRef.current) {
+						valueRef.current = value;
+						schemaRef.current = schema;
+						onChange(value, schema, errorCount);
+					}
+				}
+			}, [state]);
+
 			return <div className={styles.editor} ref={div}></div>;
 		};
 	},
 	{ ssr: false }
-);
-
-export interface SchemaEditorProps {
-	initialValue: string;
-	onChange: (props: UpdateProps) => void;
-}
-
-const SchemaEditor: React.FC<SchemaEditorProps & BoxOwnProps<"div", PaneOwnProps>> = memo(
-	({ initialValue, onChange, ...rest }) => {
-		return (
-			<Pane className={styles.container} border="default" {...rest}>
-				<TaslEditor initialValue={initialValue} onChange={onChange} />
-			</Pane>
-		);
-	}
 );
 
 export default SchemaEditor;

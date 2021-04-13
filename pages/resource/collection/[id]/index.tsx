@@ -1,6 +1,8 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
+import { Paragraph } from "evergreen-ui";
+
 import {
 	prisma,
 	serializeUpdatedAt,
@@ -18,8 +20,7 @@ import {
 	CollectionVersionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { CollectionPageFrame, CollectionVersionOverview } from "components";
-import { Paragraph } from "evergreen-ui";
+import { CollectionPageFrame, ReadmeViewer } from "components";
 
 type CollectionOverviewProps = CollectionPageProps & {
 	latestVersion: CollectionVersionProps | null;
@@ -44,28 +45,14 @@ export const getServerSideProps: GetServerSideProps<
 	});
 
 	// The reason to check for null separately from getResourcePagePermissions
-	// is so that TypeScript know it's not null afterward
+	// is so that TypeScript knows it's not null afterward
 	if (collectionWithVersion === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collectionWithVersion)) {
+	} else if (!getResourcePagePermissions(context, collectionWithVersion, false)) {
 		return { notFound: true };
 	}
 
 	const versionCount = await countCollectionVersions(collectionWithVersion);
-
-	// if (versionCount < 1) {
-	// 	const profileSlug = getProfileSlug(collectionWithVersion.agent);
-	// 	return {
-	// 		redirect: {
-	// 			destination: buildUrl({
-	// 				profileSlug,
-	// 				contentSlug: collectionWithVersion.slug,
-	// 				mode: "edit",
-	// 			}),
-	// 			permanent: false,
-	// 		},
-	// 	};
-	// }
 
 	// We need to take the .versions property out
 	// before returning as a prop so that react doesn't
@@ -91,9 +78,9 @@ const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ latestVersi
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<CollectionPageFrame {...props}>
 				{latestVersion === null ? (
-					<Paragraph>No versions</Paragraph>
+					<Paragraph>No versions yet!</Paragraph>
 				) : (
-					<CollectionVersionOverview {...latestVersion} />
+					<ReadmeViewer source={latestVersion.readme} />
 				)}
 			</CollectionPageFrame>
 		</LocationContext.Provider>

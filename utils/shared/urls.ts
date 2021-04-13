@@ -1,5 +1,3 @@
-import { ResourceProps } from "utils/shared/propTypes";
-
 export interface LocationData {
 	profileSlug?: string;
 	contentSlug?: string;
@@ -40,11 +38,3 @@ export const buildUrl = ({
 		return `/${components.join("/")}`;
 	}
 };
-
-export const getResourceLocation = ({
-	slug,
-	agent: { user, organization },
-}: Omit<ResourceProps, "createdAt">): LocationData => ({
-	profileSlug: user?.slug || organization?.slug || undefined,
-	contentSlug: slug || undefined,
-});

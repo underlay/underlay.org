@@ -9,7 +9,7 @@
 
 export type ResourcePageParams = { id: string };
 
-// These are the basic properties that every schema and collection page needs
+// These are the basic properties that every resource page needs
 export type ResourceProps = {
 	id: string;
 	description: string;
@@ -30,29 +30,42 @@ export type CollectionPageProps = {
 	collection: ResourceProps;
 };
 
+export type PipelinePageProps = {
+	pipeline: ResourceProps;
+};
+
+export type UserProps = {
+	id: string;
+	slug: string | null;
+};
+
 // These are the basic agent properties that every resource page needs
 export type AgentProps = {
-	user: { id: string; slug: string | null } | null;
+	user: UserProps | null;
 	organization: { id: string; slug: string | null } | null;
 };
 
-export const getProfileSlug = ({
-	user,
-	organization,
-}: {
-	user: null | { slug: null | string };
-	organization: null | { slug: null | string };
-}) => user?.slug || organization?.slug || undefined;
+export const getProfileSlug = ({ user, organization }: AgentProps) =>
+	user?.slug || organization?.slug || undefined;
 
-export type SchemaVersionProps = {
+export type ResourceVersionProps = {
+	id: string;
 	versionNumber: string;
+	createdAt: string;
+	user: UserProps;
+};
+
+export type ExecutionProps = {
+	id: string;
+	createdAt: string;
+	user: { id: string; slug: string | null };
+	successful: boolean | null;
+	executionNumber: string;
+};
+
+export type SchemaVersionProps = ResourceVersionProps & {
 	content: string;
-	readme: string | null;
-	createdAt: string;
+	readme: string;
 };
 
-export type CollectionVersionProps = {
-	versionNumber: string;
-	readme: string | null;
-	createdAt: string;
-};
+export type CollectionVersionProps = ResourceVersionProps & { readme: string };
