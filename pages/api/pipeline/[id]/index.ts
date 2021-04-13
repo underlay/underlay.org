@@ -136,10 +136,13 @@ export default makeHandler<"/api/pipeline/[id]">({
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
 			exec: async (req, { id }) => {
+				console.log("posting");
 				const session = await getSession({ req });
 				if (session === null) {
 					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
+
+				console.log("got session with user", session.user.slug);
 
 				const pipeline = await prisma.pipeline.findFirst({
 					where: { id, agent: { userId: session.user.id } },
@@ -151,6 +154,8 @@ export default makeHandler<"/api/pipeline/[id]">({
 					},
 				});
 
+				console.log("found pipeline", pipeline?.slug);
+
 				if (pipeline === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
 				} else if (!pipelineGraph.is(pipeline.graph)) {
@@ -158,6 +163,7 @@ export default makeHandler<"/api/pipeline/[id]">({
 				}
 
 				const executionNumber = getExecutionNumber(pipeline.lastExecution);
+				console.log("execution number", executionNumber);
 
 				const executionId = uuid();
 				const token = uuid();
