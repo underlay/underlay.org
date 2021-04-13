@@ -1,21 +1,26 @@
+import { v4 as uuid } from "uuid";
 import { StatusCodes } from "http-status-codes";
-
+import { isLeft } from "fp-ts/lib/Either.js";
 import * as t from "io-ts";
 
 import { getSession } from "next-auth/client";
 
-import type { ValidationError } from "@underlay/pipeline";
+import { evaluateEvent, ValidationError } from "@underlay/pipeline";
 
 import { makeHandler, ApiError } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma, selectAgentProps } from "utils/server/prisma";
 import { checkSlugUniqueness } from "utils/server/resource";
-import { pipelineGraph, validatePipelineGraph } from "utils/server/pipeline";
+import { encodePipelineGraph, pipelineGraph, validatePipelineGraph } from "utils/server/pipeline";
 import { slugPattern } from "utils/shared/slug";
 import { getExecutionNumber } from "utils/server/executions";
 import { buildUrl } from "utils/shared/urls";
 import { getProfileSlug } from "utils/shared/propTypes";
+import { InvokeCommand } from "@aws-sdk/client-lambda";
+import { Lambda } from "utils/server/lambda";
+
+const evaluateEventStream = t.array(evaluateEvent);
 
 const params = t.type({ id: t.string });
 
@@ -141,24 +146,58 @@ export default makeHandler<"/api/pipeline/[id]">({
 						...selectAgentProps,
 						slug: true,
 						graph: true,
-						lastExecution: {
-							select: {
-								id: true,
-								executionNumber: true,
-							},
-						},
+						lastExecution: { select: { id: true, executionNumber: true } },
 					},
 				});
 
 				if (pipeline === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
+				} else if (!pipelineGraph.is(pipeline.graph)) {
+					throw new ApiError(StatusCodes.CONFLICT);
 				}
 
 				const executionNumber = getExecutionNumber(pipeline.lastExecution);
 
+				const executionId = uuid();
+				const token = uuid();
+
+				const payload = JSON.stringify({
+					host: process.env.NEXTAUTH_URL!,
+					key: executionId,
+					token: token,
+					graph: encodePipelineGraph(pipeline.graph),
+				});
+
+				console.log("request payload", payload);
+
+				const command = new InvokeCommand({
+					FunctionName: "pipeline-runtime",
+					Payload: Buffer.from(payload),
+				});
+
+				const response = await Lambda.send(command);
+				console.log("got response", response);
+				if (response.Payload === undefined) {
+					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+				}
+
+				const result = evaluateEventStream.decode(
+					JSON.parse(Buffer.from(response.Payload).toString("utf-8"))
+				);
+
+				if (isLeft(result)) {
+					console.log("result is not an event stream", result.left);
+					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+				}
+
+				const successful = result.right.some(({ event }) => event === "success");
+				console.log("successful", successful);
+
 				const execution = await prisma.execution.create({
-					select: { id: true },
+					select: { id: true, token: true },
 					data: {
+						id: executionId,
+						token: token,
 						pipeline: { connect: { id } },
 						user: { connect: { id: session.user.id } },
 						previousExecution:
@@ -168,6 +207,7 @@ export default makeHandler<"/api/pipeline/[id]">({
 						isLastExecution: { connect: { id } },
 						executionNumber,
 						graph: pipeline.graph,
+						successful: successful,
 					},
 				});
 
