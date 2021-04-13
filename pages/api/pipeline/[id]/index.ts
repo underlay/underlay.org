@@ -136,13 +136,10 @@ export default makeHandler<"/api/pipeline/[id]">({
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
 			exec: async (req, { id }) => {
-				console.log("posting");
 				const session = await getSession({ req });
 				if (session === null) {
 					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
-
-				console.log("got session with user", session.user.slug);
 
 				const pipeline = await prisma.pipeline.findFirst({
 					where: { id, agent: { userId: session.user.id } },
@@ -154,8 +151,6 @@ export default makeHandler<"/api/pipeline/[id]">({
 					},
 				});
 
-				console.log("found pipeline", pipeline?.slug);
-
 				if (pipeline === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
 				} else if (!pipelineGraph.is(pipeline.graph)) {
@@ -163,7 +158,6 @@ export default makeHandler<"/api/pipeline/[id]">({
 				}
 
 				const executionNumber = getExecutionNumber(pipeline.lastExecution);
-				console.log("execution number", executionNumber);
 
 				const executionId = uuid();
 				const token = uuid();
@@ -180,8 +174,6 @@ export default makeHandler<"/api/pipeline/[id]">({
 					graph: graph.value,
 				};
 
-				console.log("request payload", requestPayload);
-
 				const command = new InvokeCommand({
 					FunctionName: "pipeline-runtime",
 					Payload: Buffer.from(JSON.stringify(requestPayload)),
@@ -192,23 +184,18 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw err;
 				});
 
-				console.log("got response", response);
 				if (response.Payload === undefined) {
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
 				}
 
 				const responsePayload = JSON.parse(Buffer.from(response.Payload).toString("utf-8"));
 
-				console.log("response payload", responsePayload);
-
 				const result = evaluateEventStream.decode(responsePayload);
 				if (isLeft(result)) {
-					console.log("result is not an event stream", result.left);
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
 				}
 
 				const successful = result.right.some(({ event }) => event === "success");
-				console.log("successful", successful);
 
 				const execution = await prisma.execution.create({
 					select: { id: true, token: true },

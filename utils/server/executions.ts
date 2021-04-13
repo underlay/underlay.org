@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "next-rest/server";
 
-export const initialExecutionNumber = "v0.0.0";
+export const initialExecutionNumber = "0";
 export function getExecutionNumber(execution: { executionNumber: string } | null) {
 	if (execution === null) {
 		return initialExecutionNumber;
