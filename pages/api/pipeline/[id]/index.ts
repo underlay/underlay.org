@@ -19,6 +19,7 @@ import { buildUrl } from "utils/shared/urls";
 import { getProfileSlug } from "utils/shared/propTypes";
 import { InvokeCommand } from "@aws-sdk/client-lambda";
 import { Lambda } from "utils/server/lambda";
+import { isNone } from "fp-ts/lib/Option";
 
 const evaluateEventStream = t.array(evaluateEvent);
 
@@ -161,11 +162,16 @@ export default makeHandler<"/api/pipeline/[id]">({
 				const executionId = uuid();
 				const token = uuid();
 
+				const graph = encodePipelineGraph(pipeline.graph);
+				if (isNone(graph)) {
+					throw new ApiError(StatusCodes.CONFLICT);
+				}
+
 				const payload = JSON.stringify({
 					host: process.env.NEXTAUTH_URL!,
 					key: executionId,
 					token: token,
-					graph: encodePipelineGraph(pipeline.graph),
+					graph: graph.value,
 				});
 
 				console.log("request payload", payload);
