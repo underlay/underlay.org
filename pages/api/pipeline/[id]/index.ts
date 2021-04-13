@@ -167,21 +167,25 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw new ApiError(StatusCodes.CONFLICT);
 				}
 
-				const payload = JSON.stringify({
+				const payload = {
 					host: process.env.NEXTAUTH_URL!,
 					key: executionId,
 					token: token,
 					graph: graph.value,
-				});
+				};
 
 				console.log("request payload", payload);
 
 				const command = new InvokeCommand({
 					FunctionName: "pipeline-runtime",
-					Payload: Buffer.from(payload),
+					Payload: Buffer.from(JSON.stringify(payload)),
 				});
 
-				const response = await Lambda.send(command);
+				const response = await Lambda.send(command).catch((err) => {
+					console.error("error", err);
+					throw err;
+				});
+
 				console.log("got response", response);
 				if (response.Payload === undefined) {
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
