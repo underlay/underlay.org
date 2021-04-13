@@ -167,18 +167,18 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw new ApiError(StatusCodes.CONFLICT);
 				}
 
-				const payload = {
+				const requestPayload = {
 					host: process.env.NEXTAUTH_URL!,
 					key: executionId,
 					token: token,
 					graph: graph.value,
 				};
 
-				console.log("request payload", payload);
+				console.log("request payload", requestPayload);
 
 				const command = new InvokeCommand({
 					FunctionName: "pipeline-runtime",
-					Payload: Buffer.from(JSON.stringify(payload)),
+					Payload: Buffer.from(JSON.stringify(requestPayload)),
 				});
 
 				const response = await Lambda.send(command).catch((err) => {
@@ -191,10 +191,11 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
 				}
 
-				const result = evaluateEventStream.decode(
-					JSON.parse(Buffer.from(response.Payload).toString("utf-8"))
-				);
+				const responsePayload = JSON.parse(Buffer.from(response.Payload).toString("utf-8"));
 
+				console.log("response payload", responsePayload);
+
+				const result = evaluateEventStream.decode(responsePayload);
 				if (isLeft(result)) {
 					console.log("result is not an event stream", result.left);
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
