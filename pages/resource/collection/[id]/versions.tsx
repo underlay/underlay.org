@@ -2,20 +2,31 @@ import React from "react";
 
 import { GetServerSideProps } from "next";
 
-import { CollectionPageFrame } from "components";
+import { Paragraph } from "evergreen-ui";
+
+import { CollectionPageFrame, VersionHistory } from "components";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 import {
 	prisma,
 	selectResourcePageProps,
-	countSchemaVersions,
 	serializeUpdatedAt,
+	serializeCreatedAt,
+	selectResourceVersionProps,
 } from "utils/server/prisma";
-import { CollectionPageProps, getProfileSlug, ResourcePageParams } from "utils/shared/propTypes";
+import {
+	getProfileSlug,
+	ResourcePageParams,
+	ResourceProps,
+	ResourceVersionProps,
+} from "utils/shared/propTypes";
 
 import { LocationContext } from "utils/client/hooks";
 
-type CollectionVersionsProps = CollectionPageProps;
+interface CollectionVersionsProps {
+	collection: ResourceProps;
+	collectionVersions: ResourceVersionProps[];
+}
 
 export const getServerSideProps: GetServerSideProps<
 	CollectionVersionsProps,
@@ -23,22 +34,28 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
 	const { id } = context.params!;
 
-	const collection = await prisma.collection.findFirst({
+	const collectionWithVersions = await prisma.collection.findFirst({
 		where: { id },
-		select: selectResourcePageProps,
+		select: {
+			...selectResourcePageProps,
+			versions: {
+				select: selectResourceVersionProps,
+			},
+		},
 	});
 
-	if (collection === null) {
+	if (collectionWithVersions === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collection)) {
+	} else if (!getResourcePagePermissions(context, collectionWithVersions, false)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(collection);
+	const { versions, ...collection } = serializeUpdatedAt(collectionWithVersions);
+
 	return {
 		props: {
-			collection: serializeUpdatedAt(collection),
-			versionCount,
+			collection,
+			collectionVersions: versions.map(serializeCreatedAt),
 		},
 	};
 };
@@ -46,11 +63,15 @@ export const getServerSideProps: GetServerSideProps<
 const SchemaVersionsPage: React.FC<CollectionVersionsProps> = (props) => {
 	const profileSlug = getProfileSlug(props.collection.agent);
 	const contentSlug = props.collection.slug;
-
+	const versionCount = props.collectionVersions.length;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "versions" }}>
-			<CollectionPageFrame {...props}>
-				{/* <SchemaVersionHistory {...props} /> */}
+			<CollectionPageFrame {...props} versionCount={versionCount}>
+				{versionCount ? (
+					<VersionHistory versions={props.collectionVersions} />
+				) : (
+					<Paragraph>No versions yet!</Paragraph>
+				)}
 			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);

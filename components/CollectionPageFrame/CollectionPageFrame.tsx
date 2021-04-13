@@ -9,23 +9,23 @@ import { CollectionPageProps } from "utils/shared/propTypes";
 
 type CollectionPageFrameProps = CollectionPageProps & { children: React.ReactNode };
 
+const ownerNavItems = (versionCount: number): NavItem[] => [
+	{ title: "Overview" },
+	{ mode: "versions", title: `Versions (${versionCount})` },
+	{ mode: "settings", title: "Settings" },
+];
+
+const nonOwnerNavItems = (versionCount: number): NavItem[] => [
+	{ title: "Overview" },
+	{ mode: "versions", title: `Versions (${versionCount})` },
+];
+
 const CollectionPageFrame = ({ collection, versionCount, children }: CollectionPageFrameProps) => {
 	const { session } = usePageContext();
 	const isOwner = session !== null && session.user.id === collection.agent.user?.id;
 	const updatedAt = useMemo(() => new Date(collection.updatedAt), [collection.updatedAt]);
 	const navItems = useMemo<NavItem[]>(
-		() =>
-			isOwner
-				? [
-						{ title: "Overview" },
-						{ mode: "edit", title: "Edit" },
-						{ mode: "versions", title: `Versions (${versionCount})` },
-						{ mode: "settings", title: "Settings" },
-				  ]
-				: [
-						{ title: "Overview" },
-						{ mode: "versions", title: `Versions (${versionCount})` },
-				  ],
+		() => (isOwner ? ownerNavItems(versionCount) : nonOwnerNavItems(versionCount)),
 		[isOwner, versionCount]
 	);
 
@@ -33,9 +33,7 @@ const CollectionPageFrame = ({ collection, versionCount, children }: CollectionP
 		<StandardFrame
 			scopeHeaderProps={{
 				type: "collection",
-				detailsTop: (
-					<Text color="muted">Last updated at {updatedAt.toLocaleDateString()}</Text>
-				),
+				detailsTop: <Text>Last updated {updatedAt.toDateString()}</Text>,
 				detailsBottom: collection.description,
 				isPrivate: !collection.isPublic,
 			}}

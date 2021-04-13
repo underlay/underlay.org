@@ -6,7 +6,7 @@ import { ResourcePageParams, getProfileSlug, CollectionPageProps } from "utils/s
 
 import { getResourcePagePermissions } from "utils/server/permissions";
 import {
-	countSchemaVersions,
+	countCollectionVersions,
 	prisma,
 	selectResourcePageProps,
 	serializeUpdatedAt,
@@ -28,11 +28,11 @@ export const getServerSideProps: GetServerSideProps<
 
 	if (collection === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collection)) {
+	} else if (!getResourcePagePermissions(context, collection, true)) {
 		return { notFound: true };
 	}
 
-	const versionCount = await countSchemaVersions(collection);
+	const versionCount = await countCollectionVersions(collection);
 
 	return {
 		props: {

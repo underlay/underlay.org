@@ -1,12 +1,12 @@
 import { IncomingMessage } from "http";
 import { GetServerSidePropsContext, NextPageContext } from "next";
+import type { Session } from "next-auth";
 
 import { ParsedUrlQuery } from "querystring";
-import { ClientSession } from "utils/shared/session";
 
-const sessionMap = new WeakMap<IncomingMessage, ClientSession | null>();
+const sessionMap = new WeakMap<IncomingMessage, Session | null>();
 
-export function setCachedSession(ctx: NextPageContext, session: ClientSession | null) {
+export function setCachedSession(ctx: NextPageContext, session: Session | null) {
 	if (ctx.req !== undefined) {
 		sessionMap.set(ctx.req, session);
 	}

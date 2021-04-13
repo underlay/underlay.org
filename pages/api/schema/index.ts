@@ -3,12 +3,14 @@ import { StatusCodes } from "http-status-codes";
 import * as t from "io-ts";
 
 import { getSession } from "next-auth/client";
-
-import { makeHandler } from "next-rest/server";
+import { makeHandler, ApiError } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
-import { prisma } from "utils/server/prisma";
-import { initialSchemaContent } from "utils/shared/schemas/initialContent";
+import { prisma, selectAgentProps } from "utils/server/prisma";
+import { checkSlugUniqueness } from "utils/server/resource";
+import { getProfileSlug } from "utils/shared/propTypes";
+import { initialSchemaContent } from "utils/server/initialSchemaContent";
+import { buildUrl } from "utils/shared/urls";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
@@ -30,7 +32,7 @@ declare module "next-rest" {
 						body: t.TypeOf<typeof requestBody>;
 					};
 					response: {
-						headers: { etag: string };
+						headers: { etag: string; location: string };
 						body: void;
 					};
 				};
@@ -45,47 +47,36 @@ export default makeHandler<"/api/schema">({
 		POST: {
 			headers: requestHeaders.is,
 			body: requestBody.is,
-			exec: async (req, {}, {}, body) => {
+			exec: async (req, {}, {}, { slug, description, isPublic }) => {
 				const session = await getSession({ req });
 				if (session === null) {
-					throw StatusCodes.UNAUTHORIZED;
+					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
-				const { slug, description, isPublic } = body;
+				await checkSlugUniqueness({ userId: session.user.id }, slug);
 
-				const collectionCount = await prisma.collection.count({
-					where: { agent: { userId: session.user.id }, slug },
-				});
+				const initialReadme = `# ${slug}\n\n> ${description}`;
 
-				if (collectionCount > 0) {
-					throw StatusCodes.CONFLICT;
-				}
-
-				const draftContent = initialSchemaContent;
-				const draftReadme = `# ${slug}\n\n> ${description}`;
-				const draftVersionNumber = "0.0.0";
-
-				// For now, we just create a schema that is linked to
-				// the session user as the agent.
 				const schema = await prisma.schema
 					.create({
+						select: { ...selectAgentProps, id: true },
 						data: {
 							agent: { connect: { userId: session.user.id } },
 							slug,
 							description,
 							isPublic,
-							draftContent,
-							draftReadme,
-							draftVersionNumber,
+							content: initialSchemaContent,
+							readme: initialReadme,
 						},
 					})
 					.catch(catchPrismaError);
 
-				if (schema === null) {
-					throw StatusCodes.INTERNAL_SERVER_ERROR;
-				}
+				const etag = `"${schema.id}"`;
 
-				return [{ etag: schema.id }, undefined];
+				const profileSlug = getProfileSlug(schema.agent);
+				const location = buildUrl({ profileSlug, contentSlug: slug });
+
+				return [{ etag, location }, undefined];
 			},
 		},
 	},

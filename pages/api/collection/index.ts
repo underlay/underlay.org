@@ -4,10 +4,11 @@ import * as t from "io-ts";
 
 import { getSession } from "next-auth/client";
 
-import { makeHandler } from "next-rest/server";
+import { makeHandler, ApiError } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma } from "utils/server/prisma";
+import { checkSlugUniqueness } from "utils/server/resource";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
@@ -46,39 +47,21 @@ export default makeHandler<"/api/collection">({
 			body: requestBody.is,
 			exec: async (req, {}, {}, body) => {
 				const session = await getSession({ req });
-				console.log("EXECUTING POST /API/COLLECTION", session);
 				if (session === null) {
-					throw StatusCodes.UNAUTHORIZED;
+					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
 				const { slug, description, isPublic } = body;
 
-				const schemaCount = await prisma.schema.count({
-					where: { agent: { userId: session.user.id }, slug },
-				});
+				await checkSlugUniqueness({ userId: session.user.id }, slug);
 
-				if (schemaCount > 0) {
-					throw StatusCodes.CONFLICT;
-				}
+				const agent = { connect: { userId: session.user.id } };
 
-				// For now, we just create a collection that is linked to
-				// the session user as the agent.
 				const collection = await prisma.collection
-					.create({
-						data: {
-							agent: { connect: { userId: session.user.id } },
-							slug,
-							description,
-							isPublic,
-						},
-					})
+					.create({ data: { agent, slug, description, isPublic } })
 					.catch(catchPrismaError);
 
-				if (collection === null) {
-					throw StatusCodes.INTERNAL_SERVER_ERROR;
-				}
-
-				return [{ etag: collection.id }, undefined];
+				return [{ etag: `"${collection.id}"` }, undefined];
 			},
 		},
 	},

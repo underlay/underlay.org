@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NextRouter, useRouter } from "next/router";
+import type { User } from "next-auth";
 import { signIn } from "next-auth/client";
 import { Pane, Button, TextInput, majorScale, Text, Heading, toaster } from "evergreen-ui";
 
@@ -8,7 +9,6 @@ import { slugPattern } from "utils/shared/slug";
 import api from "next-rest/client";
 import StatusCodes from "http-status-codes";
 import { usePageContext } from "utils/client/hooks";
-import { ClientUser } from "utils/shared/session";
 
 // A very simple email regex - not intended to be exhaustive
 const emailPattern = /^.+@.+\.[a-z]{2,}$/;
@@ -47,7 +47,7 @@ function EmailProvider({}) {
 	);
 }
 
-function SetSlug({ user, router }: { user: ClientUser; router: NextRouter }) {
+function SetSlug({ user, router }: { user: User; router: NextRouter }) {
 	const [slug, setSlug] = useState("");
 	const isValid = slugPattern.test(slug);
 	const [isLoading, setIsLoading] = useState(false);

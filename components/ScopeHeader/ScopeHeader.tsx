@@ -9,7 +9,7 @@ import { useLocationContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
 export type ScopeHeaderProps = {
-	type: "collection" | "schema" | "org" | "user";
+	type: "collection" | "schema" | "pipeline" | "org" | "user";
 	profileTitle?: string;
 	detailsTop?: React.ReactNode;
 	detailsBottom?: React.ReactNode;

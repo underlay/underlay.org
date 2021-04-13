@@ -29,6 +29,15 @@ const Header = () => {
 						<>
 							<Button
 								is="a"
+								href="/new/pipeline"
+								marginRight={12}
+								height={40}
+								appearance="minimal"
+							>
+								New pipeline
+							</Button>
+							<Button
+								is="a"
 								href="/new/collection"
 								marginRight={12}
 								height={40}

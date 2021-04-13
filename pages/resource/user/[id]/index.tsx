@@ -1,27 +1,26 @@
 import { GetServerSideProps } from "next";
+import type { Session } from "next-auth";
 
 import { Profile } from "components";
 import { LocationContext } from "utils/client/hooks";
 import { ResourcePageParams } from "utils/shared/propTypes";
 import { prisma, serializeUpdatedAt } from "utils/server/prisma";
 import { getCachedSession } from "utils/server/session";
-import { ClientSession } from "utils/shared/session";
+
+interface ResourceProps {
+	slug: string;
+	isPublic: boolean;
+	updatedAt: string;
+}
 
 export interface UserProfilePageProps {
 	user: { slug: string; avatar: string | null };
-	schemas: {
-		slug: string;
-		isPublic: boolean;
-		updatedAt: string;
-	}[];
-	collections: {
-		slug: string;
-		isPublic: boolean;
-		updatedAt: string;
-	}[];
+	schemas: ResourceProps[];
+	collections: ResourceProps[];
+	pipelines: ResourceProps[];
 }
 
-const selectAgentResourceWhere = (session: ClientSession | null) => ({
+const selectAgentResourceWhere = (session: Session | null) => ({
 	where:
 		session === null
 			? { isPublic: true }
@@ -57,13 +56,13 @@ export const getServerSideProps: GetServerSideProps<
 			id: true,
 			slug: true,
 			avatar: true,
-			Agent: { select: { schemas: resources, collections: resources } },
+			agent: { select: { schemas: resources, collections: resources, pipelines: resources } },
 		},
 	});
 
 	if (user === null) {
 		return { notFound: true };
-	} else if (user.Agent === null) {
+	} else if (user.agent === null) {
 		return { notFound: true };
 	} else if (user.slug === null) {
 		return { redirect: { permanent: false, destination: "/login" } };
@@ -72,19 +71,21 @@ export const getServerSideProps: GetServerSideProps<
 	return {
 		props: {
 			user: { slug: user.slug, avatar: user.avatar },
-			schemas: user.Agent.schemas.map(serializeUpdatedAt),
-			collections: user.Agent.collections.map(serializeUpdatedAt),
+			schemas: user.agent.schemas.map(serializeUpdatedAt),
+			collections: user.agent.collections.map(serializeUpdatedAt),
+			pipelines: user.agent.pipelines.map(serializeUpdatedAt),
 		},
 	};
 };
 
-const UserProfilePage: React.FC<UserProfilePageProps> = ({ user, schemas, collections }) => {
+const UserProfilePage: React.FC<UserProfilePageProps> = (props) => {
 	return (
-		<LocationContext.Provider value={{ profileSlug: user.slug }}>
+		<LocationContext.Provider value={{ profileSlug: props.user.slug }}>
 			<Profile
-				avatar={user.avatar || undefined}
-				schemas={schemas}
-				collections={collections}
+				avatar={props.user.avatar || undefined}
+				schemas={props.schemas}
+				collections={props.collections}
+				pipelines={props.pipelines}
 			/>
 		</LocationContext.Provider>
 	);

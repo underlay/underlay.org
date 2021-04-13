@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<
 
 	if (schema === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schema)) {
+	} else if (!getResourcePagePermissions(context, schema, true)) {
 		return { notFound: true };
 	}
 

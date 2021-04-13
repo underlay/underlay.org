@@ -7,9 +7,9 @@ import styles from "./style.module.scss";
 
 const TaslViewer = dynamic(
 	async () => {
-		const { readOnlyConfig, EditorView, EditorState } = await import(
-			"@underlay/tasl-codemirror/lib/config"
-		);
+		const { EditorState } = await import("@codemirror/next/state");
+		const { EditorView } = await import("@codemirror/next/view");
+		const { readOnlyConfig } = await import("@underlay/tasl-codemirror");
 
 		return function TaslViewer({ value }: { value: string }) {
 			const div = useRef<HTMLDivElement>(null);

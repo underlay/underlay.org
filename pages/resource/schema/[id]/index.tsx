@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, SchemaVersionOverview } from "components";
+import { ReadmeViewer, SchemaPageFrame, SchemaViewer } from "components";
 import {
 	prisma,
 	selectResourcePageProps,
@@ -11,7 +11,6 @@ import {
 	serializeCreatedAt,
 } from "utils/server/prisma";
 import { getResourcePagePermissions } from "utils/server/permissions";
-// import { buildUrl } from "utils/shared/urls";
 
 import {
 	SchemaPageProps,
@@ -20,7 +19,7 @@ import {
 	SchemaVersionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { Paragraph } from "evergreen-ui";
+import { majorScale, Pane, Paragraph } from "evergreen-ui";
 
 type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionProps | null };
 
@@ -46,25 +45,11 @@ export const getServerSideProps: GetServerSideProps<
 	// is so that TypeScript know it's not null afterward
 	if (schemaWithVersion === null) {
 		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, schemaWithVersion)) {
+	} else if (!getResourcePagePermissions(context, schemaWithVersion, false)) {
 		return { notFound: true };
 	}
 
 	const versionCount = await countSchemaVersions(schemaWithVersion);
-
-	// if (versionCount < 1) {
-	// 	const profileSlug = getProfileSlug(schemaWithVersion.agent);
-	// 	return {
-	// 		redirect: {
-	// 			destination: buildUrl({
-	// 				profileSlug,
-	// 				contentSlug: schemaWithVersion.slug,
-	// 				mode: "edit",
-	// 			}),
-	// 			permanent: false,
-	// 		},
-	// 	};
-	// }
 
 	// We need to take the .versions property out
 	// before returning as a prop so that react doesn't
@@ -83,20 +68,33 @@ export const getServerSideProps: GetServerSideProps<
 	};
 };
 
-const SchemaOverviewPage: React.FC<SchemaOverviewProps> = ({ latestVersion, ...props }) => {
+const SchemaOverviewPage: React.FC<SchemaOverviewProps> = (props) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
+
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<SchemaPageFrame {...props}>
-				{latestVersion === null ? (
-					<Paragraph>No versions</Paragraph>
-				) : (
-					<SchemaVersionOverview {...latestVersion} />
-				)}
+				<SchemaOverviewPageContent {...props} />
 			</SchemaPageFrame>
 		</LocationContext.Provider>
 	);
 };
+
+function SchemaOverviewPageContent(props: SchemaOverviewProps) {
+	if (props.latestVersion === null) {
+		return <Paragraph>No versions yet!</Paragraph>;
+	} else {
+		const { readme, content } = props.latestVersion;
+		return (
+			<React.Fragment>
+				<SchemaViewer marginY={majorScale(2)} value={content} />
+				<Pane marginY={majorScale(8)}>
+					<ReadmeViewer source={readme} />
+				</Pane>
+			</React.Fragment>
+		);
+	}
+}
 
 export default SchemaOverviewPage;
