@@ -134,7 +134,7 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 		}
 
 		setPublishing(true);
-		publishVersion(id, schemaRef.current, readmeRef.current)
+		publishVersion(id)
 			.then((location) => {
 				setPublishing(false);
 				setClean(true);
@@ -231,12 +231,12 @@ async function saveDraft(id: string, readme: string, content: string): Promise<v
 	);
 }
 
-async function publishVersion(id: string, content: string, readme: string): Promise<string> {
+async function publishVersion(id: string): Promise<string> {
 	const [{ location }] = await api.post(
 		"/api/schema/[id]",
 		{ id },
 		{ "content-type": "application/json" },
-		{ content, readme }
+		undefined
 	);
 	return location;
 }
