@@ -20,7 +20,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = (props) => {
 	}
 
 	return (
-		<Table background="tint1" border>
+		<Table background="tint2" border>
 			<Table.Head>
 				<Table.TextHeaderCell>Version number</Table.TextHeaderCell>
 				<Table.TextHeaderCell>User</Table.TextHeaderCell>

@@ -1,7 +1,7 @@
 /* Copied from https://github.com/segmentio/evergreen/blob/master/src/theme/src/default-theme/theme-helpers/index.js */
 /* Orignal values are left as comments next to their overwritten value */
 
-const textStyles:any = {
+const textStyles: Record<string, Record<string, string | number>> = {
 	"600": {
 		fontSize: "22px",
 		fontWeight: 400,
@@ -32,8 +32,7 @@ const textStyles:any = {
 		marginTop: 14,
 	},
 };
-const getTextStyle = (size: number) => {
-	return textStyles[String(size)];
-};
+
+const getTextStyle = (size: number) => textStyles[size.toString()];
 
 export default getTextStyle;

@@ -25,11 +25,11 @@
 		"@aws-sdk/client-lambda": "^3.12.0",
 		"@aws-sdk/client-s3": "^3.12.0",
 		"@codemirror/next": "0.16.0",
-		"@prisma/client": "^2.21.0",
+		"@prisma/client": "^2.21.1",
 		"@underlay/apg": "^1.2.6",
 		"@underlay/pipeline": "0.0.4",
-		"@underlay/tasl-codemirror": "0.0.4",
-		"@underlay/tasl-lezer": "0.0.4",
+		"@underlay/tasl-codemirror": "0.0.6",
+		"@underlay/tasl-lezer": "0.0.6",
 		"buffer": "^6.0.3",
 		"classnames": "^2.3.1",
 		"evergreen-ui": "^5.1.2",
@@ -69,7 +69,7 @@
 		"@types/react-dom": "^17.0.3",
 		"@types/uuid": "^8.3.0",
 		"core-js": "^3.10.1",
-		"prisma": "^2.21.0",
+		"prisma": "^2.21.1",
 		"sass": "^1.32.8",
 		"typescript": "^4.2.4"
 	}

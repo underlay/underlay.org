@@ -21,7 +21,7 @@ import {
 import { LocationContext } from "utils/client/hooks";
 import { Paragraph } from "evergreen-ui";
 
-type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionProps | null };
+type SchemaOverviewProps = SchemaPageProps & { lastVersion: SchemaVersionProps | null };
 
 export const getServerSideProps: GetServerSideProps<
 	SchemaOverviewProps,
@@ -33,11 +33,7 @@ export const getServerSideProps: GetServerSideProps<
 		where: { id },
 		select: {
 			...selectResourcePageProps,
-			versions: {
-				take: 1,
-				orderBy: { createdAt: "desc" },
-				select: selectSchemaVersionOverviewProps,
-			},
+			lastVersion: { select: selectSchemaVersionOverviewProps },
 		},
 	});
 
@@ -51,19 +47,13 @@ export const getServerSideProps: GetServerSideProps<
 
 	const versionCount = await countSchemaVersions(schemaWithVersion);
 
-	// We need to take the .versions property out
-	// before returning as a prop so that react doesn't
-	// complain about not being able to serialize Dates
-	const {
-		versions: [latestVersion],
-		...schema
-	} = schemaWithVersion;
+	const { lastVersion, ...schema } = schemaWithVersion;
 
 	return {
 		props: {
 			versionCount,
 			schema: serializeUpdatedAt(schema),
-			latestVersion: latestVersion === undefined ? null : serializeCreatedAt(latestVersion),
+			lastVersion: lastVersion && serializeCreatedAt(lastVersion),
 		},
 	};
 };
@@ -75,12 +65,12 @@ const SchemaOverviewPage: React.FC<SchemaOverviewProps> = (props) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<SchemaPageFrame {...props}>
-				{props.latestVersion === null ? (
+				{props.lastVersion === null ? (
 					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
 				) : (
 					<SchemaVersionOverview
 						schema={props.schema}
-						schemaVersion={props.latestVersion}
+						schemaVersion={props.lastVersion}
 					/>
 				)}
 			</SchemaPageFrame>

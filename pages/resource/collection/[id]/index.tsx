@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { Heading, majorScale, Pane, Paragraph } from "evergreen-ui";
+import { Paragraph } from "evergreen-ui";
 
 import {
 	prisma,
@@ -20,10 +20,10 @@ import {
 	CollectionVersionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { CollectionPageFrame, ReadmeViewer } from "components";
+import { CollectionPageFrame, CollectionVersionOverview } from "components";
 
 type CollectionOverviewProps = CollectionPageProps & {
-	latestVersion: CollectionVersionProps | null;
+	lastVersion: CollectionVersionProps | null;
 };
 
 export const getServerSideProps: GetServerSideProps<
@@ -36,11 +36,7 @@ export const getServerSideProps: GetServerSideProps<
 		where: { id },
 		select: {
 			...selectResourcePageProps,
-			versions: {
-				take: 1,
-				orderBy: { createdAt: "desc" },
-				select: selectCollectionVersionOverviewProps,
-			},
+			lastVersion: { select: selectCollectionVersionOverviewProps },
 		},
 	});
 
@@ -54,41 +50,31 @@ export const getServerSideProps: GetServerSideProps<
 
 	const versionCount = await countCollectionVersions(collectionWithVersion);
 
-	// We need to take the .versions property out
-	// before returning as a prop so that react doesn't
-	// complain about not being able to serialize Dates
-	const {
-		versions: [latestVersion],
-		...collection
-	} = collectionWithVersion;
+	const { lastVersion, ...collection } = collectionWithVersion;
 
 	return {
 		props: {
 			versionCount,
 			collection: serializeUpdatedAt(collection),
-			latestVersion: latestVersion === undefined ? null : serializeCreatedAt(latestVersion),
+			lastVersion: lastVersion && serializeCreatedAt(lastVersion),
 		},
 	};
 };
 
-const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ latestVersion, ...props }) => {
+const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ lastVersion, ...props }) => {
 	const profileSlug = getProfileSlug(props.collection.agent);
 	const contentSlug = props.collection.slug;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<CollectionPageFrame {...props}>
-				<Pane display="flex">
-					<Pane flex={1}>
-						{latestVersion === null ? (
-							<Paragraph fontStyle="italic">No versions yet!</Paragraph>
-						) : (
-							<ReadmeViewer source={latestVersion.readme} />
-						)}
-					</Pane>
-					<Pane width={majorScale(80)} border background="tint2">
-						<Heading margin={majorScale(2)}>Hello world</Heading>
-					</Pane>
-				</Pane>
+				{lastVersion === null ? (
+					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
+				) : (
+					<CollectionVersionOverview
+						collection={props.collection}
+						collectionVersion={lastVersion}
+					/>
+				)}
 			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);

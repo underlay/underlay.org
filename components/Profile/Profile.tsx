@@ -80,7 +80,7 @@ function ResourceTable(props: { resources: ResourceProps[] }) {
 	const { profileSlug } = useLocationContext();
 
 	return (
-		<Table background="tint1" border>
+		<Table background="tint2" border>
 			<Table.Head>
 				<Table.TextHeaderCell flexBasis={majorScale(32)} flexGrow={0}>
 					Name
