@@ -9,7 +9,7 @@ import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma } from "utils/server/prisma";
 import { checkSlugUniqueness } from "utils/server/resource";
-import { emptyGraph } from "utils/shared/pipeline";
+import { emptyGraph } from "utils/server/pipeline";
 
 const validateParams = t.type({});
 const requestHeaders = t.type({ "content-type": t.literal("application/json") });
