@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid";
 import { StatusCodes } from "http-status-codes";
 import { isLeft } from "fp-ts/lib/Either.js";
 import * as t from "io-ts";
@@ -159,8 +158,20 @@ export default makeHandler<"/api/pipeline/[id]">({
 
 				const executionNumber = getExecutionNumber(pipeline.lastExecution);
 
-				const executionId = uuid();
-				const token = uuid();
+				const execution = await prisma.execution.create({
+					select: { id: true, token: true },
+					data: {
+						pipeline: { connect: { id } },
+						user: { connect: { id: session.user.id } },
+						previousExecution:
+							pipeline.lastExecution === null
+								? undefined
+								: { connect: { id: pipeline.lastExecution.id } },
+						isLastExecution: { connect: { id } },
+						executionNumber,
+						graph: pipeline.graph,
+					},
+				});
 
 				const graph = encodePipelineGraph(pipeline.graph);
 				if (isNone(graph)) {
@@ -169,8 +180,8 @@ export default makeHandler<"/api/pipeline/[id]">({
 
 				const requestPayload = {
 					host: process.env.NEXTAUTH_URL!,
-					key: executionId,
-					token: token,
+					key: execution.id,
+					token: execution.token,
 					graph: graph.value,
 				};
 
@@ -196,22 +207,11 @@ export default makeHandler<"/api/pipeline/[id]">({
 					| EvaluateEventFailure
 					| undefined;
 
-				const execution = await prisma.execution.create({
-					select: { id: true, token: true },
+				await prisma.execution.update({
+					where: { id: execution.id },
 					data: {
-						id: executionId,
-						token: token,
-						pipeline: { connect: { id } },
-						user: { connect: { id: session.user.id } },
-						previousExecution:
-							pipeline.lastExecution === null
-								? undefined
-								: { connect: { id: pipeline.lastExecution.id } },
-						isLastExecution: { connect: { id } },
-						executionNumber,
-						graph: pipeline.graph,
-						error: failure === undefined ? null : failure.error,
 						successful: failure === undefined,
+						error: failure === undefined ? null : failure.error,
 					},
 				});
 

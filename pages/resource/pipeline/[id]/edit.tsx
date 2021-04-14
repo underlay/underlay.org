@@ -176,13 +176,14 @@ function PipelineEditContent(props: PipelineEditProps) {
 			return;
 		}
 
-		setExecuting(false);
+		setExecuting(true);
 
 		api.post("/api/pipeline/[id]", { id: props.pipeline.id }, {}, undefined)
 			.then(([{ location }]) => router.push(location))
 			.catch((err) => {
 				console.error(err);
 				toaster.danger("Could not start execution");
+				setExecuting(false);
 			});
 	}, []);
 

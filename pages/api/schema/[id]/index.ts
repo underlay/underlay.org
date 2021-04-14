@@ -29,11 +29,8 @@ const patchRequestBody = t.partial({
 	readme: t.string,
 });
 
-const postRequestHeaders = t.type({ "content-type": t.literal("application/json") });
-const postRequestBody = t.type({
-	content: t.string,
-	readme: t.string,
-});
+const postRequestHeaders = t.type({});
+const postRequestBody = t.void;
 
 declare module "next-rest" {
 	interface API {
@@ -100,7 +97,7 @@ export default makeHandler<"/api/schema/[id]">({
 		POST: {
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
-			exec: async (req, { id }, {}, { readme, content }) => {
+			exec: async (req, { id }, {}) => {
 				const session = await getSession({ req });
 				if (session === null) {
 					throw new ApiError(StatusCodes.FORBIDDEN);
@@ -111,6 +108,8 @@ export default makeHandler<"/api/schema/[id]">({
 					select: {
 						...selectAgentProps,
 						slug: true,
+						content: true,
+						readme: true,
 						lastVersion: {
 							select: { id: true, versionNumber: true, schemaInstance: true },
 						},
@@ -121,7 +120,7 @@ export default makeHandler<"/api/schema/[id]">({
 					throw new ApiError(StatusCodes.NOT_FOUND);
 				}
 
-				const result = parseSchema(content);
+				const result = parseSchema(schema.content);
 				if (isLeft(result)) {
 					throw new ApiError(StatusCodes.BAD_REQUEST);
 				}
@@ -130,30 +129,26 @@ export default makeHandler<"/api/schema/[id]">({
 
 				const versionNumber = getVersionNumber(schema.lastVersion, result.right.schema);
 
-				const { lastVersion } = await prisma.schema
-					.update({
-						include: { lastVersion: { select: { id: true } } },
-						where: { id },
-						data: {
-							content: content,
-							readme: readme,
-							lastVersion: {
-								create: {
-									schema: { connect: { id } },
-									user: { connect: { id: session.user.id } },
-									previousVersion:
-										schema.lastVersion === null
-											? undefined
-											: { connect: { id: schema.lastVersion.id } },
-									versionNumber,
-									readme,
-									content,
-									schemaInstance,
-								},
+				const { lastVersion } = await prisma.schema.update({
+					select: { lastVersion: { select: { id: true } } },
+					where: { id },
+					data: {
+						lastVersion: {
+							create: {
+								schema: { connect: { id } },
+								user: { connect: { id: session.user.id } },
+								previousVersion:
+									schema.lastVersion === null
+										? undefined
+										: { connect: { id: schema.lastVersion.id } },
+								versionNumber,
+								content: schema.content,
+								readme: schema.readme,
+								schemaInstance,
 							},
 						},
-					})
-					.catch(catchPrismaError);
+					},
+				});
 
 				const etag = `"${lastVersion!.id}"`;
 

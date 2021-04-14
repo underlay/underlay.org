@@ -106,14 +106,12 @@ export default makeHandler<"/api/collection/[id]">({
 		POST: {
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
-			exec: async (req, { id, key, token }, headers, body) => {
+			exec: async ({}, { id, key, token }, headers, body) => {
 				const {
 					// "if-match": ifMatch,
 					"x-collection-schema": schemaURI,
 					"x-collection-instance": instanceURI,
 				} = headers;
-
-				console.log("handling collection post request", key, token, req.query, headers);
 
 				if (key === undefined || token === undefined) {
 					throw new ApiError(StatusCodes.BAD_REQUEST);
@@ -124,8 +122,6 @@ export default makeHandler<"/api/collection/[id]">({
 					select: { token: true, successful: true, userId: true },
 				});
 
-				console.log("found the corresponding execution", execution);
-
 				if (
 					execution === null ||
 					execution.successful !== null ||
@@ -134,11 +130,7 @@ export default makeHandler<"/api/collection/[id]">({
 					throw new ApiError(StatusCodes.BAD_REQUEST);
 				}
 
-				console.log("resolving schema...");
-
 				const schema = await resolveSchema(schemaURI);
-
-				console.log("resolved schema. finding collection...");
 
 				const collection = await prisma.collection.findUnique({
 					where: { id },
@@ -169,13 +161,8 @@ export default makeHandler<"/api/collection/[id]">({
 				// 	throw new ApiError(StatusCodes.PRECONDITION_FAILED);
 				// }
 
-				console.log("getting version number...");
-
 				const versionNumber = getVersionNumber(collection.lastVersion, schema);
 
-				console.log("got version number", versionNumber);
-
-				console.log("creating collection version...");
 				const collectionVersion = await prisma.collectionVersion
 					.create({
 						select: { id: true },
@@ -196,8 +183,6 @@ export default makeHandler<"/api/collection/[id]">({
 						},
 					})
 					.catch(catchPrismaError);
-
-				console.log("created collection version.");
 
 				const etag = `"${collectionVersion.id}"`;
 
