@@ -107,7 +107,7 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 				<PipelineViewer blocks={blocks} graph={execution.graph} />
 				{execution.error === null ? (
 					<Pane marginY={majorScale(2)} border background="greenTint">
-						<Heading>Success</Heading>
+						<Heading margin={majorScale(2)}>Success</Heading>
 					</Pane>
 				) : (
 					<ValidationReport errors={[execution.error]} />

@@ -4,7 +4,8 @@ import { StatusCodes } from "http-status-codes";
 
 import * as t from "io-ts";
 
-import { prisma } from "utils/server/prisma";
+import { prisma, selectAgentProps } from "utils/server/prisma";
+import { getResourcePagePermissions } from "utils/server/permissions";
 
 const params = t.type({ id: t.string, versionNumber: t.string });
 
@@ -23,20 +24,19 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 	const collectionVersion = await prisma.collectionVersion.findUnique({
 		where: { collectionId_versionNumber: { collectionId: id, versionNumber } },
 		select: {
-			collection: { select: { isPublic: true, agent: { select: { userId: true } } } },
+			collection: { select: { isPublic: true, ...selectAgentProps } },
 			readme: true,
 		},
 	});
 
 	if (collectionVersion === null) {
 		return res.status(StatusCodes.NOT_FOUND).end();
-	} else if (
-		collectionVersion.collection.isPublic ||
-		collectionVersion.collection.agent.userId === session.user.id
-	) {
+	} else if (!getResourcePagePermissions({ req }, collectionVersion.collection, false)) {
+		return res.status(StatusCodes.NOT_FOUND).end();
+	} else {
+		res.setHeader("Content-Disposition", "attachment; filename=README.md");
+		res.setHeader("Content-Type", "text/markdown");
 		res.status(200).send(collectionVersion.readme);
 		return res.end();
-	} else {
-		return res.status(StatusCodes.NOT_FOUND).end();
 	}
 }
