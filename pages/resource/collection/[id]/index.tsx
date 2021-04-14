@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { Paragraph } from "evergreen-ui";
+import { Heading, majorScale, Pane, Paragraph } from "evergreen-ui";
 
 import {
 	prisma,
@@ -77,11 +77,18 @@ const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ latestVersi
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<CollectionPageFrame {...props}>
-				{latestVersion === null ? (
-					<Paragraph>No versions yet!</Paragraph>
-				) : (
-					<ReadmeViewer source={latestVersion.readme} />
-				)}
+				<Pane display="flex">
+					<Pane flex={1}>
+						{latestVersion === null ? (
+							<Paragraph fontStyle="italic">No versions yet!</Paragraph>
+						) : (
+							<ReadmeViewer source={latestVersion.readme} />
+						)}
+					</Pane>
+					<Pane width={majorScale(80)} border background="tint2">
+						<Heading margin={majorScale(2)}>Hello world</Heading>
+					</Pane>
+				</Pane>
 			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);

@@ -1,9 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { majorScale, Pane } from "evergreen-ui";
-
-import { ReadmeViewer, SchemaPageFrame, SchemaViewer, VersionNavigator } from "components";
+import { SchemaPageFrame, SchemaVersionOverview, VersionNavigator } from "components";
 
 import {
 	countSchemaVersions,
@@ -70,13 +68,12 @@ export const getServerSideProps: GetServerSideProps<
 
 const SchemaVersionPage: React.FC<SchemaVersionPageProps> = ({
 	previousSchemaVersion: previousVersion,
-	schemaVersion,
 	nextSchemaVersion: nextVersion,
 	...props
 }) => {
 	const profileSlug = getProfileSlug(props.schema.agent);
 	const contentSlug = props.schema.slug;
-	const { versionNumber, readme, content } = schemaVersion;
+	const { versionNumber, createdAt } = props.schemaVersion;
 
 	const previous = previousVersion?.versionNumber || null;
 	const next = nextVersion?.versionNumber || null;
@@ -86,17 +83,8 @@ const SchemaVersionPage: React.FC<SchemaVersionPageProps> = ({
 			value={{ profileSlug, contentSlug, versionNumber, mode: "versions" }}
 		>
 			<SchemaPageFrame {...props}>
-				<VersionNavigator
-					previous={previous}
-					next={next}
-					createdAt={schemaVersion.createdAt}
-				/>
-
-				<SchemaViewer marginY={majorScale(2)} value={content} />
-
-				<Pane marginY={majorScale(8)}>
-					<ReadmeViewer source={readme} />
-				</Pane>
+				<VersionNavigator previous={previous} next={next} createdAt={createdAt} />
+				<SchemaVersionOverview schema={props.schema} schemaVersion={props.schemaVersion} />
 			</SchemaPageFrame>
 		</LocationContext.Provider>
 	);

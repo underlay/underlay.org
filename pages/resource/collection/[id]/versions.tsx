@@ -70,7 +70,7 @@ const SchemaVersionsPage: React.FC<CollectionVersionsProps> = (props) => {
 				{versionCount ? (
 					<VersionHistory versions={props.collectionVersions} />
 				) : (
-					<Paragraph>No versions yet!</Paragraph>
+					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
 				)}
 			</CollectionPageFrame>
 		</LocationContext.Provider>

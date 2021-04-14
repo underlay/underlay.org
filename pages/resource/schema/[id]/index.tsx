@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { ReadmeViewer, SchemaPageFrame, SchemaViewer } from "components";
+import { SchemaPageFrame, SchemaVersionOverview } from "components";
 import {
 	prisma,
 	selectResourcePageProps,
@@ -19,7 +19,7 @@ import {
 	SchemaVersionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { majorScale, Pane, Paragraph } from "evergreen-ui";
+import { Paragraph } from "evergreen-ui";
 
 type SchemaOverviewProps = SchemaPageProps & { latestVersion: SchemaVersionProps | null };
 
@@ -75,26 +75,17 @@ const SchemaOverviewPage: React.FC<SchemaOverviewProps> = (props) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<SchemaPageFrame {...props}>
-				<SchemaOverviewPageContent {...props} />
+				{props.latestVersion === null ? (
+					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
+				) : (
+					<SchemaVersionOverview
+						schema={props.schema}
+						schemaVersion={props.latestVersion}
+					/>
+				)}
 			</SchemaPageFrame>
 		</LocationContext.Provider>
 	);
 };
-
-function SchemaOverviewPageContent(props: SchemaOverviewProps) {
-	if (props.latestVersion === null) {
-		return <Paragraph>No versions yet!</Paragraph>;
-	} else {
-		const { readme, content } = props.latestVersion;
-		return (
-			<React.Fragment>
-				<SchemaViewer marginY={majorScale(2)} value={content} />
-				<Pane marginY={majorScale(8)}>
-					<ReadmeViewer source={readme} />
-				</Pane>
-			</React.Fragment>
-		);
-	}
-}
 
 export default SchemaOverviewPage;

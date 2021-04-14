@@ -135,7 +135,7 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 
 		setPublishing(true);
 		publishVersion(id)
-			.then((location) => {
+			.then(({ location }) => {
 				setPublishing(false);
 				setClean(true);
 				router.push(location);
@@ -231,14 +231,9 @@ async function saveDraft(id: string, readme: string, content: string): Promise<v
 	);
 }
 
-async function publishVersion(id: string): Promise<string> {
-	const [{ location }] = await api.post(
-		"/api/schema/[id]",
-		{ id },
-		{ "content-type": "application/json" },
-		undefined
-	);
-	return location;
+async function publishVersion(id: string): Promise<{ location: string }> {
+	const [headers] = await api.post("/api/schema/[id]", { id }, {}, undefined);
+	return headers;
 }
 
 export default SchemaEditPage;

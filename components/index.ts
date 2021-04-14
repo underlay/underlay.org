@@ -27,3 +27,4 @@ export { default as ValidationReport } from "./Pipeline/ValidationReport";
 export { default as PipelinePageFrame } from "./PipelinePageFrame/PipelinePageFrame";
 export { default as BlockEditor } from "./BlockEditor/BlockEditor";
 export { default as FileUpload } from "./FileUpload/FileUpload";
+export { default as SchemaVersionOverview } from "./SchemaVersionOverview/SchemaVersionOverview";

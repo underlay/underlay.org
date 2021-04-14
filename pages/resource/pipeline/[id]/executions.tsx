@@ -82,12 +82,13 @@ function ExecutionsContent(props: { executions: ExecutionProps[] }) {
 	const { profileSlug, contentSlug } = useLocationContext();
 
 	if (props.executions.length === 0) {
-		return <Paragraph>No executions yet!</Paragraph>;
+		return <Paragraph fontStyle="italic">No executions yet!</Paragraph>;
 	}
 
 	return (
 		<Table>
 			<Table.Head>
+				<Table.TextHeaderCell>Execution number</Table.TextHeaderCell>
 				<Table.TextHeaderCell>User</Table.TextHeaderCell>
 				<Table.TextHeaderCell>Date</Table.TextHeaderCell>
 				<Table.TextHeaderCell>Status</Table.TextHeaderCell>
@@ -106,6 +107,7 @@ function ExecutionsContent(props: { executions: ExecutionProps[] }) {
 						successful === null ? "yellowTint" : successful ? "greenTint" : "redTint";
 					return (
 						<Table.Row key={index} is="a" href={href} background={background}>
+							<Table.TextCell>{executionNumber}</Table.TextCell>
 							<Table.TextCell>@{user.slug}</Table.TextCell>
 							<Table.TextCell>
 								{createdAtDate.toDateString()} at{" "}

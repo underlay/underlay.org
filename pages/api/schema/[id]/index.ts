@@ -97,24 +97,29 @@ export default makeHandler<"/api/schema/[id]">({
 		POST: {
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
-			exec: async (req, { id }, {}) => {
+			exec: async (req, { id }) => {
 				const session = await getSession({ req });
 				if (session === null) {
 					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
-				const schema = await prisma.schema.findFirst({
-					where: { id, agent: { userId: session.user.id } },
-					select: {
-						...selectAgentProps,
-						slug: true,
-						content: true,
-						readme: true,
-						lastVersion: {
-							select: { id: true, versionNumber: true, schemaInstance: true },
+				const schema = await prisma.schema
+					.findFirst({
+						where: { id, agent: { userId: session.user.id } },
+						select: {
+							...selectAgentProps,
+							slug: true,
+							content: true,
+							readme: true,
+							lastVersion: {
+								select: { id: true, versionNumber: true, schemaInstance: true },
+							},
 						},
-					},
-				});
+					})
+					.catch((err) => {
+						console.error("could not find schema", err);
+						throw err;
+					});
 
 				if (schema === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
@@ -129,21 +134,27 @@ export default makeHandler<"/api/schema/[id]">({
 
 				const versionNumber = getVersionNumber(schema.lastVersion, result.right.schema);
 
-				const schemaVersion = await prisma.schemaVersion.create({
-					select: { id: true },
-					data: {
-						schema: { connect: { id } },
-						user: { connect: { id: session.user.id } },
-						previousVersion:
-							schema.lastVersion === null
-								? undefined
-								: { connect: { id: schema.lastVersion.id } },
-						versionNumber,
-						content: schema.content,
-						readme: schema.readme,
-						schemaInstance,
-					},
-				});
+				const schemaVersion = await prisma.schemaVersion
+					.create({
+						select: { id: true },
+						data: {
+							schema: { connect: { id } },
+							user: { connect: { id: session.user.id } },
+							previousVersion:
+								schema.lastVersion === null
+									? undefined
+									: { connect: { id: schema.lastVersion.id } },
+							isLastVersion: { connect: { id } },
+							versionNumber,
+							content: schema.content,
+							readme: schema.readme,
+							schemaInstance,
+						},
+					})
+					.catch((err) => {
+						console.error("could not create schema version", err);
+						throw err;
+					});
 
 				const etag = `"${schemaVersion.id}"`;
 
