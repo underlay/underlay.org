@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/client";
 import { StatusCodes } from "http-status-codes";
 
 import * as t from "io-ts";
@@ -10,11 +9,6 @@ import { getResourcePagePermissions } from "utils/server/permissions";
 const params = t.type({ id: t.string, versionNumber: t.string });
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-	const session = await getSession({ req });
-	if (session === null) {
-		return res.status(StatusCodes.FORBIDDEN).end();
-	}
-
 	if (!params.is(req.query)) {
 		return res.status(StatusCodes.BAD_REQUEST).end();
 	}
@@ -24,7 +18,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 	const collectionVersion = await prisma.collectionVersion.findUnique({
 		where: { collectionId_versionNumber: { collectionId: id, versionNumber } },
 		select: {
-			collection: { select: { isPublic: true, ...selectAgentProps } },
+			collection: { select: { slug: true, isPublic: true, ...selectAgentProps } },
 			readme: true,
 		},
 	});
@@ -34,7 +28,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 	} else if (!getResourcePagePermissions({ req }, collectionVersion.collection, false)) {
 		return res.status(StatusCodes.NOT_FOUND).end();
 	} else {
-		res.setHeader("Content-Disposition", "attachment; filename=README.md");
+		const filename = `${collectionVersion.collection.slug}-${versionNumber}.README.md`;
+		res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
 		res.setHeader("Content-Type", "text/markdown");
 		res.status(200).send(collectionVersion.readme);
 		return res.end();
