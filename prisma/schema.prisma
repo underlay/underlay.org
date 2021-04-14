@@ -266,7 +266,9 @@ model Execution {
     previousExecutionId String?    @map(name: "previous_execution_id")
 
     graph      Json
+    error      Json?
     successful Boolean?
+
 
     token     String   @default(uuid())
     createdAt DateTime @default(now()) @map(name: "created_at")

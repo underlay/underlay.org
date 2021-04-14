@@ -167,3 +167,5 @@ function validateNodeInputs(
 	}
 	return true;
 }
+
+export const emptyGraph: PipelineGraph = { nodes: {}, edges: {}, state: {} };

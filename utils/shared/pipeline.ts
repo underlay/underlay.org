@@ -35,5 +35,3 @@ export function reduceState(
 		return state;
 	}
 }
-
-export const emptyGraph: PipelineGraph = { nodes: {}, edges: {}, state: {} };

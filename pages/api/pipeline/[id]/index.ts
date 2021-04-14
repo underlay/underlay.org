@@ -5,7 +5,7 @@ import * as t from "io-ts";
 
 import { getSession } from "next-auth/client";
 
-import { evaluateEvent, ValidationError } from "@underlay/pipeline";
+import { evaluateEvent, EvaluateEventFailure, ValidationError } from "@underlay/pipeline";
 
 import { makeHandler, ApiError } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
@@ -195,7 +195,10 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
 				}
 
-				const successful = result.right.some(({ event }) => event === "success");
+				console.log("got execution result", result.right);
+				const failure = result.right.find(({ event }) => event === "failure") as
+					| EvaluateEventFailure
+					| undefined;
 
 				const execution = await prisma.execution.create({
 					select: { id: true, token: true },
@@ -211,7 +214,8 @@ export default makeHandler<"/api/pipeline/[id]">({
 						isLastExecution: { connect: { id } },
 						executionNumber,
 						graph: pipeline.graph,
-						successful: successful,
+						error: failure ? failure.error : null,
+						successful: failure === undefined,
 					},
 				});
 
