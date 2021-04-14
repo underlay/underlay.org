@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext } from "next";
+import type { IncomingMessage } from "http";
 
 import { getCachedSession } from "utils/server/session";
 
@@ -6,7 +6,7 @@ import { getCachedSession } from "utils/server/session";
 // what exactly we pass in, ie both collections and schemas.
 // (also different routes will have fetched different properties)
 export const getResourcePagePermissions = (
-	context: GetServerSidePropsContext,
+	context: { req: IncomingMessage },
 	resource: { isPublic: boolean; agent: { user: { id: string } | null } },
 	owner: boolean
 ) => {

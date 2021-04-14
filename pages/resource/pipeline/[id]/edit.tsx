@@ -21,19 +21,19 @@ import {
 	LocationContext,
 	useStateRef,
 } from "utils/client/hooks";
+import { PipelineAction, PipelineBlocks, reduceState, PipelineGraph } from "utils/shared/pipeline";
 import {
+	pipelineBlocks,
+	pipelineGraph,
+	validatePipelineGraph,
 	emptyGraph,
-	PipelineAction,
-	PipelineBlocks,
-	reduceState,
-	PipelineGraph,
-} from "utils/shared/pipeline";
-import { pipelineBlocks, pipelineGraph, validatePipelineGraph } from "utils/server/pipeline";
+} from "utils/server/pipeline";
 import { useRouter } from "next/router";
 
 type PipelineEditProps = PipelinePageProps & {
+	pipeline: { graph: PipelineGraph };
+	errors: ValidationError[];
 	blocks: PipelineBlocks;
-	pipeline: { graph: PipelineGraph; errors: ValidationError[] };
 	targets: CollectionTarget[];
 };
 
@@ -66,11 +66,12 @@ export const getServerSideProps: GetServerSideProps<PipelineEditProps, ResourceP
 		},
 	});
 
-	const graph = pipelineGraph.is(pipelineWithGraph.graph) ? pipelineWithGraph.graph : emptyGraph;
+	const { graph: graphValue, ...pipeline } = serializeUpdatedAt(pipelineWithGraph);
+	const graph = pipelineGraph.is(graphValue) ? graphValue : emptyGraph;
 
 	const errors = await validatePipelineGraph(graph);
-	const pipeline = { ...serializeUpdatedAt(pipelineWithGraph), graph, errors };
-	return { props: { pipeline, targets, blocks: pipelineBlocks } };
+
+	return { props: { pipeline: { ...pipeline, graph }, errors, targets, blocks: pipelineBlocks } };
 };
 
 const PipelineEditPage: React.FC<PipelineEditProps> = (props) => {
@@ -101,7 +102,7 @@ function PipelineEditContent(props: PipelineEditProps) {
 		setGraph({ ...graphRef.current, ...graph });
 	}, []);
 
-	const [errors, setErrors, errorsRef] = useStateRef<ValidationError[]>(props.pipeline.errors);
+	const [errors, setErrors, errorsRef] = useStateRef<ValidationError[]>(props.errors);
 
 	const save = useDebouncedCallback((graph: PipelineGraph) => {
 		setClean(true);
@@ -113,7 +114,10 @@ function PipelineEditContent(props: PipelineEditProps) {
 			graph
 		)
 			.then(([{}, result]) => setErrors(result || []))
-			.catch((err) => toaster.danger(`Failed to save pipeline: ${err.toString()}`))
+			.catch((err) => {
+				console.error(err);
+				toaster.danger("Could not save pipeline");
+			})
 			.finally(() => setSaving(false));
 	}, 1000);
 
@@ -172,11 +176,15 @@ function PipelineEditContent(props: PipelineEditProps) {
 			return;
 		}
 
-		setExecuting(false);
+		setExecuting(true);
 
 		api.post("/api/pipeline/[id]", { id: props.pipeline.id }, {}, undefined)
 			.then(([{ location }]) => router.push(location))
-			.catch((err) => toaster.danger(`Could not start execution: ${err.toString()}`));
+			.catch((err) => {
+				console.error(err);
+				toaster.danger("Could not start execution");
+				setExecuting(false);
+			});
 	}, []);
 
 	return (

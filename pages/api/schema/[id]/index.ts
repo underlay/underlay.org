@@ -29,11 +29,8 @@ const patchRequestBody = t.partial({
 	readme: t.string,
 });
 
-const postRequestHeaders = t.type({ "content-type": t.literal("application/json") });
-const postRequestBody = t.type({
-	content: t.string,
-	readme: t.string,
-});
+const postRequestHeaders = t.type({});
+const postRequestBody = t.void;
 
 declare module "next-rest" {
 	interface API {
@@ -100,28 +97,35 @@ export default makeHandler<"/api/schema/[id]">({
 		POST: {
 			headers: postRequestHeaders.is,
 			body: postRequestBody.is,
-			exec: async (req, { id }, {}, { readme, content }) => {
+			exec: async (req, { id }) => {
 				const session = await getSession({ req });
 				if (session === null) {
 					throw new ApiError(StatusCodes.FORBIDDEN);
 				}
 
-				const schema = await prisma.schema.findFirst({
-					where: { id, agent: { userId: session.user.id } },
-					select: {
-						...selectAgentProps,
-						slug: true,
-						lastVersion: {
-							select: { id: true, versionNumber: true, schemaInstance: true },
+				const schema = await prisma.schema
+					.findFirst({
+						where: { id, agent: { userId: session.user.id } },
+						select: {
+							...selectAgentProps,
+							slug: true,
+							content: true,
+							readme: true,
+							lastVersion: {
+								select: { id: true, versionNumber: true, schemaInstance: true },
+							},
 						},
-					},
-				});
+					})
+					.catch((err) => {
+						console.error("could not find schema", err);
+						throw err;
+					});
 
 				if (schema === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
 				}
 
-				const result = parseSchema(content);
+				const result = parseSchema(schema.content);
 				if (isLeft(result)) {
 					throw new ApiError(StatusCodes.BAD_REQUEST);
 				}
@@ -130,32 +134,29 @@ export default makeHandler<"/api/schema/[id]">({
 
 				const versionNumber = getVersionNumber(schema.lastVersion, result.right.schema);
 
-				const { lastVersion } = await prisma.schema
-					.update({
-						include: { lastVersion: { select: { id: true } } },
-						where: { id },
+				const schemaVersion = await prisma.schemaVersion
+					.create({
+						select: { id: true },
 						data: {
-							content: content,
-							readme: readme,
-							lastVersion: {
-								create: {
-									schema: { connect: { id } },
-									user: { connect: { id: session.user.id } },
-									previousVersion:
-										schema.lastVersion === null
-											? undefined
-											: { connect: { id: schema.lastVersion.id } },
-									versionNumber,
-									readme,
-									content,
-									schemaInstance,
-								},
-							},
+							schema: { connect: { id } },
+							user: { connect: { id: session.user.id } },
+							previousVersion:
+								schema.lastVersion === null
+									? undefined
+									: { connect: { id: schema.lastVersion.id } },
+							isLastVersion: { connect: { id } },
+							versionNumber,
+							content: schema.content,
+							readme: schema.readme,
+							schemaInstance,
 						},
 					})
-					.catch(catchPrismaError);
+					.catch((err) => {
+						console.error("could not create schema version", err);
+						throw err;
+					});
 
-				const etag = `"${lastVersion!.id}"`;
+				const etag = `"${schemaVersion.id}"`;
 
 				const profileSlug = getProfileSlug(schema.agent);
 				const location = buildUrl({ profileSlug, contentSlug: schema.slug, versionNumber });

@@ -1,6 +1,10 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
+import { validationError, ValidationError } from "@underlay/pipeline";
+
+import { PipelinePageFrame, PipelineViewer, ValidationReport, VersionNavigator } from "components";
+
 import {
 	prisma,
 	selectResourcePageProps,
@@ -17,10 +21,14 @@ import {
 	ExecutionProps,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { PipelinePageFrame, VersionNavigator } from "components";
+
+import type { PipelineBlocks, PipelineGraph } from "utils/shared/pipeline";
+import { pipelineBlocks, pipelineGraph, emptyGraph } from "utils/server/pipeline";
+import { Heading, majorScale, Pane } from "evergreen-ui";
 
 export type ExecutionPageProps = PipelinePageProps & {
-	execution: ExecutionProps;
+	blocks: PipelineBlocks;
+	execution: ExecutionProps & { graph: PipelineGraph; error: ValidationError | null };
 	previousExecution: { executionNumber: string } | null;
 	nextExecution: { executionNumber: string } | null;
 };
@@ -35,6 +43,8 @@ export const getServerSideProps: GetServerSideProps<
 		where: { id },
 		select: {
 			...selectExecutionOverviewProps,
+			graph: true,
+			error: true,
 			previousExecution: { select: { executionNumber: true } },
 			nextExecution: { select: { executionNumber: true } },
 			pipeline: { select: selectResourcePageProps },
@@ -47,22 +57,31 @@ export const getServerSideProps: GetServerSideProps<
 		return { notFound: true };
 	}
 
-	// We need to take the .collection property out
-	// before returning as a prop so that react doesn't
-	// complain about not being able to serialize Dates
-	const { pipeline, previousExecution, nextExecution, ...execution } = executionWithPipeline;
+	const {
+		pipeline,
+		previousExecution,
+		nextExecution,
+		error: errorValue,
+		graph: graphValue,
+		...execution
+	} = serializeCreatedAt(executionWithPipeline);
+
+	const graph = pipelineGraph.is(graphValue) ? graphValue : emptyGraph;
+	const error = validationError.is(errorValue) ? errorValue : null;
 
 	return {
 		props: {
 			pipeline: serializeUpdatedAt(pipeline),
-			execution: serializeCreatedAt(execution),
+			execution: { ...execution, error, graph },
 			previousExecution,
 			nextExecution,
+			blocks: pipelineBlocks,
 		},
 	};
 };
 
 const ExecutionPage: React.FC<ExecutionPageProps> = ({
+	blocks,
 	execution,
 	previousExecution,
 	nextExecution,
@@ -73,6 +92,7 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 
 	const previous = previousExecution?.executionNumber || null;
 	const next = nextExecution?.executionNumber || null;
+
 	return (
 		<LocationContext.Provider
 			value={{
@@ -84,6 +104,14 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 		>
 			<PipelinePageFrame {...props}>
 				<VersionNavigator previous={previous} next={next} createdAt={execution.createdAt} />
+				<PipelineViewer blocks={blocks} graph={execution.graph} />
+				{execution.error === null ? (
+					<Pane marginY={majorScale(2)} border background="greenTint">
+						<Heading margin={majorScale(2)}>Success</Heading>
+					</Pane>
+				) : (
+					<ValidationReport errors={[execution.error]} />
+				)}
 			</PipelinePageFrame>
 		</LocationContext.Provider>
 	);

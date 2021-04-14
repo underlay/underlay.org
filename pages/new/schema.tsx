@@ -15,7 +15,7 @@ import {
 	toaster,
 } from "evergreen-ui";
 
-import api from "next-rest/client";
+import api, { ApiError } from "next-rest/client";
 
 import StatusCodes from "http-status-codes";
 
@@ -50,12 +50,12 @@ const NewSchema: React.FC<{}> = ({}) => {
 		const body = { slug, description, isPublic };
 		api.post("/api/schema", {}, { "content-type": "application/json" }, body)
 			.then(([{ location }]) => router.push(location))
-			.catch((error) => {
+			.catch((err) => {
 				setIsLoading(false);
-				if (error === StatusCodes.CONFLICT) {
-					toaster.danger(`Schema name unavailable`);
+				if (err instanceof ApiError && err.status === StatusCodes.CONFLICT) {
+					toaster.danger("Schema name unavailable");
 				} else {
-					toaster.danger(error.toString());
+					toaster.danger("Operation failed");
 				}
 			});
 	}, []);

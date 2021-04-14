@@ -16,21 +16,15 @@ const VersionHistory: React.FC<VersionHistoryProps> = (props) => {
 	const { profileSlug, contentSlug } = useLocationContext();
 
 	if (props.versions.length === 0) {
-		return <Paragraph>No versions yet!</Paragraph>;
+		return <Paragraph fontStyle="italic">No versions yet!</Paragraph>;
 	}
 
 	return (
-		<Table background="tint1" border>
+		<Table background="tint2" border>
 			<Table.Head>
-				<Table.TextHeaderCell flexBasis={136} flexGrow={0}>
-					Version number
-				</Table.TextHeaderCell>
-				<Table.TextHeaderCell flexBasis={240} flexGrow={0}>
-					User
-				</Table.TextHeaderCell>
-				<Table.TextHeaderCell flexBasis={240} flexGrow={0}>
-					Date
-				</Table.TextHeaderCell>
+				<Table.TextHeaderCell>Version number</Table.TextHeaderCell>
+				<Table.TextHeaderCell>User</Table.TextHeaderCell>
+				<Table.TextHeaderCell>Date</Table.TextHeaderCell>
 			</Table.Head>
 			<Table.Body>
 				{props.versions.map(({ id, versionNumber, createdAt, user }) => {
@@ -38,12 +32,8 @@ const VersionHistory: React.FC<VersionHistoryProps> = (props) => {
 					const createdAtDate = new Date(createdAt);
 					return (
 						<Table.Row key={id} is="a" href={href}>
-							<Table.TextCell flexBasis={136} flexGrow={0}>
-								{versionNumber}
-							</Table.TextCell>
-							<Table.TextCell flexBasis={240} flexGrow={0}>
-								{user.slug && `@${user.slug}`}
-							</Table.TextCell>
+							<Table.TextCell>{versionNumber}</Table.TextCell>
+							<Table.TextCell>@{user.slug}</Table.TextCell>
 							<Table.TextCell>
 								{createdAtDate.toDateString()} at{" "}
 								{createdAtDate.toLocaleTimeString()}

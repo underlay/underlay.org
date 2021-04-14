@@ -3,8 +3,6 @@ import { GetServerSideProps } from "next";
 
 import api from "next-rest/client";
 
-import { StatusCodes } from "http-status-codes";
-
 import {
 	majorScale,
 	Pane,
@@ -94,13 +92,6 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 
 	const [errorCount, setErrorCount, errorCountRef] = useStateRef(0);
 
-	// const lastestVersionNumber = useMemo(
-	// 	() => latestVersion && semverValid(latestVersion.versionNumber),
-	// 	[latestVersion]
-	// );
-
-	// const [versionNumber, setVersionNumber, versionNumberRef] = useStateRef(draftVersionNumber);
-
 	const schemaRef = useRef<string>(content);
 	const readmeRef = useRef<string>(readme);
 
@@ -108,18 +99,12 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 		setClean(true);
 		setSaving(true);
 		saveDraft(id, readmeRef.current, schemaRef.current)
-			.catch((err) => toaster.danger(`Failed to save draft: ${err.toString()}`))
+			.catch((err) => {
+				console.error(err);
+				toaster.danger("Could not save draft");
+			})
 			.finally(() => setSaving(false));
 	}, 1000);
-
-	// const handleVersionChange = useCallback(
-	// 	({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-	// 		setVersionNumber(value);
-	// 		setClean(false);
-	// 		save();
-	// 	},
-	// 	[]
-	// );
 
 	const handleSchemaChange = useCallback(
 		(value: string, {}: Schema.Schema, errorCount: number) => {
@@ -149,19 +134,16 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 		}
 
 		setPublishing(true);
-		publishVersion(id, schemaRef.current, readmeRef.current)
-			.then((location) => {
+		publishVersion(id)
+			.then(({ location }) => {
 				setPublishing(false);
 				setClean(true);
 				router.push(location);
 			})
 			.catch((err) => {
 				setPublishing(false);
-				toaster.danger(
-					err === StatusCodes.CONFLICT
-						? "Error publishing schema version: version number conflict"
-						: `Error publishing schema version: ${err.toString()}`
-				);
+				console.error(err);
+				toaster.danger("Could not publish schema version");
 			});
 	}, []);
 
@@ -249,14 +231,9 @@ async function saveDraft(id: string, readme: string, content: string): Promise<v
 	);
 }
 
-async function publishVersion(id: string, content: string, readme: string): Promise<string> {
-	const [{ location }] = await api.post(
-		"/api/schema/[id]",
-		{ id },
-		{ "content-type": "application/json" },
-		{ content, readme }
-	);
-	return location;
+async function publishVersion(id: string): Promise<{ location: string }> {
+	const [headers] = await api.post("/api/schema/[id]", { id }, {}, undefined);
+	return headers;
 }
 
 export default SchemaEditPage;

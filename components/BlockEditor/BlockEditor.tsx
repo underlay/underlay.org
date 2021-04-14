@@ -30,7 +30,7 @@ export default function BlockEditor({ graph, id, setState }: BlockEditorProps) {
 	}
 
 	return (
-		<Pane border="default" marginY={majorScale(2)} background="tint1">
+		<Pane border marginY={majorScale(2)} background="tint2">
 			<Pane display="flex" margin={majorScale(2)}>
 				<Heading flex={1}>Configuation</Heading>
 				<Code size={300}>#{id}</Code>

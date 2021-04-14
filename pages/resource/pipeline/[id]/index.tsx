@@ -1,18 +1,26 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
+import type { ValidationError } from "@underlay/pipeline";
+
 import { prisma, serializeUpdatedAt, selectResourcePageProps } from "utils/server/prisma";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 import { ResourcePageParams, getProfileSlug, PipelinePageProps } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
 
-import { PipelineViewer, PipelinePageFrame } from "components";
+import { PipelineViewer, PipelinePageFrame, ValidationReport } from "components";
 import type { PipelineGraph, PipelineBlocks } from "utils/shared/pipeline";
-import { pipelineGraph, pipelineBlocks } from "utils/server/pipeline";
+import {
+	pipelineGraph,
+	pipelineBlocks,
+	emptyGraph,
+	validatePipelineGraph,
+} from "utils/server/pipeline";
 
 type PipelineOverviewProps = PipelinePageProps & {
 	pipeline: { graph: PipelineGraph };
+	errors: ValidationError[];
 	blocks: PipelineBlocks;
 };
 
@@ -35,23 +43,22 @@ export const getServerSideProps: GetServerSideProps<
 		return { notFound: true };
 	}
 
-	const { graph, ...pipeline } = serializeUpdatedAt(pipelineWithGraph);
+	const { graph: graphValue, ...pipeline } = serializeUpdatedAt(pipelineWithGraph);
+	const graph = pipelineGraph.is(graphValue) ? graphValue : emptyGraph;
 
-	if (pipelineGraph.is(graph)) {
-		return { props: { blocks: pipelineBlocks, pipeline: { ...pipeline, graph } } };
-	} else {
-		const graph = { nodes: {}, edges: {}, state: {} };
-		return { props: { blocks: pipelineBlocks, pipeline: { ...pipeline, graph } } };
-	}
+	const errors = await validatePipelineGraph(graph);
+
+	return { props: { pipeline: { ...pipeline, graph }, errors, blocks: pipelineBlocks } };
 };
 
-const PipelineOverviewPage: React.FC<PipelineOverviewProps> = ({ blocks, pipeline }) => {
+const PipelineOverviewPage: React.FC<PipelineOverviewProps> = ({ blocks, pipeline, errors }) => {
 	const profileSlug = getProfileSlug(pipeline.agent);
 	const contentSlug = pipeline.slug;
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<PipelinePageFrame pipeline={pipeline}>
 				<PipelineViewer blocks={blocks} graph={pipeline.graph} />
+				<ValidationReport errors={errors} />
 			</PipelinePageFrame>
 		</LocationContext.Provider>
 	);

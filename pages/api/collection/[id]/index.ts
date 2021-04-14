@@ -38,6 +38,7 @@ const postRequestHeaders = t.intersection([
 		"x-collection-instance": t.string,
 	}),
 ]);
+
 const postRequestBody = t.string;
 
 declare module "next-rest" {
@@ -141,6 +142,8 @@ export default makeHandler<"/api/collection/[id]">({
 						},
 					},
 				});
+
+				console.log("found collection", collection);
 
 				if (collection === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);

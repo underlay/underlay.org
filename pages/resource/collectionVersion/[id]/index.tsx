@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { CollectionPageFrame, ReadmeViewer, VersionNavigator } from "components";
+import { CollectionPageFrame, VersionNavigator, CollectionVersionOverview } from "components";
 import {
 	countCollectionVersions,
 	prisma,
@@ -19,7 +19,6 @@ import {
 	getProfileSlug,
 } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
-import { Pane, Paragraph } from "evergreen-ui";
 
 export type CollectionVersionPageProps = CollectionPageProps & {
 	collectionVersion: CollectionVersionProps;
@@ -82,7 +81,7 @@ const CollectionVersionPage: React.FC<CollectionVersionPageProps> = ({
 }) => {
 	const profileSlug = getProfileSlug(props.collection.agent);
 	const contentSlug = props.collection.slug;
-	const { versionNumber, readme } = collectionVersion;
+	const { versionNumber } = collectionVersion;
 
 	const previous = previousCollectionVersion?.versionNumber || null;
 	const next = nextCollectionVersion?.versionNumber || null;
@@ -95,15 +94,10 @@ const CollectionVersionPage: React.FC<CollectionVersionPageProps> = ({
 					previous={previous}
 					next={next}
 				/>
-				<Pane>
-					{readme === null ? (
-						<Paragraph fontStyle="italic" color="muted">
-							No readme
-						</Paragraph>
-					) : (
-						<ReadmeViewer source={readme} />
-					)}
-				</Pane>
+				<CollectionVersionOverview
+					collection={props.collection}
+					collectionVersion={collectionVersion}
+				/>
 			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);

@@ -35,7 +35,8 @@ const FileUpload: React.FC<FileUploadProps> = (props: FileUploadProps) => {
 				})
 				.catch((err) => {
 					setSaving(false);
-					toaster.danger(`File upload failed: ${err.toString()}`);
+					console.error(err);
+					toaster.danger("File upload failed");
 				});
 		}
 	}, []);

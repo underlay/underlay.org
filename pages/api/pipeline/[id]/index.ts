@@ -1,21 +1,26 @@
 import { StatusCodes } from "http-status-codes";
-
+import { isLeft } from "fp-ts/lib/Either.js";
 import * as t from "io-ts";
 
 import { getSession } from "next-auth/client";
 
-import type { ValidationError } from "@underlay/pipeline";
+import { evaluateEvent, EvaluateEventFailure, ValidationError } from "@underlay/pipeline";
 
 import { makeHandler, ApiError } from "next-rest/server";
 import { catchPrismaError } from "utils/server/catchPrismaError";
 
 import { prisma, selectAgentProps } from "utils/server/prisma";
 import { checkSlugUniqueness } from "utils/server/resource";
-import { pipelineGraph, validatePipelineGraph } from "utils/server/pipeline";
+import { encodePipelineGraph, pipelineGraph, validatePipelineGraph } from "utils/server/pipeline";
 import { slugPattern } from "utils/shared/slug";
 import { getExecutionNumber } from "utils/server/executions";
 import { buildUrl } from "utils/shared/urls";
 import { getProfileSlug } from "utils/shared/propTypes";
+import { InvokeCommand } from "@aws-sdk/client-lambda";
+import { Lambda } from "utils/server/lambda";
+import { isNone } from "fp-ts/lib/Option";
+
+const evaluateEventStream = t.array(evaluateEvent);
 
 const params = t.type({ id: t.string });
 
@@ -141,23 +146,20 @@ export default makeHandler<"/api/pipeline/[id]">({
 						...selectAgentProps,
 						slug: true,
 						graph: true,
-						lastExecution: {
-							select: {
-								id: true,
-								executionNumber: true,
-							},
-						},
+						lastExecution: { select: { id: true, executionNumber: true } },
 					},
 				});
 
 				if (pipeline === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);
+				} else if (!pipelineGraph.is(pipeline.graph)) {
+					throw new ApiError(StatusCodes.CONFLICT);
 				}
 
 				const executionNumber = getExecutionNumber(pipeline.lastExecution);
 
 				const execution = await prisma.execution.create({
-					select: { id: true },
+					select: { id: true, token: true },
 					data: {
 						pipeline: { connect: { id } },
 						user: { connect: { id: session.user.id } },
@@ -168,6 +170,48 @@ export default makeHandler<"/api/pipeline/[id]">({
 						isLastExecution: { connect: { id } },
 						executionNumber,
 						graph: pipeline.graph,
+					},
+				});
+
+				const graph = encodePipelineGraph(pipeline.graph);
+				if (isNone(graph)) {
+					throw new ApiError(StatusCodes.CONFLICT);
+				}
+
+				const requestPayload = {
+					host: process.env.NEXTAUTH_URL!,
+					key: execution.id,
+					token: execution.token,
+					graph: graph.value,
+				};
+
+				const command = new InvokeCommand({
+					FunctionName: "pipeline-runtime",
+					Payload: Buffer.from(JSON.stringify(requestPayload)),
+				});
+
+				const response = await Lambda.send(command);
+
+				if (response.Payload === undefined) {
+					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+				}
+
+				const responsePayload = JSON.parse(Buffer.from(response.Payload).toString("utf-8"));
+
+				const result = evaluateEventStream.decode(responsePayload);
+				if (isLeft(result)) {
+					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+				}
+
+				const failure = result.right.find(({ event }) => event === "failure") as
+					| EvaluateEventFailure
+					| undefined;
+
+				await prisma.execution.update({
+					where: { id: execution.id },
+					data: {
+						successful: failure === undefined,
+						error: failure === undefined ? null : failure.error,
 					},
 				});
 
