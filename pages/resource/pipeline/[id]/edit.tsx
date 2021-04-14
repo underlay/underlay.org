@@ -114,7 +114,10 @@ function PipelineEditContent(props: PipelineEditProps) {
 			graph
 		)
 			.then(([{}, result]) => setErrors(result || []))
-			.catch((err) => toaster.danger(`Failed to save pipeline: ${err.toString()}`))
+			.catch((err) => {
+				console.error(err);
+				toaster.danger("Could not save pipeline");
+			})
 			.finally(() => setSaving(false));
 	}, 1000);
 
@@ -177,7 +180,10 @@ function PipelineEditContent(props: PipelineEditProps) {
 
 		api.post("/api/pipeline/[id]", { id: props.pipeline.id }, {}, undefined)
 			.then(([{ location }]) => router.push(location))
-			.catch((err) => toaster.danger(`Could not start execution: ${err.toString()}`));
+			.catch((err) => {
+				console.error(err);
+				toaster.danger("Could not start execution");
+			});
 	}, []);
 
 	return (

@@ -179,10 +179,7 @@ export default makeHandler<"/api/pipeline/[id]">({
 					Payload: Buffer.from(JSON.stringify(requestPayload)),
 				});
 
-				const response = await Lambda.send(command).catch((err) => {
-					console.error("error", err);
-					throw err;
-				});
+				const response = await Lambda.send(command);
 
 				if (response.Payload === undefined) {
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -195,36 +192,28 @@ export default makeHandler<"/api/pipeline/[id]">({
 					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
 				}
 
-				console.log("got execution result", result.right);
 				const failure = result.right.find(({ event }) => event === "failure") as
 					| EvaluateEventFailure
 					| undefined;
 
-				console.log("looking for failure...", failure);
-
-				const execution = await prisma.execution
-					.create({
-						select: { id: true, token: true },
-						data: {
-							id: executionId,
-							token: token,
-							pipeline: { connect: { id } },
-							user: { connect: { id: session.user.id } },
-							previousExecution:
-								pipeline.lastExecution === null
-									? undefined
-									: { connect: { id: pipeline.lastExecution.id } },
-							isLastExecution: { connect: { id } },
-							executionNumber,
-							graph: pipeline.graph,
-							error: failure === undefined ? null : failure.error,
-							successful: failure === undefined,
-						},
-					})
-					.catch((err) => {
-						console.error("could not create execution", err);
-						throw err;
-					});
+				const execution = await prisma.execution.create({
+					select: { id: true, token: true },
+					data: {
+						id: executionId,
+						token: token,
+						pipeline: { connect: { id } },
+						user: { connect: { id: session.user.id } },
+						previousExecution:
+							pipeline.lastExecution === null
+								? undefined
+								: { connect: { id: pipeline.lastExecution.id } },
+						isLastExecution: { connect: { id } },
+						executionNumber,
+						graph: pipeline.graph,
+						error: failure === undefined ? null : failure.error,
+						successful: failure === undefined,
+					},
+				});
 
 				const etag = `"${execution.id}"`;
 

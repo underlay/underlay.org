@@ -24,6 +24,7 @@ import { LocationContext } from "utils/client/hooks";
 
 import type { PipelineBlocks, PipelineGraph } from "utils/shared/pipeline";
 import { pipelineBlocks, pipelineGraph, emptyGraph } from "utils/server/pipeline";
+import { Heading, majorScale, Pane } from "evergreen-ui";
 
 export type ExecutionPageProps = PipelinePageProps & {
 	blocks: PipelineBlocks;
@@ -92,8 +93,6 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 	const previous = previousExecution?.executionNumber || null;
 	const next = nextExecution?.executionNumber || null;
 
-	const errors = execution.error === null ? [] : [execution.error];
-
 	return (
 		<LocationContext.Provider
 			value={{
@@ -106,7 +105,13 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 			<PipelinePageFrame {...props}>
 				<VersionNavigator previous={previous} next={next} createdAt={execution.createdAt} />
 				<PipelineViewer blocks={blocks} graph={execution.graph} />
-				<ValidationReport errors={errors} />
+				{execution.error === null ? (
+					<Pane marginY={majorScale(2)} border background="greenTint">
+						<Heading>Success</Heading>
+					</Pane>
+				) : (
+					<ValidationReport errors={[execution.error]} />
+				)}
 			</PipelinePageFrame>
 		</LocationContext.Provider>
 	);

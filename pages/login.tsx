@@ -6,7 +6,7 @@ import { Pane, Button, TextInput, majorScale, Text, Heading, toaster } from "eve
 
 import { slugPattern } from "utils/shared/slug";
 
-import api from "next-rest/client";
+import api, { ApiError } from "next-rest/client";
 import StatusCodes from "http-status-codes";
 import { usePageContext } from "utils/client/hooks";
 
@@ -72,9 +72,10 @@ function SetSlug({ user, router }: { user: User; router: NextRouter }) {
 					})
 					.catch((err) => {
 						setIsLoading(false);
-						if (err === StatusCodes.CONFLICT) {
+						if (err instanceof ApiError && err.status === StatusCodes.CONFLICT) {
 							toaster.danger("Username unavailble");
 						} else {
+							console.error(err);
 							toaster.danger("Operation failed");
 						}
 					});

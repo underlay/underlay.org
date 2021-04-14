@@ -15,7 +15,7 @@ import {
 	toaster,
 } from "evergreen-ui";
 
-import api from "next-rest/client";
+import api, { ApiError } from "next-rest/client";
 
 import StatusCodes from "http-status-codes";
 
@@ -50,12 +50,13 @@ const NewPipeline: React.FC<{}> = ({}) => {
 			const body = { slug: contentSlug, description, isPublic };
 			api.post("/api/pipeline", {}, { "content-type": "application/json" }, body)
 				.then(([{}]) => router.push(buildUrl({ profileSlug, contentSlug })))
-				.catch((error) => {
+				.catch((err) => {
 					setIsLoading(false);
-					if (error === StatusCodes.CONFLICT) {
-						toaster.danger(`Pipeline name unavailable`);
+					if (err instanceof ApiError && err.status === StatusCodes.CONFLICT) {
+						toaster.danger("Pipeline name unavailable");
 					} else {
-						toaster.danger(error.toString());
+						console.error(err);
+						toaster.danger("Operation failed");
 					}
 				});
 		},
