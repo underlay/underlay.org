@@ -200,24 +200,31 @@ export default makeHandler<"/api/pipeline/[id]">({
 					| EvaluateEventFailure
 					| undefined;
 
-				const execution = await prisma.execution.create({
-					select: { id: true, token: true },
-					data: {
-						id: executionId,
-						token: token,
-						pipeline: { connect: { id } },
-						user: { connect: { id: session.user.id } },
-						previousExecution:
-							pipeline.lastExecution === null
-								? undefined
-								: { connect: { id: pipeline.lastExecution.id } },
-						isLastExecution: { connect: { id } },
-						executionNumber,
-						graph: pipeline.graph,
-						error: failure ? failure.error : null,
-						successful: failure === undefined,
-					},
-				});
+				console.log("looking for failure...", failure);
+
+				const execution = await prisma.execution
+					.create({
+						select: { id: true, token: true },
+						data: {
+							id: executionId,
+							token: token,
+							pipeline: { connect: { id } },
+							user: { connect: { id: session.user.id } },
+							previousExecution:
+								pipeline.lastExecution === null
+									? undefined
+									: { connect: { id: pipeline.lastExecution.id } },
+							isLastExecution: { connect: { id } },
+							executionNumber,
+							graph: pipeline.graph,
+							error: failure === undefined ? null : failure.error,
+							successful: failure === undefined,
+						},
+					})
+					.catch((err) => {
+						console.error("could not create execution", err);
+						throw err;
+					});
 
 				const etag = `"${execution.id}"`;
 
