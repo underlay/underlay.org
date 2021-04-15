@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { Button, majorScale, Pane, Paragraph, Select, Text } from "evergreen-ui";
+import { Button, Link, majorScale, Pane, Paragraph, Select, Text } from "evergreen-ui";
 import { useCollectionTargetContext, useStateRef } from "utils/client/hooks";
 
 function CollectionTargets(props: { id: string | null; onChange: (id: string | null) => void }) {
@@ -38,7 +38,10 @@ function CollectionTargets(props: { id: string | null; onChange: (id: string | n
 			<>
 				<Paragraph>No collection targets found.</Paragraph>
 				<Paragraph>
-					Maybe you'd like to <a href="/new/collection">create a new collection?</a>
+					Maybe you'd like to{" "}
+					<Link size={300} href="/new/collection">
+						create a new collection?
+					</Link>
 				</Paragraph>
 			</>
 		);

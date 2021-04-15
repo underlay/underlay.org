@@ -81,6 +81,13 @@ export const selectSchemaVersionOverviewProps = {
 // this will select an object of type CollectionVersionProps
 export const selectCollectionVersionOverviewProps = {
 	...selectResourceVersionProps,
+	execution: {
+		select: {
+			id: true,
+			executionNumber: true,
+			pipeline: { select: { isPublic: true, slug: true, ...selectAgentProps } },
+		},
+	},
 	readme: true,
 };
 

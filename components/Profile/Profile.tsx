@@ -1,7 +1,7 @@
 import ScopeHeader from "components/ScopeHeader/ScopeHeader";
 import Section from "components/Section/Section";
 
-import { Heading, majorScale, Pane, Paragraph, Table } from "evergreen-ui";
+import { Heading, Link, majorScale, Pane, Paragraph, Table } from "evergreen-ui";
 
 import React, { useMemo } from "react";
 import { useLocationContext, usePageContext } from "utils/client/hooks";
@@ -43,7 +43,10 @@ const Profile: React.FC<ProfileProps> = (props) => {
 						<ResourceTable resources={props.schemas} />
 					) : isCurrentProfile ? (
 						<Paragraph>
-							No schemas yet. <a href="/new/schema">Create one?</a>
+							No schemas yet.{" "}
+							<Link size={300} href="/new/schema">
+								Create one?
+							</Link>
 						</Paragraph>
 					) : (
 						<Paragraph>No schemas yet.</Paragraph>
@@ -54,7 +57,10 @@ const Profile: React.FC<ProfileProps> = (props) => {
 						<ResourceTable resources={props.collections} />
 					) : isCurrentProfile ? (
 						<Paragraph>
-							No collections yet. <a href="/new/collection">Create one?</a>
+							No collections yet.{" "}
+							<Link size={300} href="/new/collection">
+								Create one?
+							</Link>
 						</Paragraph>
 					) : (
 						<Paragraph>No collections yet.</Paragraph>
@@ -65,7 +71,10 @@ const Profile: React.FC<ProfileProps> = (props) => {
 						<ResourceTable resources={props.pipelines} />
 					) : isCurrentProfile ? (
 						<Paragraph>
-							No pipelines yet. <a href="/new/pipeline">Create one?</a>
+							No pipelines yet.{" "}
+							<Link size={300} href="/new/pipeline">
+								Create one?
+							</Link>
 						</Paragraph>
 					) : (
 						<Paragraph>No pipelines yet.</Paragraph>

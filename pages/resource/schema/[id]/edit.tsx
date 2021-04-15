@@ -183,8 +183,11 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 			</Section>
 			<Section title="README" useUppercase={false}>
 				<Paragraph marginY={majorScale(1)}>
-					Readme files are written in <a href="https://commonmark.org/">markdown</a> and
-					are used to document a specific version of a schema.
+					Readme files are written in{" "}
+					<Link size={300} href="https://commonmark.org/">
+						markdown
+					</Link>{" "}
+					and are used to document a specific version of a schema.
 				</Paragraph>
 				<Pane marginY={majorScale(2)} border>
 					<ReadmeEditor initialValue={readme} onChange={handleReadmeChange} />

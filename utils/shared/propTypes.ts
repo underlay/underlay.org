@@ -68,4 +68,10 @@ export type SchemaVersionProps = ResourceVersionProps & {
 	readme: string;
 };
 
-export type CollectionVersionProps = ResourceVersionProps & { readme: string };
+export type CollectionVersionProps = ResourceVersionProps & {
+	readme: string;
+	execution: {
+		executionNumber: string;
+		pipeline: { agent: AgentProps; slug: string; isPublic: boolean };
+	};
+};
