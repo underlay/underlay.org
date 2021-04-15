@@ -33,7 +33,7 @@ declare module "next-rest" {
 					response: {
 						headers: {
 							"content-type": "application/json";
-							"cache-control": "no-store";
+							"cache-control": "no-store, max-age=0";
 						};
 						body: {
 							key: string;
@@ -109,7 +109,7 @@ export default makeHandler<"/api/user/[id]/upload/[filename]">({
 
 				const signature = sign(policy, date);
 				return [
-					{ "content-type": "application/json", "cache-control": "no-store" },
+					{ "content-type": "application/json", "cache-control": "no-store, max-age=0" },
 					{ key, bucket, policy, credential, signature, date },
 				];
 			},

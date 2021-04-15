@@ -36,7 +36,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 		res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
 		res.setHeader("Content-Type", "application/x-apg-instance");
 		res.setHeader("X-APG-Instance-Schema", "index.schema");
-		res.status(200).send(data);
-		return res.end();
+		res.status(200);
+		data.pipe(res);
 	}
 }
