@@ -13,6 +13,7 @@ import {
 	TickCircleIcon,
 	DotIcon,
 	Dialog,
+	Link,
 } from "evergreen-ui";
 
 import { useDebouncedCallback } from "use-debounce";
