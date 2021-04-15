@@ -31,7 +31,10 @@ declare module "next-rest" {
 						body: t.TypeOf<typeof body>;
 					};
 					response: {
-						headers: { "content-type": "application/json" };
+						headers: {
+							"content-type": "application/json";
+							"cache-control": "no-store";
+						};
 						body: {
 							key: string;
 							bucket: string;
@@ -106,7 +109,7 @@ export default makeHandler<"/api/user/[id]/upload/[filename]">({
 
 				const signature = sign(policy, date);
 				return [
-					{ "content-type": "application/json" },
+					{ "content-type": "application/json", "cache-control": "no-store" },
 					{ key, bucket, policy, credential, signature, date },
 				];
 			},
