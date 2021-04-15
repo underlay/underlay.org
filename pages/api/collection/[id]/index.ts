@@ -85,7 +85,7 @@ export default makeHandler<"/api/collection/[id]">({
 
 				if (data.slug !== undefined) {
 					if (!slugPattern.test(data.slug)) {
-						throw new ApiError(StatusCodes.BAD_REQUEST);
+						throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid name");
 					}
 					await checkSlugUniqueness({ userId: session.user.id }, data.slug);
 				}
@@ -142,8 +142,6 @@ export default makeHandler<"/api/collection/[id]">({
 						},
 					},
 				});
-
-				console.log("found collection", collection);
 
 				if (collection === null) {
 					throw new ApiError(StatusCodes.NOT_FOUND);

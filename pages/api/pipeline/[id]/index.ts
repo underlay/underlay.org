@@ -193,14 +193,21 @@ export default makeHandler<"/api/pipeline/[id]">({
 				const response = await Lambda.send(command);
 
 				if (response.Payload === undefined) {
-					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+					throw new ApiError(
+						StatusCodes.INTERNAL_SERVER_ERROR,
+						"Empty response from pipieline evaluation"
+					);
 				}
 
 				const responsePayload = JSON.parse(Buffer.from(response.Payload).toString("utf-8"));
 
 				const result = evaluateEventStream.decode(responsePayload);
 				if (isLeft(result)) {
-					throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR);
+					console.error(responsePayload);
+					throw new ApiError(
+						StatusCodes.INTERNAL_SERVER_ERROR,
+						"Invalid response from pipeline evaluation"
+					);
 				}
 
 				const failure = result.right.find(({ event }) => event === "failure") as

@@ -93,6 +93,8 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 	const previous = previousExecution?.executionNumber || null;
 	const next = nextExecution?.executionNumber || null;
 
+	const errors = execution.error === null ? [] : [execution.error];
+
 	return (
 		<LocationContext.Provider
 			value={{
@@ -105,12 +107,16 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 			<PipelinePageFrame {...props}>
 				<VersionNavigator previous={previous} next={next} createdAt={execution.createdAt} />
 				<PipelineViewer blocks={blocks} graph={execution.graph} />
-				{execution.error === null ? (
+				{execution.successful === null ? (
+					<Pane marginY={majorScale(2)} border background="yellowTint">
+						<Heading margin={majorScale(2)}>Pending</Heading>
+					</Pane>
+				) : execution.successful ? (
 					<Pane marginY={majorScale(2)} border background="greenTint">
 						<Heading margin={majorScale(2)}>Success</Heading>
 					</Pane>
 				) : (
-					<ValidationReport errors={[execution.error]} />
+					<ValidationReport errors={errors} />
 				)}
 			</PipelinePageFrame>
 		</LocationContext.Provider>
