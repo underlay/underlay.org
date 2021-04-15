@@ -59,7 +59,7 @@ export default makeHandler<"/api/schema">({
 
 				const schema = await prisma.schema
 					.create({
-						select: { ...selectAgentProps, id: true },
+						select: { agent: { select: selectAgentProps }, id: true },
 						data: {
 							agent: { connect: { userId: session.user.id } },
 							slug,

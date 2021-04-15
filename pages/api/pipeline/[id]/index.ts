@@ -143,7 +143,7 @@ export default makeHandler<"/api/pipeline/[id]">({
 				const pipeline = await prisma.pipeline.findFirst({
 					where: { id, agent: { userId: session.user.id } },
 					select: {
-						...selectAgentProps,
+						agent: { select: selectAgentProps },
 						slug: true,
 						graph: true,
 						lastExecution: { select: { id: true, executionNumber: true } },

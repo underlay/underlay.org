@@ -1,12 +1,16 @@
 import React from "react";
-import { CollectionVersionProps, getProfileSlug, ResourceProps } from "utils/shared/propTypes";
+import {
+	CollectionVersionProps,
+	getProfileSlug,
+	ResourceContentProps,
+} from "utils/shared/propTypes";
 
 import { ReadmeViewer, ResourceVersionInfoPanel } from "components";
 import { Button, DownloadIcon, Link, majorScale, Pane, Paragraph } from "evergreen-ui";
 import { buildUrl } from "utils/shared/urls";
 
 export interface CollectionVersionOverviewProps {
-	collection: ResourceProps;
+	collection: ResourceContentProps;
 	collectionVersion: CollectionVersionProps;
 }
 

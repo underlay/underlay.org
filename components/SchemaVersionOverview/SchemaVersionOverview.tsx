@@ -1,12 +1,12 @@
 import React from "react";
-import { ResourceProps, SchemaVersionProps } from "utils/shared/propTypes";
+import { ResourceContentProps, SchemaVersionProps } from "utils/shared/propTypes";
 
 import { ReadmeViewer, ResourceVersionInfoPanel } from "components";
 import { Button, DownloadIcon, majorScale, Pane } from "evergreen-ui";
 import SchemaViewer from "components/Schema/SchemaViewer";
 
 export interface SchemaVersionOverviewProps {
-	schema: ResourceProps;
+	schema: ResourceContentProps;
 	schemaVersion: SchemaVersionProps;
 }
 

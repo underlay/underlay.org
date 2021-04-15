@@ -15,14 +15,14 @@ import {
 import {
 	getProfileSlug,
 	ResourcePageParams,
-	ResourceProps,
+	ResourceContentProps,
 	ResourceVersionProps,
 } from "utils/shared/propTypes";
 
 import { LocationContext } from "utils/client/hooks";
 
 interface SchemaVersionsProps {
-	schema: ResourceProps;
+	schema: ResourceContentProps;
 	schemaVersions: ResourceVersionProps[];
 }
 

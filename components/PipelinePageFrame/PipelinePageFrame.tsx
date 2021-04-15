@@ -5,10 +5,10 @@ import { StandardFrame } from "components";
 import { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
-import { ResourceProps } from "utils/shared/propTypes";
+import { ResourceContentProps } from "utils/shared/propTypes";
 
 interface PipelinePageFrameProps {
-	pipeline: ResourceProps;
+	pipeline: ResourceContentProps;
 	children: React.ReactNode;
 }
 

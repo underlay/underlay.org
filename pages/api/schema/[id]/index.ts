@@ -107,7 +107,7 @@ export default makeHandler<"/api/schema/[id]">({
 					.findFirst({
 						where: { id, agent: { userId: session.user.id } },
 						select: {
-							...selectAgentProps,
+							agent: { select: selectAgentProps },
 							slug: true,
 							content: true,
 							readme: true,

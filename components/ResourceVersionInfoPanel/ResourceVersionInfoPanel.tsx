@@ -2,12 +2,12 @@ import React from "react";
 
 import { Heading, majorScale, minorScale, Pane, Paragraph, Text } from "evergreen-ui";
 
-import { ResourceProps, ResourceVersionProps } from "utils/shared/propTypes";
+import { ResourceContentProps, ResourceVersionProps } from "utils/shared/propTypes";
 import { useLocationContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
 export interface ResourceVersionInfoPanelProps {
-	resource: ResourceProps;
+	resource: ResourceContentProps;
 	resourceVersion: ResourceVersionProps;
 }
 

@@ -9,29 +9,37 @@
 
 export type ResourcePageParams = { id: string };
 
-// These are the basic properties that every resource page needs
+// These are the basic properties that identify a resource;
+// e.g. just the parts we need to link *to* it from a related page
 export type ResourceProps = {
+	agent: AgentProps;
+	slug: string;
+	isPublic: boolean;
+};
+
+// These are the basic properties that every resource page needs;
+// e.g. the parts we want to display on its own page.
+export type ResourceContentProps = ResourceProps & {
 	id: string;
 	description: string;
-	slug: string;
-	agent: AgentProps;
-	isPublic: boolean;
 	updatedAt: string;
 };
 
 // These are the basic properties that every schema page needs
 export type SchemaPageProps = {
 	versionCount: number;
-	schema: ResourceProps;
+	schema: ResourceContentProps;
 };
 
+// These are the basic properties that every collection page needs
 export type CollectionPageProps = {
 	versionCount: number;
-	collection: ResourceProps;
+	collection: ResourceContentProps;
 };
 
+// These are the basic properties that every pipeline page needs
 export type PipelinePageProps = {
-	pipeline: ResourceProps;
+	pipeline: ResourceContentProps;
 };
 
 export type UserProps = {
@@ -42,7 +50,7 @@ export type UserProps = {
 // These are the basic agent properties that every resource page needs
 export type AgentProps = {
 	user: UserProps | null;
-	organization: { id: string; slug: string | null } | null;
+	organization: UserProps | null;
 };
 
 export const getProfileSlug = ({ user, organization }: AgentProps) =>
@@ -58,7 +66,7 @@ export type ResourceVersionProps = {
 export type ExecutionProps = {
 	id: string;
 	createdAt: string;
-	user: { id: string; slug: string | null };
+	user: UserProps;
 	successful: boolean | null;
 	executionNumber: string;
 };
@@ -72,6 +80,6 @@ export type CollectionVersionProps = ResourceVersionProps & {
 	readme: string;
 	execution: {
 		executionNumber: string;
-		pipeline: { agent: AgentProps; slug: string; isPublic: boolean };
+		pipeline: ResourceProps;
 	};
 };

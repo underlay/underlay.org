@@ -39,28 +39,26 @@ export const countSchemaVersions = async ({ id }: { id: string }) =>
 export const countCollectionVersions = async ({ id }: { id: string }) =>
 	prisma.collectionVersion.count({ where: { collectionId: id } });
 
-export const selectUserProps = {
-	user: { select: { id: true, slug: true } },
-};
+export const selectUserProps = { id: true, slug: true };
 
 // this will select an object of type { agent: AgentProps }
 export const selectAgentProps = {
-	agent: {
-		select: {
-			...selectUserProps,
-			organization: { select: { id: true, slug: true } },
-			id: true,
-		},
-	},
+	user: { select: selectUserProps },
+	organization: { select: { id: true, slug: true } },
+	id: true,
+};
+
+export const selectResourceProps = {
+	agent: { select: selectAgentProps },
+	slug: true,
+	isPublic: true,
 };
 
 export const selectResourcePageProps = {
+	...selectResourceProps,
 	id: true,
 	description: true,
-	isPublic: true,
 	updatedAt: true,
-	slug: true,
-	...selectAgentProps,
 };
 
 // this will select an object of type ResourceVersionProps
@@ -68,7 +66,7 @@ export const selectResourceVersionProps = {
 	id: true,
 	createdAt: true,
 	versionNumber: true,
-	...selectUserProps,
+	user: { select: selectUserProps },
 };
 
 // this will select an object of type SchemaVersionProps
@@ -85,7 +83,7 @@ export const selectCollectionVersionOverviewProps = {
 		select: {
 			id: true,
 			executionNumber: true,
-			pipeline: { select: { isPublic: true, slug: true, ...selectAgentProps } },
+			pipeline: { select: selectResourceProps },
 		},
 	},
 	readme: true,
@@ -93,8 +91,8 @@ export const selectCollectionVersionOverviewProps = {
 
 // this will select an object of type ExecutionProps
 export const selectExecutionOverviewProps = {
-	...selectUserProps,
 	id: true,
+	user: { select: selectUserProps },
 	executionNumber: true,
 	successful: true,
 	createdAt: true,

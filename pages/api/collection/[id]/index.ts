@@ -135,7 +135,7 @@ export default makeHandler<"/api/collection/[id]">({
 				const collection = await prisma.collection.findUnique({
 					where: { id },
 					select: {
-						...selectAgentProps,
+						agent: { select: selectAgentProps },
 						slug: true,
 						lastVersion: {
 							select: { id: true, versionNumber: true, schemaInstance: true },

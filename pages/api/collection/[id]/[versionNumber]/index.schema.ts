@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 
 import * as t from "io-ts";
 
-import { prisma, selectAgentProps } from "utils/server/prisma";
+import { prisma, selectResourceProps } from "utils/server/prisma";
 import { getResourcePagePermissions } from "utils/server/permissions";
 
 const params = t.type({ id: t.string, versionNumber: t.string });
@@ -18,7 +18,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 	const collectionVersion = await prisma.collectionVersion.findUnique({
 		where: { collectionId_versionNumber: { collectionId: id, versionNumber } },
 		select: {
-			collection: { select: { slug: true, isPublic: true, ...selectAgentProps } },
+			collection: { select: selectResourceProps },
 			schemaInstance: true,
 		},
 	});
