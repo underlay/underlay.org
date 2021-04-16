@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { Pane, Heading, Code, majorScale } from "evergreen-ui";
 
@@ -23,8 +23,6 @@ export default function BlockEditor({ graph, id, setState }: BlockEditorProps) {
 		return editors[kind] as unknown;
 	}, [id]) as Editor<JsonObject>;
 
-	const handleSetState = useCallback((state: Partial<JsonObject>) => setState(id, state), [id]);
-
 	if (state === undefined) {
 		return null;
 	}
@@ -40,7 +38,7 @@ export default function BlockEditor({ graph, id, setState }: BlockEditorProps) {
 					key={id}
 					id={id}
 					state={state}
-					setState={handleSetState}
+					setState={setState}
 				></editor.component>
 			</Pane>
 		</Pane>

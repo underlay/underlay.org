@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
 	Checkbox,
 	Heading,
@@ -27,12 +27,17 @@ import { getProxyURL } from "utils/client/upload";
 
 type Column = State["columns"][number];
 
-const getDefaultColumn = (
+const getDefaultClassKey = ({ profileSlug, contentSlug }: LocationData, id: string) =>
+	`http://r1.underlay.org/${profileSlug}/${contentSlug}/${id}`;
+
+const getDefaultPropertyKey = (
 	{ profileSlug, contentSlug }: LocationData,
 	id: string,
 	index: number
-): Column => ({
-	key: `http://r1.underlay.org/${profileSlug}/${contentSlug}/${id}/${index}`,
+) => `http://r1.underlay.org/${profileSlug}/${contentSlug}/${id}/${index}`;
+
+const getDefaultColumn = (location: LocationData, id: string, index: number): Column => ({
+	key: getDefaultPropertyKey(location, id, index),
 	nullValue: null,
 	type: { kind: "literal", datatype: xsd.string },
 });
@@ -67,11 +72,16 @@ const CsvImportEditor: Editor<State> = {
 
 		const location = useLocationContext();
 
+		const stateRef = useRef(state);
+		stateRef.current = state;
+
 		useEffect(() => {
-			if (preview !== null && preview.length > 0 && state.columns.length === 0) {
+			if (preview !== null && preview.length > 0) {
 				const [{ length }] = preview;
-				const columns = new Array(length).fill(null);
-				setState({ columns });
+				if (length !== state.columns.length) {
+					const columns = new Array(length).fill(null);
+					setState(id, { columns });
+				}
 			}
 		}, [preview, state.columns]);
 
@@ -82,36 +92,34 @@ const CsvImportEditor: Editor<State> = {
 			}
 		}, []);
 
-		const handleUpload = useCallback(
-			(uri: string, file: File) => {
-				setState({ uri });
-				parseFilePreview(file).then(setPreview);
-			},
-			[setState]
-		);
+		const handleUpload = useCallback((uri: string, file: File) => {
+			if (stateRef.current.key === "") {
+				setState(id, { uri, key: getDefaultClassKey(location, id) });
+			} else {
+				setState(id, { uri });
+			}
+			parseFilePreview(file).then(setPreview);
+		}, []);
 
-		const handleReset = useCallback(() => setState({ uri: null }), []);
+		const handleReset = useCallback(() => setState(id, { uri: null }), []);
 
 		const handleKeyChange = useCallback(
 			({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
-				setState({ key: value }),
+				setState(id, { key: value }),
 			[]
 		);
 
 		const handleHeaderChange = useCallback(
 			({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) =>
-				setState({ header: checked }),
+				setState(id, { header: checked }),
 			[]
 		);
 
-		const setColumn = useCallback(
-			(index: number, column: Column) => {
-				const columns = state.columns.slice();
-				columns[index] = column;
-				setState({ columns });
-			},
-			[state.columns]
-		);
+		const setColumn = useCallback((index: number, column: Column) => {
+			const columns = stateRef.current.columns.slice();
+			columns[index] = column;
+			setState(id, { columns });
+		}, []);
 
 		return (
 			<>

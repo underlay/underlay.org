@@ -2,23 +2,26 @@ import { Editor } from "../../editor";
 
 import type { State } from "@underlay/pipeline/collection-export";
 import { Heading, majorScale, Pane } from "evergreen-ui";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { ReadmeEditor } from "components";
 
 import CollectionTargets from "./CollectionTargets";
 
 const CollectionExportEditor: Editor<State> = {
-	component: ({ state, setState }) => {
-		const handleReadmeUpdate = useCallback(
-			(value: string) => {
-				if (value !== state.readme) {
-					setState({ readme: value });
-				}
-			},
-			[state.readme, setState]
-		);
+	component: ({ id, state, setState }) => {
+		const stateRef = useRef(state);
+		stateRef.current = state;
 
-		const handleTargetUpdate = useCallback((id: string | null) => setState({ id }), [setState]);
+		const handleReadmeUpdate = useCallback((value: string) => {
+			if (value !== stateRef.current.readme) {
+				setState(id, { readme: value });
+			}
+		}, []);
+
+		const handleTargetUpdate = useCallback(
+			(target: string | null) => setState(id, { id: target }),
+			[]
+		);
 
 		return (
 			<>

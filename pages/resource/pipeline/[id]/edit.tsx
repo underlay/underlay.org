@@ -197,7 +197,7 @@ function PipelineEditContent(props: PipelineEditProps) {
 					dispatch={dispatch}
 					onFocus={handleFocus}
 				/>
-				{focus && <BlockEditor id={focus} graph={graph} setState={setState} />}
+				{focus && <BlockEditor key={focus} id={focus} graph={graph} setState={setState} />}
 				<ValidationReport errors={errors} />
 			</Pane>
 			<Pane marginY={majorScale(4)} display="flex" justifyContent="space-between">
