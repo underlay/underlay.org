@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 
 import { Button, DotIcon, majorScale, Pane, Spinner, TickCircleIcon, toaster } from "evergreen-ui";
-import { makeReducer } from "react-dataflow-editor/lib/redux/reducers.js";
+
+import { Editor, Focus, reduce } from "react-dataflow-editor";
 
 import api from "next-rest/client";
 
@@ -10,7 +12,7 @@ import { useDebouncedCallback } from "use-debounce";
 
 import type { JsonObject, ValidationError } from "@underlay/pipeline";
 
-import { BlockEditor, PipelineEditor, PipelinePageFrame, ValidationReport } from "components";
+import { BlockEditor, PipelinePageFrame, ValidationReport } from "components";
 
 import { getResourcePagePermissions } from "utils/server/permissions";
 import { selectResourcePageProps, prisma, serializeUpdatedAt } from "utils/server/prisma";
@@ -21,14 +23,20 @@ import {
 	LocationContext,
 	useStateRef,
 } from "utils/client/hooks";
-import { PipelineAction, PipelineBlocks, reduceState, PipelineGraph } from "utils/shared/pipeline";
+import {
+	PipelineSchema,
+	PipelineEditorAction,
+	PipelineBlocks,
+	PipelineGraph,
+	reduceState,
+} from "utils/shared/pipeline";
+
 import {
 	pipelineBlocks,
 	pipelineGraph,
 	validatePipelineGraph,
 	emptyGraph,
 } from "utils/server/pipeline";
-import { useRouter } from "next/router";
 
 type PipelineEditProps = PipelinePageProps & {
 	pipeline: { graph: PipelineGraph };
@@ -96,6 +104,7 @@ function PipelineEditContent(props: PipelineEditProps) {
 	const [executing, setExecuting] = useState(false);
 	const [clean, setClean, cleanRef] = useStateRef(true);
 	const [graph, setGraph, graphRef] = useStateRef<PipelineGraph>(props.pipeline.graph);
+	const [focus, setFocus, focusRef] = useStateRef<Focus | null>(null);
 
 	const updateGraph = useCallback((graph: Partial<PipelineGraph>) => {
 		setClean(false);
@@ -152,17 +161,24 @@ function PipelineEditContent(props: PipelineEditProps) {
 		};
 	}, []);
 
-	const reduce = useMemo(() => makeReducer(props.blocks, graph), []);
-	const dispatch = useCallback((action: PipelineAction) => {
-		const { state, ...graph } = graphRef.current;
-		setGraph({ state: reduceState(state, action, props.blocks), ...reduce(graph, action) });
-		setClean(false);
-	}, []);
+	const dispatch = useCallback((action: PipelineEditorAction) => {
+		if (action.type === "focus") {
+			setFocus(action.subject);
+		} else {
+			const { edges, focus, nodes } = reduce(
+				props.blocks,
+				{
+					nodes: graphRef.current.nodes,
+					edges: graphRef.current.edges,
+					focus: focusRef.current,
+				},
+				action
+			);
 
-	const [focus, setFocus, focusRef] = useStateRef<string | null>(null);
-	const handleFocus = useCallback((id: string | null) => {
-		if (id !== null && id !== focusRef.current) {
-			setFocus(id);
+			const state = reduceState(props.blocks, graphRef.current.state, action);
+			setGraph({ nodes, edges, state });
+			setFocus(focus);
+			setClean(false);
 		}
 	}, []);
 
@@ -190,14 +206,19 @@ function PipelineEditContent(props: PipelineEditProps) {
 	return (
 		<>
 			<Pane marginY={majorScale(2)}>
-				<PipelineEditor
-					blocks={props.blocks}
-					nodes={graph.nodes}
-					edges={graph.edges}
+				<Editor<PipelineSchema>
+					kinds={props.blocks}
+					state={{ nodes: graph.nodes, edges: graph.edges, focus }}
 					dispatch={dispatch}
-					onFocus={handleFocus}
 				/>
-				{focus && <BlockEditor key={focus} id={focus} graph={graph} setState={setState} />}
+				{focus !== null && (
+					<ElementFocusPanel
+						key={`${focus.element}:${focus.id}`}
+						focus={focus}
+						graph={graph}
+						setState={setState}
+					/>
+				)}
 				<ValidationReport errors={errors} />
 			</Pane>
 			<Pane marginY={majorScale(4)} display="flex" justifyContent="space-between">
@@ -220,6 +241,19 @@ function PipelineEditContent(props: PipelineEditProps) {
 			</Pane>
 		</>
 	);
+}
+
+interface ElementFocusPanelProps {
+	focus: Focus;
+	graph: PipelineGraph;
+	setState: (id: string, state: Partial<JsonObject>) => void;
+}
+
+function ElementFocusPanel(props: ElementFocusPanelProps) {
+	if (props.focus.element === "node") {
+		return <BlockEditor id={props.focus.id} graph={props.graph} setState={props.setState} />;
+	}
+	return null;
 }
 
 export default PipelineEditPage;

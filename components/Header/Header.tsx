@@ -18,7 +18,7 @@ import styles from "./Header.module.scss";
 
 const Header = () => {
 	const { session } = usePageContext();
-	const user = session?.user;
+
 	return (
 		<nav className={styles.header}>
 			<div className={styles.content}>
@@ -34,7 +34,7 @@ const Header = () => {
 					</Button>
 				</Pane>
 				<Pane display="flex" alignItems="center">
-					{user ? (
+					{session ? (
 						<>
 							<IconButton
 								icon={PlusIcon}
@@ -49,12 +49,12 @@ const Header = () => {
 								content={
 									<Menu>
 										<Menu.Group>
-											<Menu.Item is="a" href={`/${user.slug}`}>
+											<Menu.Item is="a" href={`/${session.user.slug}`}>
 												Profile
 											</Menu.Item>
 											<Menu.Item
 												is="a"
-												href={`/${user.slug}/settings`}
+												href={`/${session.user.slug}/settings`}
 												disabled={true}
 											>
 												Settings
@@ -75,8 +75,8 @@ const Header = () => {
 									icon={
 										<Avatar
 											size={32}
-											name={user.email}
-											src={user.avatar || undefined}
+											name={session.user.email}
+											src={session.user.avatar || undefined}
 										/>
 									}
 								/>

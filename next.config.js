@@ -9,4 +9,8 @@ const withTM = require("next-transpile-modules")([
 	"@underlay/tasl-lezer",
 ]);
 
-module.exports = withTM();
+module.exports = withTM({
+	future: {
+		webpack5: true,
+	},
+});

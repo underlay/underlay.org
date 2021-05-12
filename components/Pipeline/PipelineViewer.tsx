@@ -1,21 +1,26 @@
-import React, { memo } from "react";
+import React, { useCallback, useState } from "react";
 
-import dynamic from "next/dynamic";
+import { Focus, FocusAction, Viewer } from "react-dataflow-editor";
 
-import type { PipelineBlocks, PipelineGraph } from "utils/shared/pipeline";
+import type { PipelineBlocks, PipelineGraph, PipelineSchema } from "utils/shared/pipeline";
 
 export interface PipelineViewerProps {
-	graph: PipelineGraph;
 	blocks: PipelineBlocks;
-	onFocus?: (id: string | null) => void;
+	graph: PipelineGraph;
 }
 
-export default dynamic(
-	async () => {
-		const { Viewer } = await import("react-dataflow-editor/lib/Viewer.js");
-		return memo(({ blocks, ...props }: PipelineViewerProps) => (
-			<Viewer blocks={blocks} {...props} />
-		));
-	},
-	{ ssr: false }
-);
+const PipelineViewer: React.FC<PipelineViewerProps> = (props) => {
+	const [focus, setFocus] = useState<Focus | null>(null);
+
+	const dispatch = useCallback((action: FocusAction) => setFocus(action.subject), []);
+
+	return (
+		<Viewer<PipelineSchema>
+			kinds={props.blocks}
+			state={{ nodes: props.graph.nodes, edges: props.graph.edges, focus }}
+			dispatch={dispatch}
+		/>
+	);
+};
+
+export default PipelineViewer;

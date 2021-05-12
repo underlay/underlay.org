@@ -14,6 +14,9 @@ declare module "next-auth" {
 		slug: string | null;
 		avatar: string | null;
 	}
+	interface Session {
+		user: User;
+	}
 }
 
 const options: NextAuthOptions = {

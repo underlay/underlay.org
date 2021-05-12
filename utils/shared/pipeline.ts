@@ -1,30 +1,37 @@
-import type {
-	Graph as EditorGraph,
-	Blocks as EditorBlocks,
-	EditorAction,
-} from "react-dataflow-editor";
+import type { EditorState, Kinds, EditorAction, Node, Edge } from "react-dataflow-editor";
 
 import type { Blocks } from "@underlay/pipeline";
 
 export type PipelineSchema = {
-	[k in keyof Blocks]: {
-		inputs: keyof Blocks[k]["inputs"];
-		outputs: keyof Blocks[k]["outputs"];
+	[K in keyof Blocks]: {
+		inputs: keyof Blocks[K]["inputs"];
+		outputs: keyof Blocks[K]["outputs"];
 	};
 };
 
-export type PipelineAction = EditorAction<PipelineSchema>;
-export type PipelineBlocks = EditorBlocks<PipelineSchema> &
-	{ [k in keyof Blocks]: { initialValue: Blocks[k]["state"] } };
+export type PipelineEditorAction = EditorAction<PipelineSchema>;
+export type PipelineEditorState = EditorState<PipelineSchema>;
 
-export type PipelineState = Record<string, Blocks[keyof Blocks]["state"]>;
-export type PipelineGraph = EditorGraph<PipelineSchema> & { state: PipelineState };
+// A Block is a Kind augmented with an initial value
+export type PipelineBlocks = Kinds<PipelineSchema> &
+	{ [K in keyof Blocks]: { initialValue: Blocks[K]["state"] } };
+
+export type PipelineConfigState = Record<string, Blocks[keyof Blocks]["state"]>;
+
+// PipelineGraph differs from PipelineEditorState in two ways:
+// 1. it doesn't store focus state
+// 2. it has a `state` object that stores each node's config value
+export type PipelineGraph = {
+	nodes: Record<string, Node<PipelineSchema>>;
+	edges: Record<string, Edge<PipelineSchema>>;
+	state: PipelineConfigState;
+};
 
 export function reduceState(
-	state: PipelineState,
-	action: PipelineAction,
-	blocks: PipelineBlocks
-): PipelineState {
+	blocks: PipelineBlocks,
+	state: PipelineConfigState,
+	action: PipelineEditorAction
+): PipelineConfigState {
 	if (action.type === "node/create") {
 		const { initialValue } = blocks[action.kind];
 		return { ...state, [action.id]: { ...initialValue } };

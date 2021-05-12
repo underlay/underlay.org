@@ -46,7 +46,7 @@ export async function validatePipelineGraph(graph: PipelineGraph): Promise<Valid
 
 // PipelineGraph is the JSON value that we store in the databse to represent pipelines.
 // Even though PipelineGraph is essentially defined by react-dataflow-editor
-// (it's just EditorGraph parametrized with PipelineSchema, plus PipelineState),
+// (it's just EditorState<PipelineSchema> & PipelineConfigState),
 // react-dataflow-editor doesn't deal with runtime validation at all so we have
 // to write a codec for PipelineGraph here. @underlay/pipeline exports a runtime
 // validator for its pipeline graphs but unfortunately we can't reuse that because

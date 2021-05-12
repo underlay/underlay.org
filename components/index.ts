@@ -17,7 +17,7 @@ export { default as VersionNavigator } from "./VersionHistory/VersionNavigator";
 export { default as ReadmeViewer } from "./Readme/ReadmeViewer";
 export { default as ReadmeEditor } from "./Readme/ReadmeEditor";
 export { default as CollectionPageFrame } from "./CollectionPageFrame/CollectionPageFrame";
-export { default as PipelineEditor } from "./Pipeline/PipelineEditor";
+// export { default as PipelineEditor } from "./Pipeline/PipelineEditor";
 export { default as PipelineViewer } from "./Pipeline/PipelineViewer";
 export { default as ValidationReport } from "./Pipeline/ValidationReport";
 export { default as PipelinePageFrame } from "./PipelinePageFrame/PipelinePageFrame";
