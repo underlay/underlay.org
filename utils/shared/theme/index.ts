@@ -10,11 +10,16 @@ const defaultFonts =
 /* These direct overwrites are made because of this Issue reply that */
 /* suggests this is the only direct way of theming at the moment:  */
 /* https://github.com/segmentio/evergreen/issues/542#issuecomment-673617651 */
-defaultTheme.colors.text.default = "#333";
 defaultTheme.typography.fontFamilies.display = defaultFonts;
 defaultTheme.typography.fontFamilies.ui = defaultFonts;
 
-defaultTheme.scales.neutral;
+defaultTheme.typography.headings[800].color = "#333";
+defaultTheme.typography.headings[800].fontWeight = 600;
+
+defaultTheme.colors.text.default = "#333";
+
+defaultTheme.colors.border.default = "lightgrey";
+
 export const theme = {
 	...defaultTheme,
 	getButtonClassName,
@@ -23,12 +28,5 @@ export const theme = {
 	getTextStyle,
 	getAvatarProps: () => {
 		return { color: "white", backgroundColor: "#D3C9BD" };
-	},
-	colors: {
-		...defaultTheme.colors,
-		border: {
-			default: "lightgrey",
-			muted: "lightgrey",
-		},
 	},
 };

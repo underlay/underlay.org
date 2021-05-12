@@ -5,17 +5,18 @@ export type IconKey =
 	| "collection"
 	| "edit"
 	| "home"
-	| "org"
+	| "organization"
 	| "rocket"
 	| "schema"
 	| "user";
 
-type Icons = {
-	[key: string]: {
+type Icons = Record<
+	IconKey,
+	{
 		path: React.ReactNode;
 		viewboxDefault: number;
-	};
-};
+	}
+>;
 
 const icons: Icons = {
 	edit: {
@@ -42,7 +43,7 @@ const icons: Icons = {
 		),
 		viewboxDefault: 1024,
 	},
-	org: {
+	organization: {
 		path: (
 			<path
 				stroke="#ede9e4"

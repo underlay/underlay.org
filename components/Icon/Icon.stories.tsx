@@ -10,17 +10,17 @@ export default {
 
 export const Primary: React.FC<{}> = () => (
 	<div>
-	<div>
-		<Icon icon="edit" size={64} />
-		<Icon icon="home" size={64} />
-		<Icon icon="collection" size={64} />
-		<Icon icon="org" size={64} />
-		<Icon icon="rocket" size={64} />
-		<Icon icon="schema" size={64} />
-		<Icon icon="user" size={64} />
-	</div>
-	<div>
-		<Icon icon="rocket" size={32} color="#ff00ff" />
-	</div>
+		<div>
+			<Icon icon="edit" size={64} />
+			<Icon icon="home" size={64} />
+			<Icon icon="collection" size={64} />
+			<Icon icon="organization" size={64} />
+			<Icon icon="rocket" size={64} />
+			<Icon icon="schema" size={64} />
+			<Icon icon="user" size={64} />
+		</div>
+		<div>
+			<Icon icon="rocket" size={32} color="#ff00ff" />
+		</div>
 	</div>
 );

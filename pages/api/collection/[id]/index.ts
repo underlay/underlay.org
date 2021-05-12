@@ -28,6 +28,7 @@ const patchRequestHeaders = t.type({ "content-type": t.literal("application/json
 const patchRequestBody = t.partial({
 	description: t.string,
 	slug: t.string,
+	isPublic: t.boolean,
 });
 
 const postRequestHeaders = t.intersection([

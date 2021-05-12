@@ -1,5 +1,14 @@
 import React from "react";
-import { Button, IconButton, Menu, Pane, Popover, Position } from "evergreen-ui";
+import {
+	Button,
+	IconButton,
+	majorScale,
+	Menu,
+	Pane,
+	PlusIcon,
+	Popover,
+	Position,
+} from "evergreen-ui";
 import { signOut } from "next-auth/client";
 
 import { Avatar } from "components";
@@ -27,33 +36,14 @@ const Header = () => {
 				<Pane display="flex" alignItems="center">
 					{user ? (
 						<>
-							<Button
+							<IconButton
+								icon={PlusIcon}
 								is="a"
-								href="/new/pipeline"
-								marginRight={12}
-								height={40}
+								href="/new"
 								appearance="minimal"
-							>
-								New pipeline
-							</Button>
-							<Button
-								is="a"
-								href="/new/collection"
-								marginRight={12}
-								height={40}
-								appearance="minimal"
-							>
-								New collection
-							</Button>
-							<Button
-								is="a"
-								href="/new/schema"
-								marginRight={12}
-								height={40}
-								appearance="minimal"
-							>
-								New schema
-							</Button>
+								height={majorScale(5)}
+								marginX={majorScale(2)}
+							/>
 							<Popover
 								position={Position.BOTTOM_LEFT}
 								content={

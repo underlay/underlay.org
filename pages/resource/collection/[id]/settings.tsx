@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { CollectionPageFrame, Section } from "components";
+import { CollectionPageFrame, ResourceSettings } from "components";
 import { ResourcePageParams, getProfileSlug, CollectionPageProps } from "utils/shared/propTypes";
 
 import { getResourcePagePermissions } from "utils/server/permissions";
@@ -49,7 +49,7 @@ const CollectionSettingsPage: React.FC<CollectionSettingsProps> = (props) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "settings" }}>
 			<CollectionPageFrame {...props}>
-				<Section title="Settings" />
+				<ResourceSettings {...props.collection} />
 			</CollectionPageFrame>
 		</LocationContext.Provider>
 	);

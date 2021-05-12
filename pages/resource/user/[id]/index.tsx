@@ -14,7 +14,7 @@ interface ResourceProps {
 }
 
 export interface UserProfilePageProps {
-	user: { slug: string; avatar: string | null };
+	user: { slug: string };
 	schemas: ResourceProps[];
 	collections: ResourceProps[];
 	pipelines: ResourceProps[];
@@ -27,11 +27,7 @@ const selectAgentResourceWhere = (session: Session | null) => ({
 			: {
 					OR: [
 						{ isPublic: true },
-						{
-							agent: {
-								user: { id: { equals: session.user.id } },
-							},
-						},
+						{ agent: { user: { id: { equals: session.user.id } } } },
 					],
 			  },
 	select: {
@@ -55,7 +51,6 @@ export const getServerSideProps: GetServerSideProps<
 		select: {
 			id: true,
 			slug: true,
-			avatar: true,
 			agent: { select: { schemas: resources, collections: resources, pipelines: resources } },
 		},
 	});
@@ -70,7 +65,7 @@ export const getServerSideProps: GetServerSideProps<
 
 	return {
 		props: {
-			user: { slug: user.slug, avatar: user.avatar },
+			user: { slug: user.slug },
 			schemas: user.agent.schemas.map(serializeUpdatedAt),
 			collections: user.agent.collections.map(serializeUpdatedAt),
 			pipelines: user.agent.pipelines.map(serializeUpdatedAt),
@@ -82,7 +77,6 @@ const UserProfilePage: React.FC<UserProfilePageProps> = (props) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug: props.user.slug }}>
 			<Profile
-				avatar={props.user.avatar || undefined}
 				schemas={props.schemas}
 				collections={props.collections}
 				pipelines={props.pipelines}

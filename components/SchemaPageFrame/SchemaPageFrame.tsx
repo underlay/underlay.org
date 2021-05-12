@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 
-import { StandardFrame } from "components";
-import { NavItem } from "components/ScopeNav/ScopeNav";
+import { ScopeHeader } from "components";
+import ScopeNav, { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
 import { SchemaPageProps } from "utils/shared/propTypes";
-import { Text } from "evergreen-ui";
+import { majorScale, Pane, Paragraph } from "evergreen-ui";
 
 type SchemaPageFrameProps = SchemaPageProps & { children: React.ReactNode };
 
@@ -31,16 +31,16 @@ const SchemaPageFrame = ({ schema, versionCount, children }: SchemaPageFrameProp
 	);
 
 	return (
-		<StandardFrame
-			scopeHeaderProps={{
-				type: "schema",
-				detailsTop: <Text>Last updated on {updatedAt.toDateString()}</Text>,
-				detailsBottom: <Text>{schema.description}</Text>,
-				isPrivate: !schema.isPublic,
-			}}
-			scopeNavProps={{ navItems }}
-			content={children}
-		/>
+		<Pane>
+			<ScopeHeader type="schema" isPublic={schema.isPublic}>
+				<Pane marginY={majorScale(1)}>
+					<Paragraph size={500}>Last updated {updatedAt.toDateString()}</Paragraph>
+					<Paragraph size={500}>{schema.description}</Paragraph>
+				</Pane>
+			</ScopeHeader>
+			<ScopeNav navItems={navItems} />
+			{children}
+		</Pane>
 	);
 };
 

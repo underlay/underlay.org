@@ -1,91 +1,83 @@
-import ScopeHeader from "components/ScopeHeader/ScopeHeader";
-import Section from "components/Section/Section";
+import React from "react";
 
 import { Heading, Link, majorScale, Pane, Paragraph, Table } from "evergreen-ui";
 
-import React, { useMemo } from "react";
+import { ScopeHeader, ScopeNav } from "components";
+
 import { useLocationContext, usePageContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
-import styles from "./Profile.module.scss";
-
-interface ResourceProps {
+interface Resource {
 	slug: string;
 	isPublic: boolean;
 	updatedAt: string;
 }
 
 export interface ProfileProps {
-	avatar?: string;
-	schemas: ResourceProps[];
-	collections: ResourceProps[];
-	pipelines: ResourceProps[];
+	schemas: Resource[];
+	collections: Resource[];
+	pipelines: Resource[];
 }
+
+const ownerNavItems = [{ title: "Overview" }, { mode: "settings", title: "Settings" }];
+const nonOwnerNavItems = [{ title: "Overview" }];
 
 const Profile: React.FC<ProfileProps> = (props) => {
 	const { profileSlug } = useLocationContext();
 	const { session } = usePageContext();
 
-	const isCurrentProfile = useMemo(() => {
-		if (session === null) {
-			return false;
-		} else {
-			return session.user.slug === profileSlug;
-		}
-	}, []);
+	const isCurrentProfile = session !== null && session.user.slug === profileSlug;
+
+	const navItems = isCurrentProfile ? ownerNavItems : nonOwnerNavItems;
 
 	return (
-		<Pane className={styles.profile}>
-			<ScopeHeader type="user" profileTitle={profileSlug} avatar={props.avatar} />
-			<Pane marginY={majorScale(8)}>
-				<Section title="Schemas">
-					{props.schemas.length ? (
-						<ResourceTable resources={props.schemas} />
-					) : isCurrentProfile ? (
-						<Paragraph>
-							No schemas yet.{" "}
-							<Link size={300} href="/new/schema">
-								Create one?
-							</Link>
-						</Paragraph>
-					) : (
-						<Paragraph>No schemas yet.</Paragraph>
-					)}
-				</Section>
-				<Section title="Collections">
-					{props.collections.length ? (
-						<ResourceTable resources={props.collections} />
-					) : isCurrentProfile ? (
-						<Paragraph>
-							No collections yet.{" "}
-							<Link size={300} href="/new/collection">
-								Create one?
-							</Link>
-						</Paragraph>
-					) : (
-						<Paragraph>No collections yet.</Paragraph>
-					)}
-				</Section>
-				<Section title="Pipelines">
-					{props.pipelines.length ? (
-						<ResourceTable resources={props.pipelines} />
-					) : isCurrentProfile ? (
-						<Paragraph>
-							No pipelines yet.{" "}
-							<Link size={300} href="/new/pipeline">
-								Create one?
-							</Link>
-						</Paragraph>
-					) : (
-						<Paragraph>No pipelines yet.</Paragraph>
-					)}
-				</Section>
-			</Pane>
+		<Pane>
+			<ScopeHeader type="user" />
+			<ScopeNav navItems={navItems} />
+			<Heading marginY={majorScale(2)}>Schemas</Heading>
+			{props.schemas.length ? (
+				<ResourceTable resources={props.schemas} />
+			) : isCurrentProfile ? (
+				<Paragraph>
+					No schemas yet.{" "}
+					<Link size={300} href="/new/schema">
+						Create one?
+					</Link>
+				</Paragraph>
+			) : (
+				<Paragraph>No schemas yet.</Paragraph>
+			)}
+			<Heading marginY={majorScale(2)}>Collections</Heading>
+			{props.collections.length ? (
+				<ResourceTable resources={props.collections} />
+			) : isCurrentProfile ? (
+				<Paragraph>
+					No collections yet.{" "}
+					<Link size={300} href="/new/collection">
+						Create one?
+					</Link>
+				</Paragraph>
+			) : (
+				<Paragraph>No collections yet.</Paragraph>
+			)}
+			<Heading marginY={majorScale(2)}>Pipelines</Heading>
+			{props.pipelines.length ? (
+				<ResourceTable resources={props.pipelines} />
+			) : isCurrentProfile ? (
+				<Paragraph>
+					No pipelines yet.{" "}
+					<Link size={300} href="/new/pipeline">
+						Create one?
+					</Link>
+				</Paragraph>
+			) : (
+				<Paragraph>No pipelines yet.</Paragraph>
+			)}
 		</Pane>
 	);
 };
 
-function ResourceTable(props: { resources: ResourceProps[] }) {
+function ResourceTable(props: { resources: Resource[] }) {
 	const { profileSlug } = useLocationContext();
 
 	return (
@@ -103,9 +95,9 @@ function ResourceTable(props: { resources: ResourceProps[] }) {
 						is="a"
 						href={buildUrl({ profileSlug, contentSlug: slug })}
 					>
-						<Table.Cell flexBasis={majorScale(32)} flexGrow={0}>
-							<Heading>{slug}</Heading>
-						</Table.Cell>
+						<Table.TextCell flexBasis={majorScale(32)} flexGrow={0}>
+							{slug}
+						</Table.TextCell>
 						<Table.TextCell>{new Date(updatedAt).toDateString()}</Table.TextCell>
 					</Table.Row>
 				))}

@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { Text } from "evergreen-ui";
+import { majorScale, Pane, Paragraph } from "evergreen-ui";
 
-import { StandardFrame } from "components";
-import { NavItem } from "components/ScopeNav/ScopeNav";
+import { ScopeHeader } from "components";
+import ScopeNav, { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
 import { CollectionPageProps } from "utils/shared/propTypes";
@@ -30,16 +30,16 @@ const CollectionPageFrame = ({ collection, versionCount, children }: CollectionP
 	);
 
 	return (
-		<StandardFrame
-			scopeHeaderProps={{
-				type: "collection",
-				detailsTop: <Text>Last updated {updatedAt.toDateString()}</Text>,
-				detailsBottom: collection.description,
-				isPrivate: !collection.isPublic,
-			}}
-			scopeNavProps={{ navItems }}
-			content={children}
-		/>
+		<Pane>
+			<ScopeHeader type="collection" isPublic={collection.isPublic}>
+				<Pane marginY={majorScale(1)}>
+					<Paragraph size={500}>Last updated {updatedAt.toDateString()}</Paragraph>
+					<Paragraph size={500}>{collection.description}</Paragraph>
+				</Pane>
+			</ScopeHeader>
+			<ScopeNav navItems={navItems} />
+			{children}
+		</Pane>
 	);
 };
 

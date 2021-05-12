@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { Text } from "evergreen-ui";
+import { majorScale, Pane, Paragraph } from "evergreen-ui";
 
-import { StandardFrame } from "components";
-import { NavItem } from "components/ScopeNav/ScopeNav";
+import { ScopeHeader, ScopeNav } from "components";
+import type { NavItem } from "components/ScopeNav/ScopeNav";
 
 import { usePageContext } from "utils/client/hooks";
 import { ResourceContentProps } from "utils/shared/propTypes";
@@ -28,16 +28,16 @@ const PipelinePageFrame = ({ pipeline, children }: PipelinePageFrameProps) => {
 	const navItems = useMemo(() => (isOwner ? ownerNavItems() : nonOwnerNavItems()), [isOwner]);
 
 	return (
-		<StandardFrame
-			scopeHeaderProps={{
-				type: "pipeline",
-				detailsTop: <Text>Last updated on {updatedAt.toLocaleDateString()}</Text>,
-				detailsBottom: <Text>{pipeline.description}</Text>,
-				isPrivate: !pipeline.isPublic,
-			}}
-			scopeNavProps={{ navItems }}
-			content={children}
-		/>
+		<Pane>
+			<ScopeHeader type="pipeline" isPublic={pipeline.isPublic}>
+				<Pane marginY={majorScale(1)}>
+					<Paragraph size={500}>Last updated {updatedAt.toDateString()}</Paragraph>
+					<Paragraph size={500}>{pipeline.description}</Paragraph>
+				</Pane>
+			</ScopeHeader>
+			<ScopeNav navItems={navItems} />
+			{children}
+		</Pane>
 	);
 };
 

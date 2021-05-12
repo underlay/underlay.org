@@ -2,7 +2,7 @@ import { Editor } from "../../editor";
 
 import type { State } from "@underlay/pipeline/collection-export";
 import { Heading, majorScale, Pane } from "evergreen-ui";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { ReadmeEditor } from "components";
 
 import CollectionTargets from "./CollectionTargets";

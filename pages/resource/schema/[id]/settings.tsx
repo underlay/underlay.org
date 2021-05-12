@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { SchemaPageFrame, Section } from "components";
+import { ResourceSettings, SchemaPageFrame } from "components";
 import { SchemaPageProps, ResourcePageParams, getProfileSlug } from "utils/shared/propTypes";
 
 import { getResourcePagePermissions } from "utils/server/permissions";
@@ -49,7 +49,7 @@ const SchemaSettingsPage: React.FC<SchemaSettingsProps> = (props) => {
 	return (
 		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "settings" }}>
 			<SchemaPageFrame {...props}>
-				<Section title="Settings" />
+				<ResourceSettings {...props.schema} />
 			</SchemaPageFrame>
 		</LocationContext.Provider>
 	);

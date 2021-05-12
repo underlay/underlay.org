@@ -1,74 +1,86 @@
 import React from "react";
-import classNames from "classnames";
-import { Badge } from "evergreen-ui";
 
-import { Avatar, Icon } from "components";
+import { Badge, Heading, majorScale, minorScale, Pane } from "evergreen-ui";
 
-import styles from "./ScopeHeader.module.scss";
+import { Icon } from "components";
+
 import { useLocationContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 
+import styles from "./ScopeHeader.module.scss";
+
 export type ScopeHeaderProps = {
-	type: "collection" | "schema" | "pipeline" | "org" | "user";
-	profileTitle?: string;
-	detailsTop?: React.ReactNode;
-	detailsBottom?: React.ReactNode;
-	avatar?: string;
-	initial?: string;
-	isPrivate?: boolean;
+	type: "collection" | "schema" | "pipeline" | "organization" | "user";
+	isPublic?: boolean;
 };
 
-const ScopeHeader: React.FC<ScopeHeaderProps> = function ({
-	type,
-	profileTitle = "",
-	detailsTop = null,
-	detailsBottom = null,
-	avatar = "",
-	initial = "",
-	isPrivate = false,
-}) {
-	const { profileSlug, contentSlug, versionNumber } = useLocationContext();
-
-	const showAvatar = avatar || initial;
-	const isProfile = type === "org" || type === "user";
+const ScopeHeader: React.FC<ScopeHeaderProps> = (props) => {
+	const isPrivate = props.isPublic === false;
 	return (
-		<div className={classNames(styles.scopeHeader, "clearfix")}>
-			<Icon className={styles.typeIcon} icon={type} size={28} />
-			{showAvatar && (
-				<Avatar className={styles.avatarComponent} name={initial} src={avatar} size={100} />
-			)}
-			<div className={styles.title}>
-				{isProfile ? (
-					<a href={buildUrl({ profileSlug })}>{profileTitle}</a>
-				) : contentSlug === undefined ? (
-					<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
-				) : versionNumber === undefined ? (
-					<React.Fragment>
-						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
-						<span>/</span>
-						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
-					</React.Fragment>
-				) : (
-					<React.Fragment>
-						<a href={buildUrl({ profileSlug })}>{profileSlug}</a>
-						<span>/</span>
-						<a href={buildUrl({ profileSlug, contentSlug })}>{contentSlug}</a>
-						<span>/</span>
-						<a href={buildUrl({ profileSlug, contentSlug, versionNumber })}>
-							{versionNumber}
-						</a>
-					</React.Fragment>
-				)}
+		<Pane>
+			<Pane display="flex">
+				<Icon className={styles.icon} icon={props.type} size={28} />
+				<Heading is="h1" className={styles.header}>
+					<ResourcePath />
+				</Heading>
 				{isPrivate && (
-					<Badge isSolid marginLeft={8} position="relative" top={-4}>
+					<Badge isSolid marginLeft={majorScale(2)} alignSelf="center">
 						Private
 					</Badge>
 				)}
-			</div>
-			<div className={classNames(styles.details, styles.top)}>{detailsTop}</div>
-			<div className={classNames(styles.details)}>{detailsBottom}</div>
-		</div>
+			</Pane>
+			{props.children}
+		</Pane>
 	);
 };
+
+function ResourcePath({}: {}) {
+	const { profileSlug, contentSlug, versionNumber } = useLocationContext();
+	const profileUrl = buildUrl({ profileSlug });
+	const contentUrl = buildUrl({ profileSlug, contentSlug });
+	const versionUrl = buildUrl({ profileSlug, contentSlug, versionNumber });
+	if (versionNumber !== undefined) {
+		return (
+			<>
+				<ResourceHeaderLink key="content" url={profileUrl}>
+					{profileSlug}
+				</ResourceHeaderLink>
+				<ResourceHeaderDelimiter />
+				<ResourceHeaderLink url={contentUrl}>{contentSlug}</ResourceHeaderLink>
+				<ResourceHeaderDelimiter />
+				<ResourceHeaderLink url={versionUrl}>{versionNumber}</ResourceHeaderLink>
+			</>
+		);
+	} else if (contentSlug !== undefined) {
+		const contentUrl = buildUrl({ profileSlug, contentSlug });
+		return (
+			<>
+				<ResourceHeaderLink key="content" url={profileUrl}>
+					{profileSlug}
+				</ResourceHeaderLink>
+				<ResourceHeaderDelimiter />
+				<ResourceHeaderLink url={contentUrl}>{contentSlug}</ResourceHeaderLink>
+			</>
+		);
+	} else {
+		return (
+			<ResourceHeaderLink key="content" url={profileUrl}>
+				{profileSlug}
+			</ResourceHeaderLink>
+		);
+	}
+}
+
+const ResourceHeaderLink: React.FC<{ url: string }> = ({ url, children }) => (
+	<Heading is="a" textDecoration="none" size={800} href={url}>
+		{children}
+	</Heading>
+);
+
+const ResourceHeaderDelimiter: React.FC<{}> = ({}) => (
+	<Heading is="span" size={800} marginX={minorScale(1)}>
+		/
+	</Heading>
+);
 
 export default ScopeHeader;
