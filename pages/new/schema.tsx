@@ -49,7 +49,7 @@ const NewSchema: React.FC<{}> = ({}) => {
 		const isPublic = privacyRef.current === "public";
 		const body = { slug, description, isPublic };
 		api.post("/api/schema", {}, { "content-type": "application/json" }, body)
-			.then(([{ location }]) => router.push(location))
+			.then(([{ location }]) => router.push(`${location}?mode=edit`))
 			.catch((err) => {
 				setIsLoading(false);
 				if (err instanceof ApiError && err.status === StatusCodes.CONFLICT) {

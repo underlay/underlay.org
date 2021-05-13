@@ -49,7 +49,7 @@ const NewPipeline: React.FC<{}> = ({}) => {
 			const isPublic = privacy === "public";
 			const body = { slug: contentSlug, description, isPublic };
 			api.post("/api/pipeline", {}, { "content-type": "application/json" }, body)
-				.then(([{}]) => router.push(buildUrl({ profileSlug, contentSlug })))
+				.then(([{}]) => router.push(buildUrl({ profileSlug, contentSlug, mode: "edit" })))
 				.catch((err) => {
 					setIsLoading(false);
 					if (err instanceof ApiError && err.status === StatusCodes.CONFLICT) {
