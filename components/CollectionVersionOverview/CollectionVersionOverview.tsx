@@ -33,16 +33,13 @@ const CollectionVersionOverview: React.FC<CollectionVersionOverviewProps> = (pro
 			<Pane flex={1}>
 				<ReadmeViewer source={props.collectionVersion.readme} />
 			</Pane>
-			<Pane marginX={majorScale(1)} alignSelf="stretch" border></Pane>
+			<Pane marginX={majorScale(1)} alignSelf="stretch" border="muted"></Pane>
 			<ResourceVersionInfoPanel
 				resource={props.collection}
 				resourceVersion={props.collectionVersion}
 			>
 				<Paragraph margin={majorScale(2)}>
-					Via{" "}
-					<Link size={300} href={executionURL}>
-						{executionLinkText}
-					</Link>
+					Via <Link href={executionURL}>{executionLinkText}</Link>
 				</Paragraph>
 				<Pane margin={majorScale(2)}>
 					<Button is="a" href={schemaURL} iconBefore={<DownloadIcon />}>

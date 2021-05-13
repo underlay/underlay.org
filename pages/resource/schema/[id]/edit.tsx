@@ -14,13 +14,14 @@ import {
 	DotIcon,
 	Dialog,
 	Link,
+	Heading,
 } from "evergreen-ui";
 
 import { useDebouncedCallback } from "use-debounce";
 
 import { Schema } from "@underlay/apg";
 
-import { SchemaPageFrame, SchemaEditor, ReadmeEditor, Section } from "components";
+import { SchemaPageFrame, SchemaEditor, ReadmeEditor } from "components";
 import { useRouter } from "next/router";
 
 import { LocationContext, useStateRef } from "utils/client/hooks";
@@ -177,23 +178,20 @@ function SchemaEditContent({ schema: { id, content, readme } }: SchemaEditProps)
 
 	return (
 		<>
-			<Section title="Content">
-				<Pane marginY={majorScale(2)} border>
-					<SchemaEditor initialValue={content} onChange={handleSchemaChange} />
-				</Pane>
-			</Section>
-			<Section title="README" useUppercase={false}>
-				<Paragraph marginY={majorScale(1)}>
-					Readme files are written in{" "}
-					<Link size={300} href="https://commonmark.org/">
-						markdown
-					</Link>{" "}
-					and are used to document a specific version of a schema.
-				</Paragraph>
-				<Pane marginY={majorScale(2)} border>
-					<ReadmeEditor initialValue={readme} onChange={handleReadmeChange} />
-				</Pane>
-			</Section>
+			<Heading marginY={majorScale(2)}>Content</Heading>
+			<Pane marginY={majorScale(2)} border="muted">
+				<SchemaEditor initialValue={content} onChange={handleSchemaChange} />
+			</Pane>
+
+			<Heading marginY={majorScale(2)}>README</Heading>
+			<Paragraph marginY={majorScale(1)}>
+				Readme files are written in <Link href="https://commonmark.org/">markdown</Link> and
+				are used to document a specific version of a schema.
+			</Paragraph>
+			<Pane marginY={majorScale(2)} border="muted">
+				<ReadmeEditor initialValue={readme} onChange={handleReadmeChange} />
+			</Pane>
+
 			<Pane marginTop={majorScale(4)} display="flex" justifyContent="space-between">
 				<Button
 					disabled={clean}

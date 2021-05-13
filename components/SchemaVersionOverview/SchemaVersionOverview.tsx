@@ -1,9 +1,8 @@
 import React from "react";
 import { ResourceContentProps, SchemaVersionProps } from "utils/shared/propTypes";
 
-import { ReadmeViewer, ResourceVersionInfoPanel } from "components";
+import { ReadmeViewer, ResourceVersionInfoPanel, SchemaViewer } from "components";
 import { Button, DownloadIcon, majorScale, Pane } from "evergreen-ui";
-import SchemaViewer from "components/Schema/SchemaViewer";
 
 export interface SchemaVersionOverviewProps {
 	schema: ResourceContentProps;
@@ -20,7 +19,7 @@ const SchemaVersionOverview: React.FC<SchemaVersionOverviewProps> = (props) => {
 				<Pane flex={1}>
 					<ReadmeViewer source={props.schemaVersion.readme} />
 				</Pane>
-				<Pane marginX={majorScale(1)} alignSelf="stretch" border></Pane>
+				<Pane marginX={majorScale(1)} alignSelf="stretch" border="muted"></Pane>
 				<ResourceVersionInfoPanel
 					resource={props.schema}
 					resourceVersion={props.schemaVersion}

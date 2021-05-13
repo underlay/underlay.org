@@ -1,21 +1,15 @@
 import React from "react";
 import classNames from "classnames";
-import { Button } from "evergreen-ui";
+import { Button, majorScale, Pane } from "evergreen-ui";
 
 import { buildUrl } from "utils/shared/urls";
-
-import styles from "./ScopeNav.module.scss";
 import { useLocationContext } from "utils/client/hooks";
 
-export interface NavChild {
-	subMode?: string;
-	title: string;
-}
+import styles from "./ScopeNav.module.scss";
 
 export interface NavItem {
 	mode?: string;
 	title: string;
-	children?: NavChild[];
 }
 
 export interface ScopeNavProps {
@@ -23,58 +17,25 @@ export interface ScopeNavProps {
 }
 
 const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
-	const {
-		mode: activeMode,
-		subMode: activeSubmode,
-		profileSlug,
-		contentSlug,
-	} = useLocationContext();
-
-	const activeModeData = navItems.find(({ mode }) => mode === activeMode);
-	const activeChildren = activeModeData?.children;
+	const { mode: activeMode, profileSlug, contentSlug } = useLocationContext();
 
 	return (
-		<div className={styles.scopeNav}>
-			<div className={styles.primary}>
-				{navItems.map(({ mode, title }) => {
-					const isActive = activeMode === mode;
-					return (
-						<Button
-							className={classNames(styles.button, isActive && styles.active)}
-							appearance="minimal"
-							key={mode || ""}
-							is="a"
-							height={40}
-							href={buildUrl({ profileSlug, contentSlug, mode })}
-						>
-							{title}
-						</Button>
-					);
-				})}
-			</div>
-			{activeChildren && (
-				<div className={styles.secondary}>
-					{activeChildren.map((item) => {
-						const { subMode: subMode, title } = item;
-						const isActive = activeSubmode === subMode;
-						const mode = activeModeData?.mode;
-						const url = buildUrl({ profileSlug, contentSlug, mode, subMode });
-						return (
-							<Button
-								className={classNames(styles.button, isActive && styles.active)}
-								appearance="minimal"
-								height={32}
-								key={subMode}
-								is="a"
-								href={url}
-							>
-								{title}
-							</Button>
-						);
-					})}
-				</div>
-			)}
-		</div>
+		<Pane marginY={majorScale(4)}>
+			<Pane borderBottom="1px solid #acacac">
+				{navItems.map(({ mode, title }) => (
+					<Button
+						className={classNames(styles.button, activeMode === mode && styles.active)}
+						appearance="minimal"
+						size="large"
+						key={mode || ""}
+						is="a"
+						href={buildUrl({ profileSlug, contentSlug, mode })}
+					>
+						{title}
+					</Button>
+				))}
+			</Pane>
+		</Pane>
 	);
 };
 

@@ -59,7 +59,7 @@ const SchemaViewer: React.FC<SchemaViewerProps & BoxOwnProps<"div", PaneOwnProps
 		return (
 			<Pane
 				className={styles.container}
-				border="default"
+				border="muted"
 				style={{ height: normalizedHeight }}
 				{...rest}
 			>

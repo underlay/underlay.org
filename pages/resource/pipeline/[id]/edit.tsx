@@ -12,7 +12,7 @@ import { useDebouncedCallback } from "use-debounce";
 
 import type { JsonObject, ValidationError } from "@underlay/pipeline";
 
-import { BlockEditor, PipelinePageFrame, ValidationReport } from "components";
+import { BlockEditor, PipelinePageFrame, PipelineValidationReport } from "components";
 
 import { getResourcePagePermissions } from "utils/server/permissions";
 import { selectResourcePageProps, prisma, serializeUpdatedAt } from "utils/server/prisma";
@@ -219,7 +219,7 @@ function PipelineEditContent(props: PipelineEditProps) {
 						setState={setState}
 					/>
 				)}
-				<ValidationReport errors={errors} />
+				<PipelineValidationReport errors={errors} />
 			</Pane>
 			<Pane marginY={majorScale(4)} display="flex" justifyContent="space-between">
 				<Button

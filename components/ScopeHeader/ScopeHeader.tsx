@@ -24,7 +24,7 @@ const ScopeHeader: React.FC<ScopeHeaderProps> = (props) => {
 					<ResourcePath />
 				</Heading>
 				{isPrivate && (
-					<Badge isSolid marginLeft={majorScale(2)} alignSelf="center">
+					<Badge marginLeft={majorScale(2)} alignSelf="center">
 						Private
 					</Badge>
 				)}

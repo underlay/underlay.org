@@ -9,7 +9,7 @@ import { getResourcePagePermissions } from "utils/server/permissions";
 import { ResourcePageParams, getProfileSlug, PipelinePageProps } from "utils/shared/propTypes";
 import { LocationContext } from "utils/client/hooks";
 
-import { PipelineViewer, PipelinePageFrame, ValidationReport } from "components";
+import { PipelineViewer, PipelinePageFrame, PipelineValidationReport } from "components";
 import type { PipelineGraph, PipelineBlocks } from "utils/shared/pipeline";
 import {
 	pipelineGraph,
@@ -58,7 +58,7 @@ const PipelineOverviewPage: React.FC<PipelineOverviewProps> = ({ blocks, pipelin
 		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
 			<PipelinePageFrame pipeline={pipeline}>
 				<PipelineViewer blocks={blocks} graph={pipeline.graph} />
-				<ValidationReport errors={errors} />
+				<PipelineValidationReport errors={errors} />
 			</PipelinePageFrame>
 		</LocationContext.Provider>
 	);

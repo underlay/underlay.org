@@ -3,7 +3,12 @@ import { GetServerSideProps } from "next";
 
 import { validationError, ValidationError } from "@underlay/pipeline";
 
-import { PipelinePageFrame, PipelineViewer, ValidationReport, VersionNavigator } from "components";
+import {
+	PipelinePageFrame,
+	PipelineViewer,
+	PipelineValidationReport,
+	VersionNavigator,
+} from "components";
 
 import {
 	prisma,
@@ -108,15 +113,15 @@ const ExecutionPage: React.FC<ExecutionPageProps> = ({
 				<VersionNavigator previous={previous} next={next} createdAt={execution.createdAt} />
 				<PipelineViewer blocks={blocks} graph={execution.graph} />
 				{execution.successful === null ? (
-					<Pane marginY={majorScale(2)} border background="yellowTint">
+					<Pane marginY={majorScale(2)} border="muted" background="yellowTint">
 						<Heading margin={majorScale(2)}>Pending</Heading>
 					</Pane>
 				) : execution.successful ? (
-					<Pane marginY={majorScale(2)} border background="greenTint">
+					<Pane marginY={majorScale(2)} border="muted" background="greenTint">
 						<Heading margin={majorScale(2)}>Success</Heading>
 					</Pane>
 				) : (
-					<ValidationReport errors={errors} />
+					<PipelineValidationReport errors={errors} />
 				)}
 			</PipelinePageFrame>
 		</LocationContext.Provider>

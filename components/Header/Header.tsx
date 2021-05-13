@@ -1,5 +1,6 @@
 import React from "react";
 import {
+	Avatar,
 	Button,
 	IconButton,
 	majorScale,
@@ -11,12 +12,11 @@ import {
 } from "evergreen-ui";
 import { signOut } from "next-auth/client";
 
-import { Avatar } from "components";
 import { usePageContext } from "utils/client/hooks";
 
 import styles from "./Header.module.scss";
 
-const Header = () => {
+const Header: React.FC<{}> = ({}) => {
 	const { session } = usePageContext();
 
 	return (
@@ -37,11 +37,11 @@ const Header = () => {
 					{session ? (
 						<>
 							<IconButton
-								icon={PlusIcon}
+								icon={<PlusIcon color="dark" />}
 								is="a"
 								href="/new"
+								size="large"
 								appearance="minimal"
-								height={majorScale(5)}
 								marginX={majorScale(2)}
 							/>
 							<Popover
@@ -54,8 +54,7 @@ const Header = () => {
 											</Menu.Item>
 											<Menu.Item
 												is="a"
-												href={`/${session.user.slug}/settings`}
-												disabled={true}
+												href={`/${session.user.slug}?mode=settings`}
 											>
 												Settings
 											</Menu.Item>
@@ -71,7 +70,7 @@ const Header = () => {
 							>
 								<IconButton
 									appearance="minimal"
-									height={40}
+									size="large"
 									icon={
 										<Avatar
 											size={32}

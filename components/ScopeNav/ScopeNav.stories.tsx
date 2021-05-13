@@ -32,10 +32,6 @@ export const Primary: React.FC<{}> = () => (
 						{
 							mode: "overview",
 							title: "Overview",
-							children: [
-								{ subMode: "overview", title: "Overview" },
-								{ subMode: "assertions", title: "Assertions" },
-							],
 						},
 						{ mode: "query", title: "Query" },
 					]}

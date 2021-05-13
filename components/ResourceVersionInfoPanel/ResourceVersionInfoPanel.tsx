@@ -18,7 +18,7 @@ const ResourceVersionInfoPanel: React.FC<ResourceVersionInfoPanelProps> = (props
 	const date = new Date(createdAt);
 
 	return (
-		<Pane width={majorScale(40)} alignSelf="start" border background="tint2">
+		<Pane width={majorScale(40)} alignSelf="start" border="muted" background="tint1">
 			<Pane margin={majorScale(2)}>
 				<Heading is="a" href={buildUrl({ profileSlug })}>
 					{profileSlug}

@@ -33,7 +33,7 @@ const PreviewTableHeader: React.FC<PreviewTableProps> = (props: PreviewTableProp
 const PreviewTable: React.FC<PreviewTableProps> = (props: PreviewTableProps) => {
 	const rows = props.header ? props.data.slice(1) : props.data;
 	return (
-		<Table border>
+		<Table border="muted">
 			<PreviewTableHeader {...props} />
 			<Table.Body>
 				{rows.map((row, i) => (

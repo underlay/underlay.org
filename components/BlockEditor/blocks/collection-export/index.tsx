@@ -30,7 +30,7 @@ const CollectionExportEditor: Editor<State> = {
 					<CollectionTargets id={state.id} onChange={handleTargetUpdate} />
 				</Pane>
 				<Heading>README</Heading>
-				<Pane marginY={majorScale(2)} border>
+				<Pane marginY={majorScale(2)} border="muted">
 					<ReadmeEditor initialValue={state.readme} onChange={handleReadmeUpdate} />
 				</Pane>
 			</>

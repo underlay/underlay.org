@@ -11,7 +11,7 @@ const ValidationReport: React.FC<ValidationReportProps> = (props) => {
 	return (
 		<>
 			{props.errors.map((error, index) => (
-				<Pane key={index} border background="redTint" marginY={majorScale(2)}>
+				<Pane key={index} border="muted" background="redTint" marginY={majorScale(2)}>
 					{renderValidationError(error)}
 				</Pane>
 			))}

@@ -38,10 +38,7 @@ function CollectionTargets(props: { id: string | null; onChange: (id: string | n
 			<>
 				<Paragraph>No collection targets found.</Paragraph>
 				<Paragraph>
-					Maybe you'd like to{" "}
-					<Link size={300} href="/new/collection">
-						create a new collection?
-					</Link>
+					Maybe you'd like to <Link href="/new/collection">create a new collection?</Link>
 				</Paragraph>
 			</>
 		);

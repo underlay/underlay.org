@@ -1,6 +1,6 @@
 import React from "react";
 
-import customIcons, { IconKey } from "./customIcons";
+import { icons, IconKey } from "./icons";
 
 type Props = {
 	icon: IconKey;
@@ -19,7 +19,7 @@ const Icon: React.FC<Props> = ({
 	ariaHidden = false,
 	ariaLabel = "",
 }) => {
-	const viewbox = customIcons[icon].viewboxDefault;
+	const viewbox = icons[icon].viewboxDefault;
 	return (
 		<span
 			className={className}
@@ -33,7 +33,7 @@ const Icon: React.FC<Props> = ({
 				viewBox={`0 0 ${viewbox} ${viewbox}`}
 				fill={color}
 			>
-				{customIcons[icon].path}
+				{icons[icon].path}
 			</svg>
 		</span>
 	);

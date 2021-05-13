@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Heading, Link, majorScale, Pane, Paragraph, Table } from "evergreen-ui";
+import { Badge, Heading, Link, majorScale, minorScale, Pane, Paragraph, Table } from "evergreen-ui";
 
 import { ScopeHeader, ScopeNav } from "components";
 
@@ -39,10 +39,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
 				<ResourceTable resources={props.schemas} />
 			) : isCurrentProfile ? (
 				<Paragraph>
-					No schemas yet.{" "}
-					<Link size={300} href="/new/schema">
-						Create one?
-					</Link>
+					No schemas yet. <Link href="/new/schema">Create one?</Link>
 				</Paragraph>
 			) : (
 				<Paragraph>No schemas yet.</Paragraph>
@@ -52,10 +49,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
 				<ResourceTable resources={props.collections} />
 			) : isCurrentProfile ? (
 				<Paragraph>
-					No collections yet.{" "}
-					<Link size={300} href="/new/collection">
-						Create one?
-					</Link>
+					No collections yet. <Link href="/new/collection">Create one?</Link>
 				</Paragraph>
 			) : (
 				<Paragraph>No collections yet.</Paragraph>
@@ -65,10 +59,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
 				<ResourceTable resources={props.pipelines} />
 			) : isCurrentProfile ? (
 				<Paragraph>
-					No pipelines yet.{" "}
-					<Link size={300} href="/new/pipeline">
-						Create one?
-					</Link>
+					No pipelines yet. <Link href="/new/pipeline">Create one?</Link>
 				</Paragraph>
 			) : (
 				<Paragraph>No pipelines yet.</Paragraph>
@@ -81,7 +72,7 @@ function ResourceTable(props: { resources: Resource[] }) {
 	const { profileSlug } = useLocationContext();
 
 	return (
-		<Table background="tint2" border>
+		<Table background="tint1" border="muted">
 			<Table.Head>
 				<Table.TextHeaderCell flexBasis={majorScale(32)} flexGrow={0}>
 					Name
@@ -89,14 +80,14 @@ function ResourceTable(props: { resources: Resource[] }) {
 				<Table.TextHeaderCell>Last updated</Table.TextHeaderCell>
 			</Table.Head>
 			<Table.Body>
-				{props.resources.map(({ slug, updatedAt }) => (
+				{props.resources.map(({ slug, updatedAt, isPublic }) => (
 					<Table.Row
 						key={slug}
 						is="a"
 						href={buildUrl({ profileSlug, contentSlug: slug })}
 					>
 						<Table.TextCell flexBasis={majorScale(32)} flexGrow={0}>
-							{slug}
+							{slug} {isPublic || <Badge marginX={minorScale(1)}>Private</Badge>}
 						</Table.TextCell>
 						<Table.TextCell>{new Date(updatedAt).toDateString()}</Table.TextCell>
 					</Table.Row>

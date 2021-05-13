@@ -45,10 +45,10 @@ const VersionNavigator: React.FC<VersionNavigatorProps> = (props) => {
 			padding={majorScale(2)}
 			display="flex"
 			alignItems="baseline"
-			marginTop={-majorScale(4)}
+			marginTop={-majorScale(2)}
 			marginBottom={majorScale(4)}
-			background="tint2"
-			border
+			background="tint1"
+			border="muted"
 		>
 			<Pane flex={1} marginX={majorScale(1)} display="flex" alignItems="center">
 				<Heading>{versionNumber}</Heading>
