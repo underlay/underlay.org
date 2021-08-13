@@ -37,7 +37,7 @@
 		"http-status-codes": "^2.1.4",
 		"io-ts": "^2.2.16",
 		"nanoid": "^3.1.23",
-		"next": "^10.2.0",
+		"next": "^11.1.0",
 		"next-auth": "^3.21.1",
 		"next-rest": "^0.2.2",
 		"next-transpile-modules": "^7.0.0",
