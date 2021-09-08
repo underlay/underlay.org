@@ -1,6 +1,8 @@
 @import "~normalize-css";
+// @import '~@blueprintjs/core/src/blueprint.scss';
+@import "./blueprint.scss";
 @import "./variables.scss";
-@import "./typography.scss";
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap');
 
 body {
 	background-color: $background-color;
@@ -11,6 +13,7 @@ body {
 	color: #333;
 	font-size: 16px;
 }
+
 .app {
 	max-width: $max-content-width;
 	min-width: $min-content-width;
@@ -27,13 +30,9 @@ body {
 	}
 }
 
-// a {
-// 	text-decoration: underline;
-// 	cursor: pointer;
-// }
-
-.capitalize {
-	text-transform: capitalize;
+a {
+	text-decoration: underline;
+	cursor: pointer;
 }
 
 .hoverline {

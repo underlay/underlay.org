@@ -1,41 +1,105 @@
 import React from "react";
+import {
+	AnchorButton,
+	OverflowList,
+	Menu,
+	MenuItem,
+	Boundary,
+	Popover,
+	Button,
+	Position,
+} from "@blueprintjs/core";
+import { Menu as MenuIcon } from "@blueprintjs/icons";
 import classNames from "classnames";
-import { Button, majorScale, Pane } from "evergreen-ui";
 
 import { buildUrl } from "utils/shared/urls";
 import { useLocationContext } from "utils/client/hooks";
 
 import styles from "./ScopeNav.module.scss";
 
-export interface NavItem {
-	mode?: string;
+type NavItem = {
+	slug: string;
 	title: string;
-}
+};
 
-export interface ScopeNavProps {
+type Props = {
+	mode: string;
 	navItems: NavItem[];
-}
+};
 
-const ScopeNav: React.FC<ScopeNavProps> = ({ navItems }) => {
-	const { mode: activeMode, profileSlug, contentSlug } = useLocationContext();
+const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
 
 	return (
-		<Pane marginY={majorScale(4)}>
-			<Pane borderBottom="1px solid #acacac">
-				{navItems.map(({ mode, title }) => (
-					<Button
-						className={classNames(styles.button, activeMode === mode && styles.active)}
-						appearance="minimal"
-						size="large"
-						key={mode || ""}
-						is="a"
-						href={buildUrl({ profileSlug, contentSlug, mode })}
-					>
-						{title}
-					</Button>
-				))}
-			</Pane>
-		</Pane>
+		<div className={styles.primary}>
+			<OverflowList
+				items={navItems}
+				collapseFrom={Boundary.END}
+				visibleItemRenderer={({ slug: modeSlug, title }: NavItem) => {
+					const isActive = mode === modeSlug;
+					return (
+						<AnchorButton
+							className={classNames(styles.button, isActive ? styles.active : "")}
+							minimal
+							large
+							key={modeSlug}
+							href={buildUrl({
+								profileSlug: profileSlug,
+								collectionSlug: collectionSlug,
+								mode: modeSlug,
+							})}
+							text={title}
+						/>
+					);
+				}}
+				overflowRenderer={(overflowItems) => {
+					return (
+						<Popover
+							content={
+								<Menu>
+									{overflowItems.map(({ slug: modeSlug, title }: NavItem) => {
+										const isActive = mode === modeSlug;
+										return (
+											<MenuItem
+												key={modeSlug}
+												text={title}
+												active={isActive}
+												href={buildUrl({
+													profileSlug: profileSlug,
+													collectionSlug: collectionSlug,
+													mode: modeSlug,
+												})}
+											/>
+										);
+									})}
+								</Menu>
+							}
+							position={Position.BOTTOM_RIGHT}
+							minimal
+						>
+							<Button minimal large className={styles.button} icon={<MenuIcon />} />
+						</Popover>
+					);
+				}}
+			/>
+			{/* {navItems.map(({ slug: modeSlug, title }: NavItem) => {
+				const isActive = mode === modeSlug;
+				return (
+					<AnchorButton
+						className={classNames(styles.button, isActive ? styles.active : "")}
+						minimal
+						large
+						key={modeSlug}
+						href={buildUrl({
+							profileSlug: profileSlug,
+							collectionSlug: collectionSlug,
+							mode: modeSlug,
+						})}
+						text={title}
+					/>
+				);
+			})} */}
+		</div>
 	);
 };
 

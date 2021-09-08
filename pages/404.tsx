@@ -1,10 +1,14 @@
-import { Heading, majorScale, Pane } from "evergreen-ui";
+import { NonIdealState } from "@blueprintjs/core";
+import { WarningSign } from "@blueprintjs/icons";
 
 const NotFound: React.FC<{}> = ({}) => {
+	const style = {
+		marginTop: "50px",
+	};
 	return (
-		<Pane maxWidth={majorScale(90)} marginX="auto" marginY={majorScale(4)}>
-			<Heading>Page Not Found</Heading>
-		</Pane>
+		<div style={style}>
+			<NonIdealState title="Page Not Found" icon={<WarningSign size={64} />} />
+		</div>
 	);
 };
 

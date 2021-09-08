@@ -1,0 +1,29 @@
+@import "pages/variables.scss";
+
+.resourceContentFrame {
+	width: 100%;
+	display: flex;
+	margin: 50px 0px 100px;
+	.nav {
+		flex: 1 1 auto;
+		width: 250px;
+		margin-right: 50px;
+	}
+	.main {
+		flex: 1 1 auto;
+		width: 100%;
+	}
+	.side {
+		flex: 0 1 auto;
+		width: 450px;
+		margin-left: 100px;
+	}
+	@include for-mobile {
+		display: block;
+		.nav, .main, .side {
+			margin: 0px 0px 50px 0px;
+			width: 100%;
+		}
+	}
+}
+

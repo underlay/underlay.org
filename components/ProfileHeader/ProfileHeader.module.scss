@@ -1,0 +1,51 @@
+.scopeHeader {
+	position: relative;
+	display: flex;
+	font-size: 18px;
+	max-width: 100%;
+	margin-bottom: 50px;
+	.icon {
+		position: absolute;
+		left: -40px;
+	}
+	.avatarComponent {
+		flex: 0 0 auto;
+		margin-right: 20px;
+	}
+	.content {
+		min-width: 0;
+	}
+	.title {
+		font-weight: 600;
+		font-size: 36px;
+		line-height: 38px;
+		margin-bottom: 7px;
+		overflow-wrap: break-word;
+		a {
+			color: inherit;
+			text-decoration: none;
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+	.profilePrefix {
+		opacity: 0.7;
+	}
+	.privateTag {
+		position: relative;
+		top: -6px;
+		margin-left: 15px;
+		font-weight: 400;
+	}
+	.details > *{
+		margin-right: 20px;
+	}
+	.mapMarker {
+		position: relative;
+		top: -3px;
+		opacity: 0.5;
+		padding-right: 3px;
+	}
+		
+}

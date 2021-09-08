@@ -1,6 +1,6 @@
-# R1
+# Underlay r1
 
-[R1](https://r1.underlay.org/) is the first Underlay Registry.
+R1 is the first Underlay Registry.
 Registries manage Underlay collections, implementing usage policies, user authentication, querying, and other features.
 
 
@@ -10,7 +10,7 @@ Registries manage Underlay collections, implementing usage policies, user authen
 npm install
 ```
 
-You will also need to generate an `.env.local` file. For Underlay team members, check our password sharing infrastructure for credentials.
+You will also need to generate an `.env.local` file. For Collector team members, check our password sharing infrastructure for credentials.
 
 ## To Run Dev Mode
 
@@ -19,16 +19,6 @@ npm run dev
 ```
 
 Navigate to `localhost:3000`
-
-## Storybook
-
-To build and test components, we use Storybook. To run:
-
-```
-npm run storybook
-```
-
-Navigate to `localhost:6006`
 
 ## To Build and Run Production Version
 

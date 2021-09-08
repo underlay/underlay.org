@@ -1,0 +1,6 @@
+{
+	"presets": ["next/babel"],
+	"plugins": [
+		"superjson-next" // Use this for getServerSideProps serialization https://github.com/blitz-js/superjson#using-with-nextjs
+	]
+}

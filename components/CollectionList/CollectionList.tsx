@@ -1,17 +1,17 @@
+// @ts-nocheck
 import React from "react";
 
 import { CollectionPreview } from "components";
-import { Collection } from "components/CollectionPreview/CollectionPreview";
 
 import styles from "./CollectionList.module.scss";
 
 type Props = {
-	collections: Collection[];
+	collections: any;
 };
 
-const PackageList: React.FC<Props> = function ({ collections }) {
+const CollectionList: React.FC<Props> = function ({ collections }) {
 	return (
-		<div>
+		<div className={styles.list}>
 			{collections.map((collection) => {
 				return (
 					<CollectionPreview
@@ -25,4 +25,4 @@ const PackageList: React.FC<Props> = function ({ collections }) {
 	);
 };
 
-export default PackageList;
+export default CollectionList;

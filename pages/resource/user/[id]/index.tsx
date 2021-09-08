@@ -1,88 +1,66 @@
+import React from "react";
 import { GetServerSideProps } from "next";
-import type { Session } from "next-auth";
+import prisma from "prisma/db";
+import Head from "next/head";
 
-import { Profile } from "components";
-import { LocationContext } from "utils/client/hooks";
-import { ResourcePageParams } from "utils/shared/propTypes";
-import { prisma, serializeUpdatedAt } from "utils/server/prisma";
-import { getCachedSession } from "utils/server/session";
+import { ProfileHeader, CollectionList, ResourceContentFrame, CommunityList } from "components";
+import { ResourcePageParams } from "utils/shared/types";
+// import { getLoginData } from "utils/server/auth/user";
 
-interface ResourceProps {
+type Props = {
+	name: string;
 	slug: string;
-	isPublic: boolean;
-	updatedAt: string;
-}
+	avatar?: string;
+	createdAt: Date;
+	memberships: any;
+	collections: any;
+};
 
-export interface UserProfilePageProps {
-	user: { slug: string };
-	schemas: ResourceProps[];
-	collections: ResourceProps[];
-	pipelines: ResourceProps[];
-}
+const UserOverview: React.FC<Props> = function ({ name, slug, avatar, collections, memberships }) {
+	return (
+		<div>
+			<Head>
+				<title>
+					{name} ({slug}) · Underlay
+				</title>
+			</Head>
+			<ProfileHeader type="user" mode="overview" name={name} slug={slug} avatar={avatar} />
+			<ResourceContentFrame
+				content={<CollectionList collections={collections} />}
+				sideContent={<CommunityList memberships={memberships} />}
+			/>
+		</div>
+	);
+};
 
-const selectAgentResourceWhere = (session: Session | null) => ({
-	where:
-		session === null
-			? { isPublic: true }
-			: {
-					OR: [
-						{ isPublic: true },
-						{ agent: { user: { id: { equals: session.user.id } } } },
-					],
-			  },
-	select: {
-		slug: true,
-		isPublic: true,
-		updatedAt: true,
-	},
-});
+export default UserOverview;
 
-export const getServerSideProps: GetServerSideProps<
-	UserProfilePageProps,
-	ResourcePageParams
-> = async (context) => {
+export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+	context
+) => {
+	// const loginData = await getLoginData(context.req);
 	const { id } = context.params!;
-
-	const session = getCachedSession(context);
-
-	const resources = selectAgentResourceWhere(session);
-	const user = await prisma.user.findUnique({
-		where: { id },
-		select: {
-			id: true,
-			slug: true,
-			agent: { select: { schemas: resources, collections: resources, pipelines: resources } },
+	const userData = await prisma.user.findUnique({
+		where: { id: id },
+		include: {
+			profile: true,
+			memberships: { include: { community: { include: { profile: true } } } },
+			collections: true,
 		},
 	});
 
-	if (user === null) {
+	if (!userData) {
 		return { notFound: true };
-	} else if (user.agent === null) {
-		return { notFound: true };
-	} else if (user.slug === null) {
-		return { redirect: { permanent: false, destination: "/login" } };
 	}
 
 	return {
 		props: {
-			user: { slug: user.slug },
-			schemas: user.agent.schemas.map(serializeUpdatedAt),
-			collections: user.agent.collections.map(serializeUpdatedAt),
-			pipelines: user.agent.pipelines.map(serializeUpdatedAt),
+			slug: userData.profile.slug,
+			name: userData.name,
+			avatar: userData.avatar || undefined,
+			createdAt: userData.createdAt,
+			memberships: userData.memberships,
+			collections: userData.collections,
 		},
 	};
 };
-
-const UserProfilePage: React.FC<UserProfilePageProps> = (props) => {
-	return (
-		<LocationContext.Provider value={{ profileSlug: props.user.slug }}>
-			<Profile
-				schemas={props.schemas}
-				collections={props.collections}
-				pipelines={props.pipelines}
-			/>
-		</LocationContext.Provider>
-	);
-};
-
-export default UserProfilePage;

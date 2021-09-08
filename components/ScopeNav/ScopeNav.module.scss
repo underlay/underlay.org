@@ -1,14 +1,17 @@
+.primary {
+	border-bottom: 1px solid #acacac;
+}
 .button {
-	padding: 5px 20px;
-	font-size: 16px;
-	border-radius: 0;
-	&:hover {
+	padding: 5px 20px !important;
+	position: relative;
+	&:hover,
+	&:active {
+		background: transparent;
 		&:after {
 			content: "";
 			position: absolute;
 			width: 100%;
 			bottom: -1px;
-			left: 0;
 			top: calc(100% - 2px);
 			background: #aaa;
 		}
@@ -19,7 +22,6 @@
 			position: absolute;
 			width: 100%;
 			bottom: -1px;
-			left: 0;
 			top: calc(100% - 2px);
 			background: black;
 		}

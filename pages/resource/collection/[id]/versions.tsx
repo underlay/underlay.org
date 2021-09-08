@@ -1,80 +1,44 @@
 import React from "react";
-
 import { GetServerSideProps } from "next";
+import prisma from "prisma/db";
 
-import { Paragraph } from "evergreen-ui";
+import { CollectionHeader } from "components";
+import { ResourcePageParams } from "utils/shared/types";
+// import { getLoginData } from "utils/server/auth/user";
 
-import { CollectionPageFrame, VersionHistory } from "components";
-import { getResourcePagePermissions } from "utils/server/permissions";
-
-import {
-	prisma,
-	selectResourcePageProps,
-	serializeUpdatedAt,
-	serializeCreatedAt,
-	selectResourceVersionProps,
-} from "utils/server/prisma";
-import {
-	getProfileSlug,
-	ResourcePageParams,
-	ResourceContentProps,
-	ResourceVersionProps,
-} from "utils/shared/propTypes";
-
-import { LocationContext } from "utils/client/hooks";
-
-interface CollectionVersionsProps {
-	collection: ResourceContentProps;
-	collectionVersions: ResourceVersionProps[];
-}
-
-export const getServerSideProps: GetServerSideProps<
-	CollectionVersionsProps,
-	ResourcePageParams
-> = async (context) => {
-	const { id } = context.params!;
-
-	const collectionWithVersions = await prisma.collection.findFirst({
-		where: { id },
-		select: {
-			...selectResourcePageProps,
-			versions: {
-				select: selectResourceVersionProps,
-			},
-		},
-	});
-
-	if (collectionWithVersions === null) {
-		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collectionWithVersions, false)) {
-		return { notFound: true };
-	}
-
-	const { versions, ...collection } = serializeUpdatedAt(collectionWithVersions);
-
-	return {
-		props: {
-			collection,
-			collectionVersions: versions.map(serializeCreatedAt),
-		},
-	};
+type Props = {
+	slug: string;
 };
 
-const SchemaVersionsPage: React.FC<CollectionVersionsProps> = (props) => {
-	const profileSlug = getProfileSlug(props.collection.agent);
-	const contentSlug = props.collection.slug;
-	const versionCount = props.collectionVersions.length;
+const CollectionVersions: React.FC<Props> = function ({ }) {
 	return (
-		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "versions" }}>
-			<CollectionPageFrame {...props} versionCount={versionCount}>
-				{versionCount ? (
-					<VersionHistory versions={props.collectionVersions} />
-				) : (
-					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
-				)}
-			</CollectionPageFrame>
-		</LocationContext.Provider>
+		<div>
+			<CollectionHeader
+				mode="versions"	
+				// details={slug}
+			/>
+		</div>
 	);
 };
 
-export default SchemaVersionsPage;
+export default CollectionVersions;
+
+export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+	context
+) => {
+	// const loginData = await getLoginData(context.req);
+	const { id } = context.params!;
+	const collectionData = await prisma.collection.findUnique({
+		where: { id: id },
+	});
+
+	if (!collectionData) {
+		return { notFound: true };
+	}
+
+	return {
+		props: {
+			slug: collectionData.slug,
+		},
+	};
+};

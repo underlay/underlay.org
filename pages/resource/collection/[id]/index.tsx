@@ -1,83 +1,61 @@
 import React from "react";
 import { GetServerSideProps } from "next";
+import prisma from "prisma/db";
+import Head from "next/head";
 
-import { Paragraph } from "evergreen-ui";
+import { CollectionHeader, ResourceContentFrame } from "components";
+import { ResourcePageParams } from "utils/shared/types";
+import MainContent from "components/CollectionOverview/MainContent";
+import SideContent from "components/CollectionOverview/SideContent";
+// import { getLoginData } from "utils/server/auth/user";
+import { useLocationContext } from "utils/client/hooks";
 
-import {
-	prisma,
-	serializeUpdatedAt,
-	serializeCreatedAt,
-	selectResourcePageProps,
-	selectCollectionVersionOverviewProps,
-	countCollectionVersions,
-} from "utils/server/prisma";
-import { getResourcePagePermissions } from "utils/server/permissions";
-
-import {
-	ResourcePageParams,
-	getProfileSlug,
-	CollectionPageProps,
-	CollectionVersionProps,
-} from "utils/shared/propTypes";
-import { LocationContext } from "utils/client/hooks";
-import { CollectionPageFrame, CollectionVersionOverview } from "components";
-
-type CollectionOverviewProps = CollectionPageProps & {
-	lastVersion: CollectionVersionProps | null;
+type Props = {
+	slug: string;
+	permission: string;
+	labels?: string[];
 };
 
-export const getServerSideProps: GetServerSideProps<
-	CollectionOverviewProps,
-	ResourcePageParams
-> = async (context) => {
-	const { id } = context.params!;
-
-	const collectionWithVersion = await prisma.collection.findUnique({
-		where: { id },
-		select: {
-			...selectResourcePageProps,
-			lastVersion: { select: selectCollectionVersionOverviewProps },
-		},
-	});
-
-	// The reason to check for null separately from getResourcePagePermissions
-	// is so that TypeScript knows it's not null afterward
-	if (collectionWithVersion === null) {
-		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collectionWithVersion, false)) {
-		return { notFound: true };
-	}
-
-	const versionCount = await countCollectionVersions(collectionWithVersion);
-
-	const { lastVersion, ...collection } = collectionWithVersion;
-
-	return {
-		props: {
-			versionCount,
-			collection: serializeUpdatedAt(collection),
-			lastVersion: lastVersion && serializeCreatedAt(lastVersion),
-		},
-	};
-};
-
-const CollectionOverviewPage: React.FC<CollectionOverviewProps> = ({ lastVersion, ...props }) => {
-	const profileSlug = getProfileSlug(props.collection.agent);
-	const contentSlug = props.collection.slug;
+const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
 	return (
-		<LocationContext.Provider value={{ profileSlug, contentSlug }}>
-			<CollectionPageFrame {...props}>
-				{lastVersion === null ? (
-					<Paragraph fontStyle="italic">No versions yet!</Paragraph>
-				) : (
-					<CollectionVersionOverview
-						collection={props.collection}
-						collectionVersion={lastVersion}
-					/>
-				)}
-			</CollectionPageFrame>
-		</LocationContext.Provider>
+		<div>
+			<Head>
+				<title>
+					{profileSlug}/{collectionSlug} · Underlay
+				</title>
+			</Head>
+			<CollectionHeader
+				mode="overview"
+				isPrivate={true || permission === "private"}
+				labels={labels}
+			/>
+			<ResourceContentFrame content={<MainContent />} sideContent={<SideContent />} />
+		</div>
 	);
 };
 
-export default CollectionOverviewPage;
+export default CollectionOverview;
+
+// @ts-ignore
+export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+	context
+) => {
+	// const loginData = await getLoginData(context.req);
+	const { id } = context.params!;
+	const collectionData = await prisma.collection.findUnique({
+		where: { id: id },
+	});
+
+	if (!collectionData) {
+		return { notFound: true };
+	}
+
+	return {
+		props: {
+			slug: collectionData.slug,
+			permission: collectionData.permission,
+			labels: collectionData.labels || undefined,
+		},
+	};
+};

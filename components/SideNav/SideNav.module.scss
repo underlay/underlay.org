@@ -1,0 +1,33 @@
+.sideNav {
+	background: transparent !important;
+	border: 1px solid #ccc;
+}
+.item {
+	border-left: 3px solid transparent;
+	&:hover {
+		border-left: 3px solid #aaa;
+	}
+	// position: relative;
+	// &:hover:before {
+	// 	content: "";
+	// 	position: absolute;
+	// 	height: calc(100% + 10px);
+	// 	left: -6px;
+	// 	background: #aaa;
+	// 	width: 3px;
+	// 	top: -7px;
+	// }
+}
+.active,
+.active:hover {
+	border-left: 3px solid black;
+	// &:before {
+	// 	content: "";
+	// 	position: absolute;
+	// 	height: calc(100% + 10px);
+	// 	left: -6px;
+	// 	background: black;
+	// 	width: 3px;
+	// 	top: -7px;
+	// }
+}

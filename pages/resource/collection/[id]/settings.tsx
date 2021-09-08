@@ -1,58 +1,44 @@
 import React from "react";
 import { GetServerSideProps } from "next";
+import prisma from "prisma/db";
 
-import { CollectionPageFrame, ResourceSettings } from "components";
-import { ResourcePageParams, getProfileSlug, CollectionPageProps } from "utils/shared/propTypes";
+import { CollectionHeader } from "components";
+import { ResourcePageParams } from "utils/shared/types";
+// import { getLoginData } from "utils/server/auth/user";
 
-import { getResourcePagePermissions } from "utils/server/permissions";
-import {
-	countCollectionVersions,
-	prisma,
-	selectResourcePageProps,
-	serializeUpdatedAt,
-} from "utils/server/prisma";
-import { LocationContext } from "utils/client/hooks";
-
-type CollectionSettingsProps = CollectionPageProps;
-
-export const getServerSideProps: GetServerSideProps<
-	CollectionSettingsProps,
-	ResourcePageParams
-> = async (context) => {
-	const { id } = context.params!;
-
-	const collection = await prisma.collection.findFirst({
-		where: { id },
-		select: selectResourcePageProps,
-	});
-
-	if (collection === null) {
-		return { notFound: true };
-	} else if (!getResourcePagePermissions(context, collection, true)) {
-		return { notFound: true };
-	}
-
-	const versionCount = await countCollectionVersions(collection);
-
-	return {
-		props: {
-			versionCount,
-			collection: serializeUpdatedAt(collection),
-		},
-	};
+type Props = {
+	slug: string;
 };
 
-const CollectionSettingsPage: React.FC<CollectionSettingsProps> = (props) => {
-	const profileSlug = getProfileSlug(props.collection.agent);
-	const contentSlug = props.collection.slug;
-
+const CollectionSettings: React.FC<Props> = function ({ }) {
 	return (
-		<LocationContext.Provider value={{ profileSlug, contentSlug, mode: "settings" }}>
-			<CollectionPageFrame {...props}>
-				<ResourceSettings {...props.collection} />
-			</CollectionPageFrame>
-		</LocationContext.Provider>
+		<div>
+			<CollectionHeader
+				mode="settings"	
+				// details={slug}
+			/>
+		</div>
 	);
 };
 
-export default CollectionSettingsPage;
+export default CollectionSettings;
+
+export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+	context
+) => {
+	// const loginData = await getLoginData(context.req);
+	const { id } = context.params!;
+	const collectionData = await prisma.collection.findUnique({
+		where: { id: id },
+	});
+
+	if (!collectionData) {
+		return { notFound: true };
+	}
+
+	return {
+		props: {
+			slug: collectionData.slug,
+		},
+	};
+};

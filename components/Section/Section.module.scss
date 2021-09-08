@@ -1,21 +1,11 @@
 .section {
-	.uppercase {
-		text-transform: uppercase;
-	}
+	margin-bottom: 50px;
 	.title {
+		text-transform: uppercase;
 		font-weight: 500;
+		font-size: 14px;
 		color: #888;
 		letter-spacing: 1px;
 		margin-bottom: 15px;
-	}
-	margin-bottom: 50px;
-	&.side {
-		margin-bottom: 25px;
-	}
-	&.margin {
-		margin-left: 15px;
-		.title {
-			margin-left: -15px;
-		}
 	}
 }

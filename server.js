@@ -2,23 +2,26 @@ const { createServer } = require("http");
 const { parse } = require("url");
 const fs = require("fs");
 const path = require("path");
-
 const next = require("next");
-
 const { PrismaClient } = require("@prisma/client");
 
-const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
+const { setEnvironment, setAppCommit } = require("./utils/shared/environment");
+
+/* ACHTUNG: These calls must appear before we import any more of our own code to ensure that */
+/* the environment, and in particular the choice of dev vs. prod, is configured correctly! */
+/* ------------------------------------------- */
+setEnvironment(process.env.R1_PRODUCTION);
+setAppCommit(process.env.HEROKU_SLUG_COMMIT);
+/* ------------------------------------------- */
+
+const isLocalhost = process.env.NODE_ENV !== "production";
+const app = next({ dev: isLocalhost });
 const handle = app.getRequestHandler();
-
 const prisma = new PrismaClient();
-
 const port = parseInt(process.env.PORT) || 3000;
 
-// This is a set of top-level page routes *other* than the resource pages
-// (ie everything except schemas and collections and their versions)
+/* Generate a set of all top-level page routes *other* than the resource pages */
 const topLevelRoutes = new Set(["_next"]);
-
 const pageFilePattern = /^([a-zA-Z0-9]+)\.tsx$/;
 for (const name of fs.readdirSync(path.resolve(__dirname, "pages"))) {
 	const stat = fs.lstatSync(path.resolve(__dirname, "pages", name));
@@ -29,128 +32,66 @@ for (const name of fs.readdirSync(path.resolve(__dirname, "pages"))) {
 		topLevelRoutes.add(fileName);
 	}
 }
-
 for (const name of fs.readdirSync(path.resolve(__dirname, "public"))) {
 	topLevelRoutes.add(name);
 }
-
 topLevelRoutes.delete("resource");
 topLevelRoutes.delete("index");
 
-const findResource = (profileSlug, contentSlug) => ({
-	slug: contentSlug,
-	agent: {
-		OR: [{ user: { slug: profileSlug } }, { organization: { slug: profileSlug } }],
-	},
-});
-
-// type: "user" | "organization" | "schema" | "schemaVersion" | "collection" | "collectionVersion" | "pipeline" | "execution"
-// query: ParsedUrlQuery
-function render(req, res, type, id, query) {
-	if (typeof query.mode === "string") {
-		if (typeof query.submode === "string") {
-			const route = `/resource/${type}/${id}/${query.mode}/${query.submode}`;
-			app.render(req, res, route, query);
-		} else {
-			const route = `/resource/${type}/${id}/${query.mode}`;
-			app.render(req, res, route, query);
-		}
-	} else {
-		const route = `/resource/${type}/${id}`;
-		app.render(req, res, route, query);
-	}
-}
-
 app.prepare().then(() => {
 	createServer(async (req, res) => {
-		// Be sure to pass `true` as the second argument to `url.parse`.
-		// This tells it to parse the query portion of the URL.
+		/* Be sure to pass `true` as the second argument to `url.parse`. */
+		/* This tells it to parse the query portion of the URL. */
 		const parsedUrl = parse(req.url, true);
 		const { pathname, query } = parsedUrl;
 
-		// The leading slash is always present
-		const components = pathname.split("/").slice(1);
+		/* Split out components and filter empty strings which */
+		/* will be present due to leading and trailing slashes */
+		const components = pathname.split("/").filter((x) => x);
 
-		if (pathname === "/" || components.length === 0) {
-			return handle(req, res, parsedUrl);
-		} else if (topLevelRoutes.has(components[0])) {
-			return handle(req, res, parsedUrl);
-		} else if (components.length === 1) {
-			const [profileSlug] = components;
-
-			const profileQuery = {
-				where: { slug: profileSlug },
-				select: { id: true },
-			};
-
-			const [user, organization] = await Promise.all([
-				prisma.user.findUnique(profileQuery),
-				prisma.organization.findUnique(profileQuery),
-			]);
-
-			if (user !== null) {
-				render(req, res, "user", user.id, query);
-			} else if (organization !== null) {
-				render(req, res, "organization", organization.id, query);
-			} else {
-				app.render(req, res, "/404", query);
-			}
-		} else if (components.length === 2) {
-			const [profileSlug, contentSlug] = components;
-
-			const contentQuery = {
-				where: findResource(profileSlug, contentSlug),
-				select: { id: true },
-			};
-
-			const [schema, collection, pipeline] = await Promise.all([
-				prisma.schema.findFirst(contentQuery),
-				prisma.collection.findFirst(contentQuery),
-				prisma.pipeline.findFirst(contentQuery),
-			]);
-
-			if (schema !== null) {
-				render(req, res, "schema", schema.id, query);
-			} else if (collection !== null) {
-				render(req, res, "collection", collection.id, query);
-			} else if (pipeline !== null) {
-				render(req, res, "pipeline", pipeline.id, query);
-			} else {
-				app.render(req, res, "/404", query);
-			}
-		} else if (components.length === 3) {
-			const [profileSlug, contentSlug, versionNumber] = components;
-
-			const resource = findResource(profileSlug, contentSlug);
-			const [schemaVersion, collectionVersion, execution] = await Promise.all([
-				prisma.schemaVersion.findFirst({
-					where: { versionNumber, schema: resource },
-					select: { id: true },
-				}),
-				prisma.collectionVersion.findFirst({
-					where: { versionNumber, collection: resource },
-					select: { id: true },
-				}),
-				prisma.execution.findFirst({
-					where: { executionNumber: versionNumber, pipeline: resource },
-					select: { id: true },
-				}),
-			]);
-
-			if (schemaVersion !== null) {
-				render(req, res, "schemaVersion", schemaVersion.id, query);
-			} else if (collectionVersion !== null) {
-				render(req, res, "collectionVersion", collectionVersion.id, query);
-			} else if (execution !== null) {
-				render(req, res, "execution", execution.id, query);
-			} else {
-				app.render(req, res, "/404", query);
-			}
+		if (components.length === 0 || topLevelRoutes.has(components[0])) {
+			handle(req, res, parsedUrl);
 		} else {
-			app.render(req, res, "/404", query);
+			/* If we're here, the path is either a profile, collection, or 404 */
+			/* So first, check if profile is valid. If not found, it's 404 */
+			const profile = await prisma.profile.findFirst({
+				where: { slug: components[0] },
+				include: {
+					user: true,
+					community: true,
+				},
+			});
+			if (!profile) {
+				return app.render(req, res, "/404", query);
+			}
+
+			/* If we have a profile, first check if we also have a valid collectionSlug  */
+			/* We need to check that we have a collection with valid slug that matches the profile slug */
+			const profileType = profile.user ? "user" : "community";
+			const profileId = profile[profileType].id;
+			const collection = components[1]
+				? await prisma.collection.findFirst({
+						where: {
+							slug: components[1],
+							[profileType]: { some: { id: profileId } },
+						},
+				  })
+				: undefined;
+			/* If we have a valid collection, route to that resource otherwise, */
+			/* route to the correct profile resource (e.g. user or community). */
+			/* For cases such as /valid-profile/neither-collection-nor-mode,  */
+			/* allow normal routing or getServersideProps to generate 404. */
+			const route = collection
+				? `/resource/collection/${collection.id}/${components.slice(2).join("/")}`
+				: `/resource/${profileType}/${profileId}/${components.slice(1).join("/")}`;
+			app.render(req, res, route, {
+				...query,
+				profileSlug: profile.slug,
+				collectionSlug: collection?.slug,
+			});
 		}
 	}).listen(port, (err) => {
 		if (err) throw err;
-		console.log(`> Ready on http://localhost:${port}`);
+		console.log(`Running server on 0.0.0.0:${port}, url: http://localhost:${port}`);
 	});
 });

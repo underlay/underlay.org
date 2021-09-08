@@ -6,9 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [0.0.2] - 2020-09-22
-- dev: Migrate framework to next.js
 
-## [0.0.1] - 2020-05-05
+## [0.0.1] - 2021-
 - update: Initial mockup of site
 

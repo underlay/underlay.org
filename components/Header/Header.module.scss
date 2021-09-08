@@ -6,8 +6,8 @@
 		content: "";
 		position: absolute;
 		top: 0;
-		width: calc(max(#{$min-content-width} + 2 * #{$gutter-padding}, 100vw));
-		left: calc(min(-#{$gutter-padding}, (100% - 100vw) / 2));
+		width: 100vw;
+		left: calc((100% - 100vw) / 2);
 		height: 280px;
 		z-index: 0;
 		background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3C/g%3E%3C/svg%3E");
@@ -26,9 +26,6 @@
 			rgba($background-color, 1) 100%
 		);
 	}
-	.left {
-		flex: 1 1 auto;
-	}
 	.content {
 		padding: 1em 0em 4em;
 		display: flex;
@@ -39,10 +36,18 @@
 	}
 	.title {
 		position: relative;
-		left: -21px;
+		left: -10px;
+		font-size: 24px;
+		font-family: 'Raleway', sans-serif;
+		font-weight: 600;
+		letter-spacing: 0.4px;
+		img {
+			height:24px;
+		}
 	}
-	img {
-		height: 28px;
-		padding-top: 6px;
+	.discover {
+		@media (max-width: 515px) {
+			display: none;
+		}
 	}
 }
