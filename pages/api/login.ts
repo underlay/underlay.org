@@ -23,6 +23,7 @@ export default nextConnect().post(async (req: NextApiRequest, res: NextApiRespon
 		res.status(200).send({ done: true });
 	} catch (error) {
 		console.error(error);
+		// @ts-ignore
 		res.status(401).send(error.message);
 	}
 });

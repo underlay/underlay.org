@@ -40,6 +40,7 @@ async function signupPost(req: NextApiRequest, res: NextApiResponse) {
 		res.status(200).send({ done: true });
 	} catch (error) {
 		console.error(error);
+		// @ts-ignore
 		res.status(403).end(error.message);
 	}
 }
