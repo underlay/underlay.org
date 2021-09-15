@@ -11,4 +11,6 @@ export { default as ResourceContentFrame } from "./ResourceContentFrame/Resource
 export { default as CommunityList } from "./CommunityList/CommunityList";
 export { default as Section } from "./Section/Section";
 export { default as SideNav } from "./SideNav/SideNav";
+export { default as AvatarList } from "./AvatarList/AvatarList";
+export { default as UserPreview } from "./UserPreview/UserPreview";
 export { default as UserList } from "./UserList/UserList";

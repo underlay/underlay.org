@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next";
 import prisma from "prisma/db";
 import Head from "next/head";
 
-import { ProfileHeader, CollectionList, UserList, ResourceContentFrame, Section } from "components";
+import { ProfileHeader, CollectionList, AvatarList, ResourceContentFrame, Section } from "components";
 import { ResourcePageParams } from "utils/shared/types";
 // import { getLoginData } from "utils/server/auth/user";
 
@@ -49,7 +49,7 @@ const CommunityOverview: React.FC<Props> = function ({
 				sideContent={
 					<React.Fragment>
 						<Section title="About">{description}</Section>
-						<UserList
+						<AvatarList
 							users={
 								// @ts-ignore
 								members.map((x) => x.user)
