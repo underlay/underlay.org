@@ -9,6 +9,7 @@
 		"dev": "node server.js",
 		"build": "next build",
 		"start": "NODE_ENV=production node server.js",
+		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
 		"type-check": "tsc"
 	},
 	"gitHooks": {
