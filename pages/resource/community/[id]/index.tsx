@@ -3,7 +3,13 @@ import { GetServerSideProps } from "next";
 import prisma from "prisma/db";
 import Head from "next/head";
 
-import { ProfileHeader, CollectionList, AvatarList, ResourceContentFrame, Section } from "components";
+import {
+	ProfileHeader,
+	CollectionList,
+	AvatarList,
+	ResourceContentFrame,
+	Section,
+} from "components";
 import { ResourcePageParams } from "utils/shared/types";
 // import { getLoginData } from "utils/server/auth/user";
 
@@ -45,7 +51,11 @@ const CommunityOverview: React.FC<Props> = function ({
 				location={location}
 			/>
 			<ResourceContentFrame
-				content={<Section title="Collections"><CollectionList collections={collections} /></Section>}
+				content={
+					<Section title="Collections">
+						<CollectionList collections={collections} />
+					</Section>
+				}
 				sideContent={
 					<React.Fragment>
 						<Section title="About">{description}</Section>

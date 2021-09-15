@@ -16,11 +16,7 @@ type Props = {
 	mode: string;
 };
 
-const CollectionHeader: React.FC<Props> = function ({
-	isPrivate = false,
-	mode,
-	labels = [],
-}) {
+const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, labels = [] }) {
 	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
 	return (
 		<div>

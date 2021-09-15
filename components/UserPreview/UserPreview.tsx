@@ -14,7 +14,7 @@ const UserPreview: React.FC<Props> = function ({ name, email, avatar, signupToke
 	return (
 		<a href={`/${signupToken}`} className={styles.previewBlock}>
 			<div className={styles.title}>
-        <Avatar className={styles.avatar} name={name} src={avatar} size={24} />
+				<Avatar className={styles.avatar} name={name} src={avatar} size={24} />
 				{name}
 			</div>
 			{email && <div className={styles.description}>{email}</div>}

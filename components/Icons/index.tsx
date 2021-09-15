@@ -1,6 +1,6 @@
 import Icon, { Props } from "./Icon";
 
-interface LocalProps extends Omit<Props, 'icon'> {}
+interface LocalProps extends Omit<Props, "icon"> {}
 
 export const Collection: React.FC<LocalProps> = (props) => <Icon {...props} icon="collection" />;
 export const Community: React.FC<LocalProps> = (props) => <Icon {...props} icon="community" />;
