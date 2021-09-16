@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 import styles from "./Footer.module.scss";
 
-const Footer = function() {
+const Footer = function () {
 	return (
 		<div className={styles.footer}>
 			<a className={styles.link} href="https://www.knowledgefutures.org">

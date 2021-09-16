@@ -217,8 +217,12 @@ const Editor: React.FC<Props> = function ({}) {
 										<div key={item.id} className={styles.entityCard}>
 											<div className={styles.topIcons}>
 												<ButtonGroup>
-												<Button minimal icon={<Provenance />} />
-												<Button minimal icon={<Discussion size={20} />} /></ButtonGroup>
+													<Button minimal icon={<Provenance />} />
+													<Button
+														minimal
+														icon={<Discussion size={20} />}
+													/>
+												</ButtonGroup>
 											</div>
 											{/* {item.id} */}
 											{Object.keys(item).map((property) => {

@@ -25,14 +25,34 @@ const UserSettings: React.FC<Props> = function ({ name, slug, avatar }) {
 				navContent={
 					<SideNav
 						menuItems={[
-							{ text: "Profile", href: buildUrl({profileSlug: profileSlug, mode: "settings", subMode: "" }), active: !activeSubMode },
-							{ text: "Account", href: buildUrl({profileSlug: profileSlug, mode: "settings", subMode: "account" }), active: activeSubMode === "account" },
+							{
+								text: "Profile",
+								href: buildUrl({
+									profileSlug: profileSlug,
+									mode: "settings",
+									subMode: "",
+								}),
+								active: !activeSubMode,
+							},
+							{
+								text: "Account",
+								href: buildUrl({
+									profileSlug: profileSlug,
+									mode: "settings",
+									subMode: "account",
+								}),
+								active: activeSubMode === "account",
+							},
 						]}
 					/>
 				}
 				content={
 					<React.Fragment>
-						{!activeSubMode && <React.Fragment><Section title="Public Profile">Details here</Section></React.Fragment>}
+						{!activeSubMode && (
+							<React.Fragment>
+								<Section title="Public Profile">Details here</Section>
+							</React.Fragment>
+						)}
 						{activeSubMode === "account" && "Account"}
 					</React.Fragment>
 				}

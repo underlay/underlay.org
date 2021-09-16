@@ -1,4 +1,4 @@
-import type { IncomingMessage } from 'http';
+import type { IncomingMessage } from "http";
 import type { NextApiResponse } from "next";
 import { serialize, parse } from "cookie";
 
@@ -6,7 +6,7 @@ const TOKEN_NAME = "token";
 
 export const MAX_AGE = 60 * 60 * 8; // 8 hours
 
-export function setTokenCookie(res: NextApiResponse, token:string) {
+export function setTokenCookie(res: NextApiResponse, token: string) {
 	const cookie = serialize(TOKEN_NAME, token, {
 		maxAge: MAX_AGE,
 		expires: new Date(Date.now() + MAX_AGE * 1000),

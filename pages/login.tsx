@@ -9,7 +9,7 @@ import encHex from "crypto-js/enc-hex";
 const Login: React.FC<{}> = ({}) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	
+
 	// @ts-ignore
 	const handleLogin = async (evt) => {
 		evt.preventDefault();

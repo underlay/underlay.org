@@ -20,7 +20,11 @@ const SideNav: React.FC<Props> = function ({ menuItems, className = "" }) {
 				return (
 					<React.Fragment key={text}>
 						{index !== 0 && <MenuDivider />}
-						<MenuItem text={text} href={href} className={classNames(styles.item, active && styles.active)} />
+						<MenuItem
+							text={text}
+							href={href}
+							className={classNames(styles.item, active && styles.active)}
+						/>
 					</React.Fragment>
 				);
 			})}

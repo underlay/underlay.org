@@ -12,16 +12,23 @@ const CommunityList: React.FC<Props> = function ({ memberships }) {
 	return (
 		<Section title="Communities">
 			<div className={styles.communities}>
-				{// @ts-ignore 
-				memberships.map((membership) => {
-					const { name, avatar } = membership.community;
-					const { slug } = membership.community.profile;
-					return (
-						<a key={slug} href={`/${slug}`} title={name} className={styles.anchor}>
-							<Avatar className={styles.avatar} name={name} src={avatar} size={40} />
-						</a>
-					);
-				})}
+				{
+					// @ts-ignore
+					memberships.map((membership) => {
+						const { name, avatar } = membership.community;
+						const { slug } = membership.community.profile;
+						return (
+							<a key={slug} href={`/${slug}`} title={name} className={styles.anchor}>
+								<Avatar
+									className={styles.avatar}
+									name={name}
+									src={avatar}
+									size={40}
+								/>
+							</a>
+						);
+					})
+				}
 			</div>
 		</Section>
 	);

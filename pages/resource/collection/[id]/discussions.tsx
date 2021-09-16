@@ -10,11 +10,11 @@ type Props = {
 	slug: string;
 };
 
-const CollectionDiscussions: React.FC<Props> = function ({ }) {
+const CollectionDiscussions: React.FC<Props> = function ({}) {
 	return (
 		<div>
 			<CollectionHeader
-				mode="discussions"	
+				mode="discussions"
 				// details={slug}
 			/>
 		</div>

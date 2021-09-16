@@ -17,6 +17,6 @@ export type LocationData = {
 	mode?: string;
 	subMode?: string;
 	versionNumber?: string;
-}
+};
 
 export type ResourcePageParams = { id: string };

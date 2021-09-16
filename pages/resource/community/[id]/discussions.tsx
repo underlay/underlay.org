@@ -12,7 +12,7 @@ type Props = {
 	avatar?: string;
 };
 
-const CommunityDiscussions: React.FC<Props> = function ({ name, slug, avatar}) {
+const CommunityDiscussions: React.FC<Props> = function ({ name, slug, avatar }) {
 	return (
 		<div>
 			<ProfileHeader

@@ -10,11 +10,11 @@ type Props = {
 	slug: string;
 };
 
-const CollectionVersions: React.FC<Props> = function ({ }) {
+const CollectionVersions: React.FC<Props> = function ({}) {
 	return (
 		<div>
 			<CollectionHeader
-				mode="versions"	
+				mode="versions"
 				// details={slug}
 			/>
 		</div>

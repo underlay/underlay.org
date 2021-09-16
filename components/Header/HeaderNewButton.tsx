@@ -5,15 +5,15 @@ const HeaderNewButton = () => {
 	return (
 		<Popover
 			content={
-				<Menu>					
-					<MenuItem text="Create Collection" href="/create/collection"/>
-					<MenuItem text="Create Community" href="/create/community"/>
+				<Menu>
+					<MenuItem text="Create Collection" href="/create/collection" />
+					<MenuItem text="Create Community" href="/create/community" />
 				</Menu>
 			}
 			position={Position.BOTTOM_RIGHT}
 			minimal
 		>
-			<Button icon="plus" text="New" minimal large/>
+			<Button icon="plus" text="New" minimal large />
 		</Popover>
 	);
 };

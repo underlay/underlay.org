@@ -13,12 +13,7 @@ const UserList: React.FC<Props> = function ({ users }) {
 	return (
 		<div className={styles.list}>
 			{users.map((user) => {
-				return (
-					<UserPreview
-						key={user.id}
-						{...user}
-					/>
-				);
+				return <UserPreview key={user.id} {...user} />;
 			})}
 		</div>
 	);
