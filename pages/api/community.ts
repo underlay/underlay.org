@@ -28,5 +28,5 @@ export default nextConnect()
 			},
 		});
 
-		return res.status(200).json({ data: community });
+		return res.status(200).json(community);
 	});
