@@ -12,6 +12,9 @@
 		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
 		"type-check": "tsc"
 	},
+	"engines": {
+		"node": ">14"
+	},
 	"gitHooks": {
 		"pre-commit": "lint-staged"
 	},
