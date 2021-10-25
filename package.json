@@ -12,6 +12,9 @@
 		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
 		"type-check": "tsc"
 	},
+	"engines": {
+		"node": ">14"
+	},
 	"gitHooks": {
 		"pre-commit": "lint-staged"
 	},
@@ -52,8 +55,5 @@
 		"prisma": "^3.0.1",
 		"typescript": "^4.4.2",
 		"yorkie": "^2.0.0"
-	},
-	"engines": {
-		"node": "14.16.1"
 	}
 }

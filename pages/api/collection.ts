@@ -21,5 +21,5 @@ export default nextConnect()
 			},
 		});
 
-		return res.status(200).json({ data: collection });
+		return res.status(200).json(collection);
 	});
