@@ -21,8 +21,8 @@ export const getProfileData = (profileSlug: string) => {
 	});
 };
 
-export const getCollectionData = (profileSlug: string, collectionSlug: string) => {
-	return prisma.profile.findUnique({
+export const getCollectionData = async (profileSlug: string, collectionSlug: string) => {
+	const profileData = await prisma.profile.findUnique({
 		where: { slug: profileSlug },
 		include: {
 			community: {
@@ -35,6 +35,16 @@ export const getCollectionData = (profileSlug: string, collectionSlug: string) =
 					},
 				},
 			},
+			user: {
+				include: {
+					collections: {
+						where: {
+							slug: collectionSlug,
+						},
+					},
+				},
+			},
 		},
 	});
+	return profileData?.community?.collections[0] || profileData?.user?.collections[0];
 };

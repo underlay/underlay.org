@@ -40,8 +40,7 @@ export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams>
 	context
 ) => {
 	const { profileSlug, collectionSlug } = context.params!;
-	const profileData = await getCollectionData(profileSlug, collectionSlug);
-	const collectionData = profileData?.community?.collections[0];
+	const collectionData = await getCollectionData(profileSlug, collectionSlug);
 
 	if (!collectionData) {
 		return { notFound: true };
