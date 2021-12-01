@@ -55,7 +55,7 @@ const Landing: React.FC<Props> = function () {
 
 	return (
 		<div className={styles.landing}>
-			<h1>Landing</h1>
+			<h1>Landing 2</h1>
 
 			<ScopeNav
 				navItems={[
