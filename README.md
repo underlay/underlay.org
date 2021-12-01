@@ -1,8 +1,4 @@
-# Underlay r1
-
-R1 is the first Underlay Registry.
-Registries manage Underlay collections, implementing usage policies, user authentication, querying, and other features.
-
+# Underlay
 
 ## To Install
 
