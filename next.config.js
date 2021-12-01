@@ -1,5 +1,3 @@
 const { withSuperjson } = require("next-superjson");
 
-module.exports = withSuperjson()({
-	target: "serverless",
-});
+module.exports = withSuperjson()({});
