@@ -42,10 +42,29 @@ export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> =
 	context
 ) => {
 	// const loginData = await getLoginData(context.req);
-	const { id } = context.params!;
-	const collectionData = await prisma.collection.findUnique({
-		where: { id: id },
+	const { profileSlug, collectionSlug } = context.params!;
+
+	// const { profileSlug } = context.params!;
+	const profileData = await prisma.profile.findUnique({
+		where: { slug: profileSlug },
+		include: {
+			community: {
+				include: {
+					// members: { include: { user: { include: { profile: true } } } },
+					collections: {
+						where: {
+							slug: collectionSlug,
+						},
+					},
+				},
+			},
+		},
 	});
+	console.log(profileData.community.collections);
+	const collectionData = profileData.community.collections[0];
+	// const collectionData = await prisma.collection.findUnique({
+	// 	where: { slug: collectionSlug },
+	// });
 
 	if (!collectionData) {
 		return { notFound: true };

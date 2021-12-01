@@ -19,4 +19,8 @@ export type LocationData = {
 	versionNumber?: string;
 };
 
-export type ResourcePageParams = { id: string };
+export type ResourcePageParams = {
+	profileSlug: string;
+	collectionSlug?: string;
+	subMode?: string;
+};

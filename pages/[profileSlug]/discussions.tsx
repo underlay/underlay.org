@@ -1,10 +1,9 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "prisma/db";
 
 import { ProfileHeader } from "components";
 import { ResourcePageParams } from "utils/shared/types";
-// import { getLoginData } from "utils/server/auth/user";
+import { getProfileData } from "utils/server/queries";
 
 type Props = {
 	name: string;
@@ -31,25 +30,18 @@ export default CommunityDiscussions;
 export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
 	context
 ) => {
-	// const loginData = await getLoginData(context.req);
-	const { id } = context.params!;
-	const communityData = await prisma.community.findUnique({
-		where: { id: id },
-		include: {
-			profile: true,
-		},
-	});
+	const { profileSlug } = context.params!;
+	const profileData = await getProfileData(profileSlug);
 
-	if (!communityData) {
+	if (!profileData?.community) {
 		return { notFound: true };
 	}
 
 	return {
 		props: {
-			slug: communityData.profile.slug,
-			name: communityData.name,
-			avatar: communityData.avatar || undefined,
-			createdAt: communityData.createdAt,
+			slug: profileData?.slug,
+			name: profileData?.community.name,
+			avatar: profileData?.community.avatar || undefined,
 		},
 	};
 };

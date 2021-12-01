@@ -7,20 +7,28 @@ import { useLocationContext } from "utils/client/hooks";
 import { ResourcePageParams } from "utils/shared/types";
 import { getLoginData } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
+import { getProfileData } from "utils/server/queries";
 
 type Props = {
-	name: string;
 	slug: string;
-	avatar?: string;
-	createdAt: Date;
+	community?: any;
+	user?: any;
 };
 
-const UserSettings: React.FC<Props> = function ({ name, slug, avatar }) {
+const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 	const { profileSlug = "", subMode } = useLocationContext();
 	const activeSubMode = subMode && subMode[0];
 	return (
 		<div>
-			<ProfileHeader type="user" mode="settings" name={name} slug={slug} avatar={avatar} />
+			<ProfileHeader
+				type={community ? "community" : "user"}
+				mode="settings"
+				name={community?.name || user?.name}
+				slug={slug}
+				avatar={community?.avatar || user?.avatar}
+				verifiedUrl={community?.verifiedUrl}
+				location={community?.location}
+			/>
 			<ResourceContentFrame
 				navContent={
 					<SideNav
@@ -66,30 +74,33 @@ export default UserSettings;
 export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
 	context
 ) => {
+	const { profileSlug, subMode } = context.params!;
+	const profileData = await getProfileData(profileSlug);
 	const validSubModes = ["account"];
-	const { subMode } = context.query;
-	if (subMode && (subMode.length > 1 || !validSubModes.includes(subMode[0]))) {
+	const isValidSubmode = !subMode || (subMode.length === 1 && validSubModes.includes(subMode[0]));
+	if (!profileData || !isValidSubmode) {
 		return { notFound: true };
 	}
-	const loginData = await getLoginData(context.req);
-	const { id } = context.params!;
-	const userData = await prisma.user.findUnique({
-		where: { id: id },
-		include: {
-			profile: true,
-		},
-	});
 
-	if (!userData || loginData?.id !== userData.id) {
+	const loginData = await getLoginData(context.req);
+
+	const hasAccessUser = profileData.user && profileData.user.id === loginData?.id;
+	const hasAccessCommunity =
+		profileData.community &&
+		profileData.community.members.find((member) => {
+			return member.userId === loginData?.id;
+		});
+
+	/* Return 404 if neither userAccess nor communityAcces is truthy */
+	if (!hasAccessUser && !hasAccessCommunity) {
 		return { notFound: true };
 	}
 
 	return {
 		props: {
-			slug: userData.profile.slug,
-			name: userData.name,
-			avatar: userData.avatar || undefined,
-			createdAt: userData.createdAt,
+			slug: profileData.slug,
+			community: profileData.community,
+			user: profileData.user,
 		},
 	};
 };
