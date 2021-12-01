@@ -1,10 +1,9 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "prisma/db";
 
 import { ProfileHeader, ResourceContentFrame, Section, SideNav } from "components";
 import { useLocationContext } from "utils/client/hooks";
-import { ResourcePageParams } from "utils/shared/types";
+import { ProfilePageParams } from "utils/shared/types";
 import { getLoginData } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
 import { getProfileData } from "utils/server/queries";
@@ -71,9 +70,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 
 export default UserSettings;
 
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
-	context
-) => {
+export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { profileSlug, subMode } = context.params!;
 	const profileData = await getProfileData(profileSlug);
 	const validSubModes = ["account"];

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag } from "@blueprintjs/core";
+import { Icon, Tag } from "@blueprintjs/core";
 
 import { ScopeNav } from "components";
 import { Collection } from "components/Icons";
@@ -8,7 +8,6 @@ import { useLocationContext } from "utils/client/hooks";
 import { collectionNavItems } from "utils/shared/navs";
 
 import styles from "./CollectionHeader.module.scss";
-// import { StarEmpty } from "@blueprintjs/icons";
 
 type Props = {
 	labels?: string[];
@@ -37,7 +36,7 @@ const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, l
 								Private
 							</Tag>
 						)}
-						{/* <StarEmpty className={styles.star} size={22} /> */}
+						<Icon icon="star-empty" size={22} />
 					</div>
 
 					<div className={styles.details}>

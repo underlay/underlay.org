@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export default nextConnect<NextApiRequest, NextApiResponse>()
 	.use(auth)
-	.get(async (req, res) => {
+	.get(async (_req, res) => {
 		const users = await prisma.user.findMany();
 		return res.json(users);
 	})

@@ -3,13 +3,12 @@ import { GetServerSideProps } from "next";
 
 import { ProfileHeader, ResourceContentFrame, Section, UserList } from "components";
 import { getProfileData } from "utils/server/queries";
-import { ResourcePageParams } from "utils/shared/types";
+import { ProfilePageParams } from "utils/shared/types";
 
 type Props = {
 	name: string;
 	slug: string;
 	avatar?: string;
-	createdAt: Date;
 	members: any;
 };
 
@@ -37,9 +36,7 @@ const CommunityPeople: React.FC<Props> = function ({ name, slug, avatar, members
 
 export default CommunityPeople;
 
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
-	context
-) => {
+export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { profileSlug } = context.params!;
 	const profileData = await getProfileData(profileSlug);
 

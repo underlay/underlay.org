@@ -1,10 +1,9 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "prisma/db";
 
 import { CollectionHeader } from "components";
-import { ResourcePageParams } from "utils/shared/types";
-// import { getLoginData } from "utils/server/auth/user";
+import { CollectionPageParams } from "utils/shared/types";
+import { getCollectionData } from "utils/server/queries";
 
 type Props = {
 	slug: string;
@@ -23,14 +22,12 @@ const CollectionDiscussions: React.FC<Props> = function ({}) {
 
 export default CollectionDiscussions;
 
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
 	context
 ) => {
-	// const loginData = await getLoginData(context.req);
-	const { id } = context.params!;
-	const collectionData = await prisma.collection.findUnique({
-		where: { id: id },
-	});
+	const { profileSlug, collectionSlug } = context.params!;
+	const profileData = await getCollectionData(profileSlug, collectionSlug);
+	const collectionData = profileData?.community?.collections[0];
 
 	if (!collectionData) {
 		return { notFound: true };

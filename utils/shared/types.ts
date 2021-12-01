@@ -19,8 +19,13 @@ export type LocationData = {
 	versionNumber?: string;
 };
 
-export type ResourcePageParams = {
+export type ProfilePageParams = {
 	profileSlug: string;
-	collectionSlug?: string;
+	subMode?: string;
+};
+
+export type CollectionPageParams = {
+	profileSlug: string;
+	collectionSlug: string;
 	subMode?: string;
 };

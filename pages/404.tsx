@@ -1,5 +1,4 @@
 import { NonIdealState } from "@blueprintjs/core";
-// import { WarningSign } from "@blueprintjs/icons";
 
 const NotFound: React.FC<{}> = ({}) => {
 	const style = {
@@ -7,8 +6,7 @@ const NotFound: React.FC<{}> = ({}) => {
 	};
 	return (
 		<div style={style}>
-			{/* <NonIdealState title="Page Not Found" icon={<WarningSign size={64} />} /> */}
-			<NonIdealState title="Page Not Found" />
+			<NonIdealState title="Page Not Found" icon="warning-sign" />
 		</div>
 	);
 };

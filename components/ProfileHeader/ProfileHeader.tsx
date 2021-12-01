@@ -1,6 +1,5 @@
 import React from "react";
-import { Intent, Tag } from "@blueprintjs/core";
-import { MapMarker } from "@blueprintjs/icons";
+import { Icon, Intent, Tag } from "@blueprintjs/core";
 
 import { Avatar, ScopeNav } from "components";
 import { buildUrl } from "utils/shared/urls";
@@ -50,12 +49,12 @@ const ProfileHeader: React.FC<Props> = function ({
 								Verified: {verifiedUrl}
 							</Tag>
 						)}
-						{/* {location && (
+						{location && (
 							<span>
-								<MapMarker className={styles.mapMarker} />
+								<Icon icon="map-marker" className={styles.mapMarker} />
 								{location}
 							</span>
-						)} */}
+						)}
 					</div>
 				</div>
 			</div>

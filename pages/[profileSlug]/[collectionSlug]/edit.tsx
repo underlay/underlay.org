@@ -1,19 +1,19 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "prisma/db";
 import Head from "next/head";
+import { Button, Intent } from "@blueprintjs/core";
 
 import { CollectionHeader } from "components";
-import { ResourcePageParams } from "utils/shared/types";
-// import { getLoginData } from "utils/server/auth/user";
+import { CollectionPageParams } from "utils/shared/types";
+import { getCollectionData } from "utils/server/queries";
 import { useLocationContext } from "utils/client/hooks";
-import { Button, Intent } from "@blueprintjs/core";
+
 import Editor from "components/Editor/Editor";
 
 type Props = {
 	slug: string;
 	permission: string;
-	labels?: string[];
+	labels?: any;
 };
 
 const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
@@ -104,15 +104,12 @@ const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
 
 export default CollectionEdit;
 
-// @ts-ignore
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
 	context
 ) => {
-	// const loginData = await getLoginData(context.req);
-	const { id } = context.params!;
-	const collectionData = await prisma.collection.findUnique({
-		where: { id: id },
-	});
+	const { profileSlug, collectionSlug } = context.params!;
+	const profileData = await getCollectionData(profileSlug, collectionSlug);
+	const collectionData = profileData?.community?.collections[0];
 
 	if (!collectionData) {
 		return { notFound: true };

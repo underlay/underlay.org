@@ -8,8 +8,8 @@ import {
 	Popover,
 	Button,
 	Position,
+	Icon,
 } from "@blueprintjs/core";
-import { Menu as MenuIcon } from "@blueprintjs/icons";
 import classNames from "classnames";
 
 import { buildUrl } from "utils/shared/urls";
@@ -77,7 +77,12 @@ const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
 							position={Position.BOTTOM_RIGHT}
 							minimal
 						>
-							<Button minimal large className={styles.button} icon={<MenuIcon />} />
+							<Button
+								minimal
+								large
+								className={styles.button}
+								icon={<Icon icon="menu" />}
+							/>
 						</Popover>
 					);
 				}}

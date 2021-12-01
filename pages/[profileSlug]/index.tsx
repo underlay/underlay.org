@@ -11,7 +11,7 @@ import {
 	CommunityList,
 } from "components";
 import { getProfileData } from "utils/server/queries";
-import { ResourcePageParams } from "utils/shared/types";
+import { ProfilePageParams } from "utils/shared/types";
 
 type Props = {
 	slug: string;
@@ -59,9 +59,7 @@ const CommunityOverview: React.FC<Props> = function ({ slug, community, user }) 
 
 export default CommunityOverview;
 
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
-	context
-) => {
+export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { profileSlug } = context.params!;
 	const profileData = await getProfileData(profileSlug);
 

@@ -20,3 +20,21 @@ export const getProfileData = (profileSlug: string) => {
 		},
 	});
 };
+
+export const getCollectionData = (profileSlug: string, collectionSlug: string) => {
+	return prisma.profile.findUnique({
+		where: { slug: profileSlug },
+		include: {
+			community: {
+				include: {
+					members: true,
+					collections: {
+						where: {
+							slug: collectionSlug,
+						},
+					},
+				},
+			},
+		},
+	});
+};

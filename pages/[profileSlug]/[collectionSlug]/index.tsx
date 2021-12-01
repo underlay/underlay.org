@@ -1,19 +1,18 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import prisma from "prisma/db";
 import Head from "next/head";
 
 import { CollectionHeader, ResourceContentFrame } from "components";
-import { ResourcePageParams } from "utils/shared/types";
+import { CollectionPageParams } from "utils/shared/types";
 import MainContent from "components/CollectionOverview/MainContent";
 import SideContent from "components/CollectionOverview/SideContent";
-// import { getLoginData } from "utils/server/auth/user";
 import { useLocationContext } from "utils/client/hooks";
+import { getCollectionData } from "utils/server/queries";
 
 type Props = {
 	slug: string;
 	permission: string;
-	labels?: string[];
+	labels?: any;
 };
 
 const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
@@ -37,34 +36,12 @@ const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
 
 export default CollectionOverview;
 
-// @ts-ignore
-export const getServerSideProps: GetServerSideProps<Props, ResourcePageParams> = async (
+export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
 	context
 ) => {
-	// const loginData = await getLoginData(context.req);
 	const { profileSlug, collectionSlug } = context.params!;
-
-	// const { profileSlug } = context.params!;
-	const profileData = await prisma.profile.findUnique({
-		where: { slug: profileSlug },
-		include: {
-			community: {
-				include: {
-					// members: { include: { user: { include: { profile: true } } } },
-					collections: {
-						where: {
-							slug: collectionSlug,
-						},
-					},
-				},
-			},
-		},
-	});
-	console.log(profileData.community.collections);
-	const collectionData = profileData.community.collections[0];
-	// const collectionData = await prisma.collection.findUnique({
-	// 	where: { slug: collectionSlug },
-	// });
+	const profileData = await getCollectionData(profileSlug, collectionSlug);
+	const collectionData = profileData?.community?.collections[0];
 
 	if (!collectionData) {
 		return { notFound: true };
