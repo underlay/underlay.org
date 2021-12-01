@@ -50,12 +50,12 @@ const ProfileHeader: React.FC<Props> = function ({
 								Verified: {verifiedUrl}
 							</Tag>
 						)}
-						{location && (
+						{/* {location && (
 							<span>
 								<MapMarker className={styles.mapMarker} />
 								{location}
 							</span>
-						)}
+						)} */}
 					</div>
 				</div>
 			</div>
