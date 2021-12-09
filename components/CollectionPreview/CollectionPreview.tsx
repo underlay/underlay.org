@@ -21,7 +21,7 @@ const CollectionPreview: React.FC<Props> = function ({
 	// version,
 	// lastPublished,
 }) {
-	const { profileSlug = "" } = useLocationContext();
+	const { profileSlug = "" } = useLocationContext().query;
 	return (
 		<a
 			href={buildUrl({

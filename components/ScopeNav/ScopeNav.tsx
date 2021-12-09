@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
 
 	return (
 		<div className={styles.primary}>

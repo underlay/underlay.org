@@ -28,7 +28,7 @@ const ProfileHeader: React.FC<Props> = function ({
 	verifiedUrl,
 	location,
 }) {
-	const { profileSlug = "" } = useLocationContext();
+	const { profileSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<div className={styles.scopeHeader}>

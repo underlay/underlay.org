@@ -8,11 +8,14 @@ type LocalUser = {
 export type LocalUserData = LocalUser | undefined;
 
 export type LocationData = {
-	profileSlug?: string;
-	collectionSlug?: string;
-	mode?: string;
-	subMode?: string;
-	versionNumber?: string;
+	pathname: string;
+	query: {
+		profileSlug?: string;
+		collectionSlug?: string;
+		mode?: string;
+		subMode?: string;
+		versionNumber?: string;
+	};
 };
 
 export type ProfilePageParams = {

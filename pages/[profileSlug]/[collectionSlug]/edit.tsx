@@ -17,7 +17,7 @@ type Props = {
 };
 
 const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<Head>

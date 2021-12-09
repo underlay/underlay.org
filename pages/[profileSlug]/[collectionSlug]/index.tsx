@@ -16,7 +16,7 @@ type Props = {
 };
 
 const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<Head>

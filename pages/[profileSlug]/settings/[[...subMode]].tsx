@@ -15,7 +15,7 @@ type Props = {
 };
 
 const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
-	const { profileSlug = "", subMode } = useLocationContext();
+	const { profileSlug = "", subMode } = useLocationContext().query;
 	const activeSubMode = subMode && subMode[0];
 	return (
 		<div>

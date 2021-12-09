@@ -4,6 +4,7 @@ import Head from "next/head";
 import initClient from "utils/client/initClient";
 import { LocalUserData } from "utils/shared/types";
 import { LoginContext, LocationContext } from "utils/client/hooks";
+import { useFathom } from "utils/client/fathom";
 import { Header, Footer } from "components";
 
 import "./app.scss";
@@ -11,8 +12,9 @@ import "./app.scss";
 type ExpandedAppProps = AppProps & { loginData: LocalUserData };
 
 function MyApp({ Component, router, pageProps, loginData }: ExpandedAppProps) {
+	useFathom();
 	return (
-		<LocationContext.Provider value={router.query}>
+		<LocationContext.Provider value={router}>
 			<LoginContext.Provider value={loginData}>
 				<Head>
 					<title>Underlay</title>

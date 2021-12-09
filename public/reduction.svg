@@ -1,0 +1,25 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line y1="-0.374845" x2="26.1399" y2="-0.374845" transform="matrix(0.636881 -0.770962 0.770961 0.636882 66.4943 53.6944)" stroke="black" stroke-width="0.749691"/>
+<line x1="66.8139" y1="53.4985" x2="83.4619" y2="80.6611" stroke="black" stroke-width="0.749691"/>
+<line x1="66.4943" y1="53.3195" x2="103.295" y2="53.3195" stroke="black" stroke-width="0.749691"/>
+<line y1="-0.374845" x2="33.8223" y2="-0.374845" transform="matrix(0.595848 0.803097 -0.803099 0.595846 103.295 53.6944)" stroke="black" stroke-width="0.749691"/>
+<circle cx="66.0562" cy="54.1325" r="10.0764" fill="#AC97E8"/>
+<circle cx="82.7041" cy="31.3509" r="10.0764" fill="#AC97E8"/>
+<circle cx="82.7041" cy="79.5427" r="10.0764" fill="#AC97E8"/>
+<circle cx="102.857" cy="54.1325" r="10.0764" fill="#AC97E8"/>
+<circle cx="123.01" cy="81.2951" r="10.0764" fill="#AC97E8"/>
+<line x1="15.7842" y1="32.2067" x2="46.3393" y2="32.2067" stroke="black" stroke-width="0.749691"/>
+<line x1="67.3099" y1="53.4745" x2="46.6403" y2="81.3336" stroke="black" stroke-width="0.749691"/>
+<line x1="46.6044" y1="32.3165" x2="67.274" y2="52.9861" stroke="black" stroke-width="0.749691"/>
+<circle cx="15.3348" cy="30.3348" r="10.3348" fill="#E89797"/>
+<circle cx="45.8899" cy="30.3348" r="10.3348" fill="#E89797"/>
+<circle cx="45.8899" cy="79.7622" r="10.3348" fill="#E89797"/>
+<circle cx="66.3146" cy="54.5502" r="10.3348" fill="#A99E9E"/>
+<line x1="83.7071" y1="82.291" x2="83.1628" y2="129.611" stroke="black" stroke-width="0.749691"/>
+<line x1="134.858" y1="103.18" x2="114.188" y2="131.039" stroke="black" stroke-width="0.749691"/>
+<line x1="85.4519" y1="79.5616" x2="134.716" y2="102.617" stroke="black" stroke-width="0.749691"/>
+<circle cx="82.8828" cy="80.04" r="10.3348" fill="#A99E9E"/>
+<circle cx="82.8828" cy="127.196" r="10.3348" fill="#58DAA3"/>
+<circle cx="113.438" cy="129.467" r="10.3348" fill="#58DAA3"/>
+<circle cx="134.108" cy="103.406" r="10.3348" fill="#58DAA3"/>
+</svg>

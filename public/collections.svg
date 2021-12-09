@@ -1,0 +1,29 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5.25" y="20.25" width="139.5" height="110.5" fill="white" stroke="black" stroke-width="0.5"/>
+<line y1="-0.573406" x2="14.4264" y2="-0.573406" transform="matrix(0.636881 -0.770962 0.770961 0.636882 98.9382 102.596)" stroke="black" stroke-width="1.14681"/>
+<line y1="-0.573406" x2="17.5824" y2="-0.573406" transform="matrix(0.522561 0.852602 -0.852601 0.522563 98.9382 102.596)" stroke="black" stroke-width="1.14681"/>
+<line x1="98.9382" y1="102.022" x2="119.248" y2="102.022" stroke="black" stroke-width="1.14681"/>
+<line y1="-0.573406" x2="18.6662" y2="-0.573406" transform="matrix(0.595844 0.8031 -0.803096 0.59585 119.248 102.596)" stroke="black" stroke-width="1.14681"/>
+<circle cx="98.6964" cy="102.837" r="5.5611" fill="#AC97E8"/>
+<circle cx="107.884" cy="90.2645" r="5.5611" fill="#AC97E8"/>
+<circle cx="107.884" cy="116.861" r="5.5611" fill="#AC97E8"/>
+<circle cx="119.006" cy="102.837" r="5.5611" fill="#AC97E8"/>
+<circle cx="130.129" cy="117.828" r="5.5611" fill="#AC97E8"/>
+<line x1="70.9517" y1="90.3702" x2="87.8148" y2="90.3702" stroke="black" stroke-width="1.14681"/>
+<line x1="99.6827" y1="102.693" x2="88.2753" y2="118.068" stroke="black" stroke-width="1.14681"/>
+<line x1="88.2202" y1="90.5382" x2="99.6275" y2="101.946" stroke="black" stroke-width="1.14681"/>
+<circle cx="70.7037" cy="89.7037" r="5.7037" fill="#E89797"/>
+<circle cx="87.5667" cy="89.7037" r="5.7037" fill="#E89797"/>
+<circle cx="87.5667" cy="116.982" r="5.7037" fill="#E89797"/>
+<circle cx="98.8388" cy="103.068" r="5.7037" fill="#A99E9E"/>
+<circle cx="107.983" cy="117.136" r="5.7037" fill="#A99E9E"/>
+<rect x="13" y="33" width="110.29" height="6.56489" fill="#CACACA"/>
+<rect x="13" y="47" width="79.5882" height="3.29286" fill="#CACACA"/>
+<path d="M13 53.5857H81.7353V56.8786H13V53.5857Z" fill="#CACACA"/>
+<path d="M13 60.1715H87.7647V63.4643H13V60.1715Z" fill="#CACACA"/>
+<path d="M13 67.1688H95V70.4616H13V67.1688Z" fill="#CACACA"/>
+<rect x="13" y="80" width="34.9412" height="3.29286" fill="#CACACA"/>
+<path d="M13 86.5857H43.1765V89.8786H13V86.5857Z" fill="#CACACA"/>
+<path d="M13 93.1715H45.8235V96.4643H13V93.1715Z" fill="#CACACA"/>
+<path d="M13 100.169H49V103.462H13V100.169Z" fill="#CACACA"/>
+</svg>

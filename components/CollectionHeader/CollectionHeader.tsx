@@ -16,7 +16,7 @@ type Props = {
 };
 
 const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, labels = [] }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext();
+	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
