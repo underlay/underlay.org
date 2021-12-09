@@ -1,67 +1,28 @@
-import crypto from "crypto";
-import type { NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingMessage } from "http";
-import prisma from "prisma/db";
+import Iron from "@hapi/iron";
 
-import { MAX_AGE, setTokenCookie, getTokenCookie, removeTokenCookie } from "./cookies";
+import { setTokenCookie, getTokenCookie, removeTokenCookie } from "./cookies";
 
-// @ts-ignore
-const TOKEN_SECRET: string = process.env.TOKEN_SECRET;
+const IRON_SECRET: string = process.env.IRON_SECRET || "";
 
 export async function setLoginSession(res: NextApiResponse, userId: string) {
-	const sessionId = crypto.randomBytes(32).toString("base64");
-	await prisma.session.create({
-		data: {
-			id: sessionId,
-			userId,
-			expiresAt: new Date(Date.now() + MAX_AGE * 1000),
-		},
-	});
-	setTokenCookie(res, sessionId);
+	const sessionJWT = await Iron.seal(userId, IRON_SECRET, Iron.defaults);
+	setTokenCookie(res, sessionJWT);
 }
 
-export async function getLoginSession(req: IncomingMessage) {
-	const sessionId = getTokenCookie(req);
-	if (!sessionId) return;
+export async function getLoginSession(req: NextApiRequest | IncomingMessage) {
+	const sessionJWT = getTokenCookie(req);
+	if (!sessionJWT) return;
 
-	const session = await prisma.session.findUnique({
-		where: {
-			id: sessionId,
-		},
-	});
-
-	// Validate the expiration date of the session
-	if (session && new Date() > session?.expiresAt) {
-		await clearExpiredSessions();
-		throw new Error("Session expired");
+	try {
+		const sessionUserId = await Iron.unseal(sessionJWT, IRON_SECRET, Iron.defaults);
+		return sessionUserId;
+	} catch (error) {
+		return undefined;
 	}
-
-	return session;
 }
 
-export async function removeLoginSession(req: IncomingMessage, res: NextApiResponse) {
-	await clearExpiredSessions();
-
-	const sessionId = getTokenCookie(req);
-	if (!sessionId) return;
-
-	await prisma.session.delete({
-		where: {
-			id: sessionId,
-		},
-	});
-
+export async function removeLoginSession(_req: NextApiRequest, res: NextApiResponse) {
 	removeTokenCookie(res);
-}
-
-async function clearExpiredSessions() {
-	/* This function is called from a few places to do perioidic database */
-	/* cleanup of expired sessions. */
-	await prisma.session.deleteMany({
-		where: {
-			expiresAt: {
-				lt: new Date(Date.now()),
-			},
-		},
-	});
 }

@@ -2,17 +2,19 @@ import App, { AppContext, AppProps } from "next/app";
 import Head from "next/head";
 
 import initClient from "utils/client/initClient";
-import { LoginData } from "utils/shared/types";
+import { LocalUserData } from "utils/shared/types";
 import { LoginContext, LocationContext } from "utils/client/hooks";
+import { useFathom } from "utils/client/fathom";
 import { Header, Footer } from "components";
 
 import "./app.scss";
 
-type ExpandedAppProps = AppProps & { loginData: LoginData };
+type ExpandedAppProps = AppProps & { loginData: LocalUserData };
 
 function MyApp({ Component, router, pageProps, loginData }: ExpandedAppProps) {
+	useFathom();
 	return (
-		<LocationContext.Provider value={router.query}>
+		<LocationContext.Provider value={router}>
 			<LoginContext.Provider value={loginData}>
 				<Head>
 					<title>Underlay</title>
@@ -32,27 +34,26 @@ function MyApp({ Component, router, pageProps, loginData }: ExpandedAppProps) {
 }
 
 MyApp.getInitialProps = async (appContext: AppContext) => {
-	const appProps = await App.getInitialProps(appContext);
 	/* 
-		This funky require function exists for a couple reasons.
-		1. getInitialProps does not do tree shaking, and so even though
-		it is only run on the server-side for _app.tsx, it is still bundled
-		with the client, causing server-side code to make it's way
-		to the client and cause 'Prisma cannot be run on the client' style
-		errors.
-		2. The Layout component approach (where every page uses a Layout
-		component and uses getServerSideProps to fetch init data) could work
-		but feels verbose and like a lot of overhead to do the exact same thing
-		
-		Webpack doesn't statically analyze eval, so it will be ignored when bundling.
-		Tips from here: https://arunoda.me/blog/ssr-and-server-only-modules
-		https://nextjs.org/docs/advanced-features/custom-app
+		There is no current way to run server-only code for all pages without
+		manually repeating that code on each page. MyApp.getInitialProps will run 
+		on both server and client. To prevent the execution of this code, we wrap
+		it in a typeof window statement. To prevent the bundling of the server code
+		we require the necessary file in-line (rather than a top-level import)
+		and update our package.json `browser` field to not bundle the 
+		utils/server/auth/user.ts file.
+		Discussions on the need for a cleaner solution:
+		https://github.com/vercel/next.js/discussions/10874
 		https://github.com/vercel/next.js/issues/22505
+		https://arunoda.me/blog/ssr-and-server-only-modules
 	*/
-	const loginData: LoginData = await require("../utils/server/initServerData.ts")(
-		appContext.ctx.req
-	);
-	return { ...appProps, loginData: loginData };
+	if (typeof window === "undefined") {
+		const { getLoginId, findUserById } = require("../utils/server/auth/user.ts");
+		const appProps = await App.getInitialProps(appContext);
+		const loginId = await getLoginId(appContext.ctx.req);
+		const loginData = await findUserById(loginId);
+		return { ...appProps, loginData: loginData };
+	}
 };
 
 export default MyApp;

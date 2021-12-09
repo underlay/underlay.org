@@ -1,7 +1,6 @@
 import React, { useState, FormEvent } from "react";
 import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
-
 import { Button, Intent, FormGroup, InputGroup } from "@blueprintjs/core";
 
 import { SignupPostBody } from "pages/api/signup";

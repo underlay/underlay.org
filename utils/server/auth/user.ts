@@ -1,46 +1,58 @@
 import crypto from "crypto";
 import prisma from "prisma/db";
+import { NextApiRequest } from "next";
 import { IncomingMessage } from "http";
 
 import { getLoginSession } from "utils/server/auth/session";
-import { LoginData } from "utils/shared/types";
 
 type PrivateUser = {
 	id: string;
-	email: string;
-	slug: string;
-	hash: string;
 	salt: string;
-	createdAt: Date;
+	hash: string;
 };
 
-export async function getLoginData(req: IncomingMessage): Promise<LoginData> {
-	const session = await getLoginSession(req);
-	const user = session && (await findUserById(session.userId));
-
-	return user
-		? {
-				id: user.id,
-				slug: user.profile.slug,
-				email: user.email,
-				name: user.name,
-				avatar: user.avatar || undefined,
-				signupCompletedAt: user.signupCompletedAt || undefined,
-				createdAt: user.createdAt,
-				updatedAt: user.updatedAt,
-		  }
-		: undefined;
+export async function getLoginId(req: NextApiRequest | IncomingMessage): Promise<string> {
+	const sessionUserId = await getLoginSession(req);
+	return sessionUserId;
 }
 
+// export async function getLoginData(req: IncomingMessage): Promise<LoginData> {
+// 	const session = await getLoginSession(req);
+// 	const user = session && (await findUserById(session.userId));
+
+// 	return user
+// 		? {
+// 				id: user.id,
+// 				slug: user.profile.slug,
+// 				email: user.email,
+// 				name: user.name,
+// 				avatar: user.avatar || undefined,
+// 				signupCompletedAt: user.signupCompletedAt || undefined,
+// 				createdAt: user.createdAt,
+// 				updatedAt: user.updatedAt,
+// 		  }
+// 		: undefined;
+// }
+
 export async function findUserByEmail(email: string) {
+	if (!email) {
+		return undefined;
+	}
 	const user = await prisma.user.findUnique({
 		where: { email },
-		include: { profile: true },
+		select: {
+			id: true,
+			salt: true,
+			hash: true,
+		},
 	});
 	return user;
 }
 
 export async function findUserById(id: string) {
+	if (!id) {
+		return undefined;
+	}
 	const user = await prisma.user.findUnique({
 		where: { id },
 		include: { profile: true },

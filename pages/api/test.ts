@@ -1,11 +1,11 @@
 // @ts-nocheck
 import nextConnect from "next-connect";
-import auth from "utils/server/auth/middleware";
+// import auth from "utils/server/auth/middleware";
 import prisma from "prisma/db";
 import crypto from "crypto";
 
 export default nextConnect()
-	.use(auth)
+	// .use(auth)
 	.get(async (req, res) => {
 		// const salt = crypto.randomBytes(16).toString("hex");
 		// const hash = crypto.pbkdf2Sync("password", salt, 1000, 64, "sha512").toString("hex");

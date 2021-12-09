@@ -1,15 +1,12 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import auth from "utils/server/auth/middleware";
 import prisma from "prisma/db";
-
-import type { NextApiRequest, NextApiResponse } from "next";
 
 interface ExtendedRequest {
 	user: { id: string };
 }
 
 export default nextConnect<NextApiRequest, NextApiResponse>()
-	.use(auth)
 	.get<ExtendedRequest>(async (req, res) => {
 		const user = await prisma.profile.findUnique({
 			where: {

@@ -1,12 +1,12 @@
 // @ts-nocheck
 import React, { useState } from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, Checkbox, InputGroup } from "@blueprintjs/core";
+import { Button, ButtonGroup, Checkbox, Icon, InputGroup } from "@blueprintjs/core";
 
 import styles from "./Editor.module.scss";
 import { nodes, relationships, entities } from "./data";
 import { Discussion, Provenance, Schema } from "components/Icons";
-import { ChevronDown, DragHandleHorizontal } from "@blueprintjs/icons";
+
 type Props = {};
 
 const classBlock = (item, isRelationship, classClick, schemaClick, showSchema) => {
@@ -156,11 +156,14 @@ const Editor: React.FC<Props> = function ({}) {
 												{field.namespace}
 											</div>
 											<div className={styles.schemaRowContent}>
-												<DragHandleHorizontal style={{ opacity: 0.6 }} />
+												<Icon
+													icon="drag-handle-horizontal"
+													style={{ opacity: 0.6 }}
+												/>
 												<InputGroup placeholder="Key..." value={field.id} />
 												<Button
 													text={field.type}
-													rightIcon={<ChevronDown />}
+													rightIcon="chevron-down"
 												/>
 												<ButtonGroup>
 													<Button

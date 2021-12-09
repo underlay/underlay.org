@@ -1,32 +1,31 @@
-// @ts-nocheck
+import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import auth from "utils/server/auth/middleware";
 import prisma from "prisma/db";
 
 import { slugifyString } from "utils/shared/strings";
+import { getLoginId } from "utils/server/auth/user";
 
-export default nextConnect()
-	.use(auth)
-	.post(async (req, res) => {
-		if (!req.user) {
-			return res.status(403).json({ ok: false });
-		}
-		const community = await prisma.community.create({
-			data: {
-				name: req.body.name,
-				profile: {
-					create: {
-						slug: slugifyString(req.body.name),
-					},
-				},
-				members: {
-					create: {
-						userId: req.user.id,
-						permission: "owner",
-					},
+export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
+	const loginId = await getLoginId(req);
+	if (!loginId) {
+		return res.status(403).json({ ok: false });
+	}
+	const community = await prisma.community.create({
+		data: {
+			name: req.body.name,
+			profile: {
+				create: {
+					slug: slugifyString(req.body.name),
 				},
 			},
-		});
-
-		return res.status(200).json(community);
+			members: {
+				create: {
+					userId: loginId,
+					permission: "owner",
+				},
+			},
+		},
 	});
+
+	return res.status(200).json(community);
+});

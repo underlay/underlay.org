@@ -1,6 +1,5 @@
 import React from "react";
-import { Intent, Tag } from "@blueprintjs/core";
-import { MapMarker } from "@blueprintjs/icons";
+import { Icon, Intent, Tag } from "@blueprintjs/core";
 
 import { Avatar, ScopeNav } from "components";
 import { buildUrl } from "utils/shared/urls";
@@ -29,7 +28,7 @@ const ProfileHeader: React.FC<Props> = function ({
 	verifiedUrl,
 	location,
 }) {
-	const { profileSlug = "" } = useLocationContext();
+	const { profileSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
@@ -52,7 +51,7 @@ const ProfileHeader: React.FC<Props> = function ({
 						)}
 						{location && (
 							<span>
-								<MapMarker className={styles.mapMarker} />
+								<Icon icon="map-marker" className={styles.mapMarker} />
 								{location}
 							</span>
 						)}
