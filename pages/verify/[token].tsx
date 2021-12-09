@@ -1,9 +1,8 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 import prisma from "prisma/db";
-// import { Button, Intent, FormGroup, InputGroup } from "@blueprintjs/core";
 
-import { getLoginData } from "utils/server/auth/user";
+import { getLoginId } from "utils/server/auth/user";
 
 type Props = {
 	completed: boolean;
@@ -22,14 +21,14 @@ const VerifyToken: React.FC<Props> = ({ completed, slug }) => {
 export default VerifyToken;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const loginData = await getLoginData(context.req);
+	const loginId = await getLoginId(context.req);
 	// @ts-ignore
 	const { token } = context.params;
 	const signupData = await prisma.user.findUnique({
 		where: { signupToken: token },
 		include: { profile: true },
 	});
-	const completedIsValid = !!signupData && signupData.id === loginData?.id;
+	const completedIsValid = !!signupData && signupData.id === loginId;
 	if (completedIsValid) {
 		await prisma.user.updateMany({
 			where: {

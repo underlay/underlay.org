@@ -4,7 +4,7 @@ import { GetServerSideProps } from "next";
 import { ProfileHeader, ResourceContentFrame, Section, SideNav } from "components";
 import { useLocationContext } from "utils/client/hooks";
 import { ProfilePageParams } from "utils/shared/types";
-import { getLoginData } from "utils/server/auth/user";
+import { getLoginId } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
 import { getProfileData } from "utils/server/queries";
 
@@ -79,13 +79,13 @@ export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = 
 		return { notFound: true };
 	}
 
-	const loginData = await getLoginData(context.req);
+	const loginId = await getLoginId(context.req);
 
-	const hasAccessUser = profileData.user && profileData.user.id === loginData?.id;
+	const hasAccessUser = profileData.user && profileData.user.id === loginId;
 	const hasAccessCommunity =
 		profileData.community &&
 		profileData.community.members.find((member) => {
-			return member.userId === loginData?.id;
+			return member.userId === loginId;
 		});
 
 	/* Return 404 if neither userAccess nor communityAcces is truthy */

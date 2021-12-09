@@ -1,12 +1,9 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import auth from "utils/server/auth/middleware";
 import prisma from "prisma/db";
 import { slugifyString } from "utils/shared/strings";
 
-import type { NextApiRequest, NextApiResponse } from "next";
-
 export default nextConnect<NextApiRequest, NextApiResponse>()
-	.use(auth)
 	.get(async (_req, res) => {
 		const users = await prisma.user.findMany();
 		return res.json(users);

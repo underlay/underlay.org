@@ -16,7 +16,7 @@ const authenticate = async (req: NextApiRequest) => {
 	});
 };
 
-export default nextConnect().post(async (req: NextApiRequest, res: NextApiResponse) => {
+export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
 	try {
 		const user = await authenticate(req);
 		await setLoginSession(res, user.id);

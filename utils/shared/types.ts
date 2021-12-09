@@ -1,15 +1,11 @@
-export type LoginData =
-	| undefined
-	| {
-			id: string;
-			slug: string;
-			email: string;
-			name?: string;
-			avatar?: string;
-			signupCompletedAt?: Date;
-			createdAt: Date;
-			updatedAt: Date;
-	  };
+type LocalUser = {
+	id: string;
+	name: string;
+	avatar?: string;
+	slug: string;
+};
+
+export type LocalUserData = LocalUser | undefined;
 
 export type LocationData = {
 	profileSlug?: string;
