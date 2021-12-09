@@ -12,7 +12,7 @@ export const useFathom = () => {
 		//  - If you're using www. for your domain, make sure you include that here.
 		Fathom.load("RUDUJXLT", {
 			includedDomains: ["www.underlay.org"],
-			url: "https://paul-attractive.underlay.org",
+			url: "https://paul-attractive.underlay.org/script.js",
 		});
 
 		function onRouteChangeComplete() {
