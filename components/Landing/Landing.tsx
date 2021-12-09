@@ -1,11 +1,12 @@
-// @ts-nocheck
 import React, { useState } from "react";
-import styles from "./Landing.module.scss";
 import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
+// import { useS3Upload } from "next-s3-upload";
+
 import { ScopeNav } from "components";
-import { useS3Upload } from "next-s3-upload";
 import Editor from "components/Editor/Editor";
+
+import styles from "./Landing.module.scss";
 
 type Props = {};
 
@@ -16,16 +17,14 @@ const Landing: React.FC<Props> = function () {
 	const [collectionName, setCollectionName] = useState("");
 	// const [userdata, setUserdata] = useState({});
 
-	const [imageUrl, setImageUrl] = useState();
-	const { FileInput, openFileDialog, uploadToS3 } = useS3Upload();
+	// const [imageUrl, setImageUrl] = useState();
+	// const { FileInput, openFileDialog, uploadToS3 } = useS3Upload();
+	// const handleFileChange = async (file) => {
+	// 	let { url } = await uploadToS3(file);
+	// 	setImageUrl(url);
+	// };
 
-	const handleFileChange = async (file) => {
-		let { url } = await uploadToS3(file);
-		setImageUrl(url);
-	};
-
-	// @ts-ignore
-	const handleLogin = async (evt) => {
+	const handleLogin = async (evt: any) => {
 		evt.preventDefault();
 		await fetch("/api/login", {
 			method: "POST",
@@ -34,7 +33,7 @@ const Landing: React.FC<Props> = function () {
 		});
 		window.location.href = "/";
 	};
-	const handleCommunityCreate = async (evt) => {
+	const handleCommunityCreate = async (evt: any) => {
 		evt.preventDefault();
 		await fetch("/api/community", {
 			method: "POST",
@@ -43,7 +42,7 @@ const Landing: React.FC<Props> = function () {
 		});
 		// window.location.href = "/";
 	};
-	const handleCollectionCreate = async (evt) => {
+	const handleCollectionCreate = async (evt: any) => {
 		evt.preventDefault();
 		await fetch("/api/collection", {
 			method: "POST",
@@ -58,6 +57,7 @@ const Landing: React.FC<Props> = function () {
 			<h1>Landing</h1>
 
 			<ScopeNav
+				mode={""}
 				navItems={[
 					{
 						slug: "overview",
@@ -141,10 +141,10 @@ const Landing: React.FC<Props> = function () {
 				<input type="submit" value="Submit" />
 			</form>
 
-			<h2>Upload</h2>
+			{/* <h2>Upload</h2>
 			<FileInput onChange={handleFileChange} />
 			<button onClick={openFileDialog}>Upload file</button>
-			{imageUrl && <img src={imageUrl} />}
+			{imageUrl && <img src={imageUrl} />} */}
 
 			<div style={{ margin: "50px 0px" }}>
 				<Editor />
