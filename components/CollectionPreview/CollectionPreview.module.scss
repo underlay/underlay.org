@@ -1,5 +1,6 @@
 .previewBlock {
 	display: block;
+	color: black;
 	// background: rgba(256,256,256,0.4);
 	box-shadow: 0px 0px 0px 1px #aaa;
 	text-decoration: none;
@@ -7,6 +8,7 @@
 	padding: 15px;
 	&:hover {
 		text-decoration: none;
+		color: black;
 		// background: rgba(256,256,256,0.2);
 		box-shadow: 0px 0px 0px 1px black;
 	}
