@@ -1,7 +1,6 @@
 {
-	"name": "underlay-r1",
+	"name": "underlay",
 	"version": "0.0.1",
-	"description": "r1: an Underlay registry",
 	"author": "Knowledge Futures, Inc <hello@knowledgefutures.org>",
 	"license": "GPL-2.0+",
 	"sideEffects": false,

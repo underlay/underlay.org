@@ -121,8 +121,8 @@ const Landing: React.FC<Props> = function () {
 							other features that make the content and its creation more accessible.
 						</div>
 						<div className={styles.text}>
-							A first Underlay registry, R1, is being developed in parallel to the
-							protocol and specs.
+							A first Underlay registry is being developed in parallel to the protocol
+							and specs.
 						</div>
 						<div className={styles.link}>
 							<a className={styles.button} href="https://r1.underlay.org">
