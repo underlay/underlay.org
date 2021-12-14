@@ -12,7 +12,7 @@ export function setTokenCookie(res: NextApiResponse, token: string) {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		path: "/",
-		sameSite: "strict",
+		sameSite: "lax",
 	};
 	const cookie = serialize(TOKEN_NAME, token, cookieOptions);
 	res.setHeader("Set-Cookie", cookie);

@@ -7,7 +7,7 @@ import { Avatar } from "components";
 const HeaderProfileButton = () => {
 	const loginData = useLoginContext();
 	const handleSignout = async () => {
-		await fetch("/api/logout", { redirect: "follow" });
+		await fetch("/api/logout", { method: "POST" });
 		window.location.href = "/";
 	};
 
