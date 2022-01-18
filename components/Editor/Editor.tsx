@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, InputGroup } from "@blueprintjs/core";
+import { Button, ButtonGroup, HTMLSelect, InputGroup } from "@blueprintjs/core";
 import SchemaEditor from "./SchemaEditor";
 
 import styles from "./Editor.module.scss";
 import { Discussion, Provenance, Schema } from "components/Icons";
-import { Add } from "@blueprintjs/icons";
+import { Add, DragHandleHorizontal } from "@blueprintjs/icons";
 import type { Entity, Node } from "./data";
 
 export type SchemaData = {
