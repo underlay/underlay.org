@@ -2,8 +2,8 @@ import { InputGroup, HTMLSelect, ButtonGroup, Button } from "@blueprintjs/core";
 import { DragHandleHorizontal } from "@blueprintjs/icons";
 import { updateArrayWithNewElement } from "utils/shared/arrays";
 import { useState } from "react";
-import { FieldType, Node } from "./data";
-import styles from "./Editor.module.scss";
+import { FieldType, Node } from "../Editor/data";
+import styles from "./SchemaEditor.module.scss";
 
 interface Props {
 	node: Node;

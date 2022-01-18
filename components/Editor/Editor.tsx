@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import classNames from "classnames";
 import { Button, ButtonGroup, InputGroup } from "@blueprintjs/core";
-import SchemaEditor from "./SchemaEditor";
+import SchemaEditor from "../SchemaEditor/SchemaEditor";
+import NodeOrRelationshipBlock from "./NodeOrRelationshipBlock";
 
 import styles from "./Editor.module.scss";
-import { Discussion, Provenance, Schema } from "components/Icons";
+import { Discussion, Provenance } from "components/Icons";
 import { Add } from "@blueprintjs/icons";
 import type { Entity, Node } from "./data";
 import { updateArrayWithNewElement } from "utils/shared/arrays";
@@ -17,30 +18,10 @@ export type SchemaData = {
 	};
 };
 
-const classBlock = (item, isRelationship, classClick, schemaClick, showSchema) => {
-	return (
-		<div
-			key={item.id}
-			className={classNames(
-				styles.node,
-				isRelationship && styles.relationship,
-				!showSchema && styles.narrowWidth
-			)}
-			onClick={classClick}
-		>
-			<div className={styles.key}>
-				<div className={styles.namespace}>{item.namespace}</div>
-				<div className={styles.name}>{item.id}</div>
-			</div>
-			{showSchema && <Button minimal icon={<Schema />} onClick={schemaClick} />}
-		</div>
-	);
-};
-
 const Editor: React.FC<SchemaData> = function ({ data }) {
 	const initialNodes: Node[] = JSON.parse(data.schemaNodeJson);
 	const relationships: Node[] = JSON.parse(data.relationshipJson);
-	const entities: Entity[] = JSON.parse(data.entityJson);
+	const entities: { [key: string]: Entity[] } = JSON.parse(data.entityJson);
 
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 	const [filterVal, setFilterVal] = useState<string>("");
@@ -51,12 +32,6 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 	const [activeFilters, setActiveFilters] = useState([]);
 	const [mode, setMode] = useState<"entities" | "schema">("entities");
 
-	let tempNode: Node = {
-		id: "",
-		namespace: "",
-		fields: [],
-	};
-
 	// remove
 	const [activeNodes, setActiveNodes] = useState([]);
 
@@ -65,6 +40,29 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 	}
 	function getActiveRelationships() {
 		return activeRelationshipIndexes.map((i) => relationships[i]);
+	}
+	function getActiveEntities() {
+		const activeNodeEntities = activeNodeIndexes
+			.map((i) => nodes[i])
+			.filter((n) => n.id in entities)
+			.map((n) => {
+				return {
+					node: n,
+					entities: entities[n.id],
+				};
+			});
+
+		const activeRelationshipEntities = activeRelationshipIndexes
+			.map((i) => relationships[i])
+			.filter((r) => r.id in entities)
+			.map((r) => {
+				return {
+					node: r,
+					entities: entities[r.id],
+				};
+			});
+
+		return [...activeNodeEntities, ...activeRelationshipEntities];
 	}
 
 	const filterColumnItems = (index: number, item: Entity) => {
@@ -134,28 +132,31 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 							);
 						})
 						.map((node, nodeIndex) => {
-							return classBlock(
-								node,
-								false,
-								() => {
-									setActiveNodeIndexes([nodeIndex]);
-									setActiveRelationshipIndexes([]);
-									setActiveFilters([]);
-									setMode("entities");
-								},
-								(evt) => {
-									setActiveNodeIndexes([nodeIndex]);
-									setMode("schema");
-									evt.stopPropagation();
-								},
-								true
+							return (
+								<NodeOrRelationshipBlock
+									node={node}
+									isRelationship={false}
+									classClick={() => {
+										setActiveNodeIndexes([nodeIndex]);
+										setActiveRelationshipIndexes([]);
+										setActiveFilters([]);
+										setMode("entities");
+										console.log("here");
+									}}
+									schemaClick={(ev) => {
+										setActiveNodeIndexes([nodeIndex]);
+										setMode("schema");
+										ev.stopPropagation();
+									}}
+									showSchema={true}
+								/>
 							);
 						})}
 
 					<div
 						key={"addNodes"}
 						className={classNames(styles.node)}
-						onClick={(ev) => {
+						onClick={() => {
 							const newActiveIndex = nodes.length;
 							setNodes([
 								...nodes,
@@ -184,21 +185,23 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 							);
 						})
 						.map((relationship, relationshipIndex) => {
-							return classBlock(
-								relationship,
-								true,
-								() => {
-									setActiveRelationshipIndexes([relationshipIndex]);
-									setActiveNodeIndexes([]);
-									setMode("entities");
-								},
-								(evt) => {
-									setActiveRelationshipIndexes([relationshipIndex]);
-									setActiveNodeIndexes([]);
-									setMode("schema");
-									evt.stopPropagation();
-								},
-								true
+							return (
+								<NodeOrRelationshipBlock
+									node={relationship}
+									isRelationship={true}
+									classClick={() => {
+										setActiveRelationshipIndexes([relationshipIndex]);
+										setActiveNodeIndexes([]);
+										setMode("entities");
+									}}
+									schemaClick={(ev) => {
+										setActiveRelationshipIndexes([relationshipIndex]);
+										setActiveNodeIndexes([]);
+										setMode("schema");
+										ev.stopPropagation();
+									}}
+									showSchema={true}
+								/>
 							);
 						})}
 				</div>
@@ -219,19 +222,29 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 					)}
 
 					{mode === "entities" &&
+						getActiveEntities().map(({ node, entities }) => {
+							return (
+								<div className={styles.column} key={`${node.id}Entities`}>
+									<div className={styles.contentHeader}>
+										<div>{node.id}</div>
+										<div>{entities.map((e) => e.id).join(",")}</div>
+									</div>
+								</div>
+							);
+						})}
+
+					{mode === "entities" &&
 						getActiveNodes().map((args) => {
 							const [node, nodeIndex] = args;
 
 							return (
 								<div className={styles.column} key={`${node.id}${nodeIndex}`}>
 									<div className={styles.contentHeader}>
-										{classBlock(
-											node,
-											node.fields[0]?.id === "source",
-											() => {},
-											() => {},
-											false
-										)}
+										<NodeOrRelationshipBlock
+											node={node}
+											isRelationship={node.fields[0]?.id === "source"}
+											showSchema={false}
+										/>
 									</div>
 									{(entities[node.id] || [])
 										.filter((item) => {
@@ -454,10 +467,14 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 																		<div
 																			className={styles.small}
 																		>
-																			{classBlock(
-																				targetRelationship,
-																				true,
-																				() => {
+																			<NodeOrRelationshipBlock
+																				node={
+																					targetRelationship
+																				}
+																				isRelationship={
+																					true
+																				}
+																				classClick={() => {
 																					if (
 																						!activeRelationshipIndexes.includes(
 																							targetRelationshipIndex
@@ -491,10 +508,9 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 																								item.id
 																							)
 																					);
-																				},
-																				undefined,
-																				false
-																			)}
+																				}}
+																				showSchema={false}
+																			/>
 																		</div>
 																	);
 																}
@@ -513,7 +529,7 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 				style={{ marginTop: "20px", marginBottom: "20px" }}
 				text="Upload Schema"
 				className={styles.rightButton}
-				onClick={async (event) => {
+				onClick={async () => {
 					await fetch("/api/schema", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },

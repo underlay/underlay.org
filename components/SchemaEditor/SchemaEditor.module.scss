@@ -1,0 +1,43 @@
+.column {
+	flex: 1 1 auto;
+	width: 0px;
+	// min-width: minmax(350px, 45%);
+	min-width: 400px;
+	// min-width: 45%;
+	padding-left: 10px;
+	margin-right: 10px;
+	overflow-y: scroll;
+	&:not(:first-of-type) {
+		border-left: 1px solid #ccc;
+	}
+}
+
+.namespace {
+	font-size: 12px;
+	opacity: 0.6;
+	margin-left: 32px;
+}
+.schemaRow {
+	margin-bottom: 30px;
+}
+.schemaRowContent {
+	display: flex;
+	align-items: center;
+	& > * {
+		margin-right: 15px;
+	}
+}
+
+.contentHeader {
+	border-bottom: 1px solid #ccc;
+	padding: 10px 2px 10px;
+	margin-bottom: 20px;
+}
+
+.rightButton {
+	float: right;
+
+	Button {
+		margin-left: 10px;
+	}
+}
