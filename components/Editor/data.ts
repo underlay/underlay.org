@@ -4,10 +4,11 @@ export interface Entity {
 	[prop: string]: any;
 }
 
+export type FieldType = "string" | "boolean" | "number";
 export interface Field {
 	id: string;
 	namespace: string;
-	type: "string" | "boolean" | "number";
+	type: FieldType;
 	isRequired: boolean;
 	allowMultiple: boolean;
 }

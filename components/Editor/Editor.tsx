@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, HTMLSelect, InputGroup } from "@blueprintjs/core";
+import { Button, ButtonGroup, InputGroup } from "@blueprintjs/core";
 import SchemaEditor from "./SchemaEditor";
 
 import styles from "./Editor.module.scss";
 import { Discussion, Provenance, Schema } from "components/Icons";
-import { Add, DragHandleHorizontal } from "@blueprintjs/icons";
+import { Add } from "@blueprintjs/icons";
 import type { Entity, Node } from "./data";
+import { updateArrayWithNewElement } from "utils/shared/arrays";
 
 export type SchemaData = {
 	data: {
@@ -203,385 +204,124 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 				</div>
 
 				<div className={styles.columns}>
-					{/* {mode === "schema" &&
-            <SchemaEditor node={nodes[activeNodeIndexes[0]]} onCommit={() => {}} />
-          } */}
+					{mode === "schema" && (
+						<SchemaEditor
+							node={nodes[activeNodeIndexes[0]]}
+							onCancel={() => {
+								setMode("entities");
+							}}
+							onCommit={(node) => {
+								setNodes(
+									updateArrayWithNewElement(nodes, activeNodeIndexes[0], node)
+								);
+							}}
+						/>
+					)}
 
-					{getActiveNodes().map((args) => {
-						const [node, nodeIndex] = args;
-
-						if (mode === "schema") {
-							tempNode = { ...node };
-							function commitTempNode() {
-								setNodes([
-									...nodes.slice(0, nodeIndex),
-									tempNode,
-									...nodes.slice(nodeIndex + 1),
-								]);
-							}
+					{mode === "entities" &&
+						getActiveNodes().map((args) => {
+							const [node, nodeIndex] = args;
 
 							return (
-								<div className={styles.column} key={node.id}>
+								<div className={styles.column} key={`${node.id}${nodeIndex}`}>
 									<div className={styles.contentHeader}>
-										<div className={styles.namespace}>{node.namespace}</div>
-										<InputGroup
-											placeholder="Class..."
-											asyncControl={true}
-											value={tempNode.id}
-											large
-											key={"class" + nodeIndex.toString()}
-											onChange={(event) => {
-												tempNode.id = event.target.value;
-											}}
-										/>
+										{classBlock(
+											node,
+											node.fields[0]?.id === "source",
+											() => {},
+											() => {},
+											false
+										)}
 									</div>
-
-									{tempNode.fields.map((field, fieldIndex) => {
-										return (
-											<div key={field.id} className={styles.schemaRow}>
-												<div className={styles.namespace}>
-													{field.namespace}
-												</div>
-												<div className={styles.schemaRowContent}>
-													<DragHandleHorizontal
-														style={{ opacity: 0.6 }}
-													/>
-													<InputGroup
-														placeholder="Key..."
-														asyncControl={true}
-														value={field.id}
-														onChange={(event) => {
-															tempNode.fields[fieldIndex].id =
-																event.target.value;
-														}}
-													/>
-
-													<HTMLSelect
-														key="type"
-														value={field.type}
-														onChange={(event) => {
-															tempNode.fields[fieldIndex].type = event
-																.target.value as any;
-															commitTempNode();
-														}}
-													>
-														<option value="string">string</option>
-														<option value="number">number</option>
-														<option value="boolean">boolean</option>
-													</HTMLSelect>
-
-													<ButtonGroup>
-														<Button
-															text="Optional"
-															active={!field.isRequired}
-															onClick={() => {
-																tempNode.fields[
-																	fieldIndex
-																].isRequired = false;
-																commitTempNode();
-															}}
-														/>
-														<Button
-															text="Required"
-															active={field.isRequired}
-															onClick={() => {
-																tempNode.fields[
-																	fieldIndex
-																].isRequired = true;
-																commitTempNode();
-															}}
-														/>
-													</ButtonGroup>
-												</div>
-											</div>
-										);
-									})}
-
-									<div>
-										<ButtonGroup>
-											<Button
-												text="Add Field"
-												onClick={(ev) => {
-													tempNode.fields.push({
-														id: "New Node",
-														namespace: "./",
-														type: "string",
-														isRequired: true,
-														allowMultiple: false,
-													});
-													commitTempNode();
-												}}
-											/>
-										</ButtonGroup>
-									</div>
-
-									<div>
-										<ButtonGroup className={styles.rightButton}>
-											<Button
-												text="Cancel"
-												onClick={(ev) => {
-													setMode("entities");
-												}}
-											/>
-											<Button
-												text="Commit"
-												onClick={(ev) => {
-													commitTempNode();
-												}}
-											/>
-										</ButtonGroup>
-									</div>
-								</div>
-							);
-						}
-
-						return (
-							<div className={styles.column} key={`${node.id}${nodeIndex}`}>
-								<div className={styles.contentHeader}>
-									{classBlock(
-										node,
-										node.fields[0]?.id === "source",
-										() => {},
-										() => {},
-										false
-									)}
-								</div>
-								{(entities[node.id] || [])
-									.filter((item) => {
-										return filterColumnItems(nodeIndex, item);
-									})
-									.map((item) => {
-										const existingRelationships: any = {};
-										Object.keys(entities).map((entityKey) => {
-											const links = entities[entityKey].reduce(
-												(prev, curr) => {
-													if (
-														curr.source === item.id ||
-														curr.target === item.id
-													) {
-														return prev.concat(curr);
-													}
-													return prev;
-												},
-												[]
-											);
-											if (links.length) {
-												existingRelationships[entityKey] = links;
-											}
-										});
-										return (
-											<div key={item.id} className={styles.entityCard}>
-												<div className={styles.topIcons}>
-													<ButtonGroup>
-														<Button minimal icon={<Provenance />} />
-														<Button
-															minimal
-															icon={<Discussion size={20} />}
-														/>
-													</ButtonGroup>
-												</div>
-												{Object.keys(item).map((property) => {
-													const propertyNamespace = findPropertyNamespace(
-														property,
-														node.id
-													);
-													if (property === "id") {
-														return null;
-													}
-													if (property === "source") {
-														const currNode = findEntityById(
-															item[property]
-														);
-														const nodeType = findNodeType(
-															item[property]
-														);
-														return (
-															<div>
-																<div
-																	className={
-																		styles.propertyWrapper
-																	}
-																>
+									{(entities[node.id] || [])
+										.filter((item) => {
+											return filterColumnItems(nodeIndex, item);
+										})
+										.map((item) => {
+											const existingRelationships: any = {};
+											Object.keys(entities).map((entityKey) => {
+												const links = entities[entityKey].reduce(
+													(prev, curr) => {
+														if (
+															curr.source === item.id ||
+															curr.target === item.id
+														) {
+															return prev.concat(curr);
+														}
+														return prev;
+													},
+													[]
+												);
+												if (links.length) {
+													existingRelationships[entityKey] = links;
+												}
+											});
+											return (
+												<div key={item.id} className={styles.entityCard}>
+													<div className={styles.topIcons}>
+														<ButtonGroup>
+															<Button minimal icon={<Provenance />} />
+															<Button
+																minimal
+																icon={<Discussion size={20} />}
+															/>
+														</ButtonGroup>
+													</div>
+													{Object.keys(item).map((property) => {
+														const propertyNamespace =
+															findPropertyNamespace(
+																property,
+																node.id
+															);
+														if (property === "id") {
+															return null;
+														}
+														if (property === "source") {
+															const currNode = findEntityById(
+																item[property]
+															);
+															const nodeType = findNodeType(
+																item[property]
+															);
+															return (
+																<div>
 																	<div
 																		className={
-																			styles.propertyHeader
+																			styles.propertyWrapper
 																		}
 																	>
 																		<div
 																			className={
-																				styles.namespace
+																				styles.propertyHeader
 																			}
 																		>
-																			{propertyNamespace}
-																		</div>
-																		Source:{" "}
-																	</div>
-
-																	<Button
-																		text={
-																			currNode.name ||
-																			currNode.title
-																		}
-																		onClick={() => {
-																			setActiveNodes(
-																				activeNodes
-																					.slice(
-																						0,
-																						nodeIndex +
-																							1
-																					)
-																					.concat(
-																						nodeType
-																					)
-																			);
-																			setActiveFilters(
-																				activeFilters
-																					.slice(
-																						0,
-																						nodeIndex
-																					)
-																					.concat(
-																						item[
-																							property
-																						]
-																					)
-																			);
-																		}}
-																	/>
-																</div>
-															</div>
-														);
-													}
-													if (property === "target") {
-														const currNode = findEntityById(
-															item[property]
-														);
-														const nodeType = findNodeType(
-															item[property]
-														);
-														return (
-															<div>
-																<div
-																	className={
-																		styles.propertyWrapper
-																	}
-																>
-																	<div
-																		className={
-																			styles.propertyHeader
-																		}
-																	>
-																		<div
-																			className={
-																				styles.namespace
-																			}
-																		>
-																			{propertyNamespace}
-																		</div>
-																		Target:{" "}
-																	</div>
-																	<Button
-																		text={
-																			currNode.name ||
-																			currNode.title
-																		}
-																		onClick={() => {
-																			setActiveNodes(
-																				activeNodes
-																					.slice(
-																						0,
-																						nodeIndex +
-																							1
-																					)
-																					.concat(
-																						nodeType
-																					)
-																			);
-																			setActiveFilters(
-																				activeFilters
-																					.slice(
-																						0,
-																						nodeIndex
-																					)
-																					.concat(
-																						item[
-																							property
-																						]
-																					)
-																			);
-																		}}
-																	/>
-																</div>
-															</div>
-														);
-													}
-													return (
-														<div>
-															<div className={styles.propertyWrapper}>
-																<div
-																	className={
-																		styles.propertyHeader
-																	}
-																>
-																	<div
-																		className={styles.namespace}
-																	>
-																		{propertyNamespace}
-																	</div>
-																	{property}:
-																</div>
-																{item[property]}
-															</div>
-														</div>
-													);
-												})}
-												{Object.keys(existingRelationships).length > 0 && (
-													<div>
-														<div className={styles.title}>
-															Relationships
-														</div>
-														{Object.keys(existingRelationships).map(
-															(key) => {
-																const targetRelationshipIndex =
-																	relationships.findIndex(
-																		(rel) => {
-																			return rel.id === key;
-																		}
-																	);
-																const targetRelationship =
-																	relationships[
-																		targetRelationshipIndex
-																	];
-
-																return (
-																	<div className={styles.small}>
-																		{classBlock(
-																			targetRelationship,
-																			true,
-																			() => {
-																				if (
-																					!activeRelationshipIndexes.includes(
-																						targetRelationshipIndex
-																					)
-																				) {
-																					setActiveRelationshipIndexes(
-																						[
-																							...activeRelationshipIndexes,
-																							targetRelationshipIndex,
-																						]
-																					);
+																			<div
+																				className={
+																					styles.namespace
 																				}
-																				// setActiveNodes(
-																				// 	activeNodes
-																				// 		.slice(
-																				// 			0,
-																				// 			index +
-																				// 				1
-																				// 		)
-																				// 		.concat(
-																				// 			targetRelationshipIndex
-																				// 		)
-																				// );
+																			>
+																				{propertyNamespace}
+																			</div>
+																			Source:{" "}
+																		</div>
+
+																		<Button
+																			text={
+																				currNode.name ||
+																				currNode.title
+																			}
+																			onClick={() => {
+																				setActiveNodes(
+																					activeNodes
+																						.slice(
+																							0,
+																							nodeIndex +
+																								1
+																						)
+																						.concat(
+																							nodeType
+																						)
+																				);
 																				setActiveFilters(
 																					activeFilters
 																						.slice(
@@ -589,25 +329,184 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 																							nodeIndex
 																						)
 																						.concat(
-																							item.id
+																							item[
+																								property
+																							]
 																						)
 																				);
-																			},
-																			undefined,
-																			false
-																		)}
+																			}}
+																		/>
 																	</div>
-																);
-															}
-														)}
-													</div>
-												)}
-											</div>
-										);
-									})}
-							</div>
-						);
-					})}
+																</div>
+															);
+														}
+														if (property === "target") {
+															const currNode = findEntityById(
+																item[property]
+															);
+															const nodeType = findNodeType(
+																item[property]
+															);
+															return (
+																<div>
+																	<div
+																		className={
+																			styles.propertyWrapper
+																		}
+																	>
+																		<div
+																			className={
+																				styles.propertyHeader
+																			}
+																		>
+																			<div
+																				className={
+																					styles.namespace
+																				}
+																			>
+																				{propertyNamespace}
+																			</div>
+																			Target:{" "}
+																		</div>
+																		<Button
+																			text={
+																				currNode.name ||
+																				currNode.title
+																			}
+																			onClick={() => {
+																				setActiveNodes(
+																					activeNodes
+																						.slice(
+																							0,
+																							nodeIndex +
+																								1
+																						)
+																						.concat(
+																							nodeType
+																						)
+																				);
+																				setActiveFilters(
+																					activeFilters
+																						.slice(
+																							0,
+																							nodeIndex
+																						)
+																						.concat(
+																							item[
+																								property
+																							]
+																						)
+																				);
+																			}}
+																		/>
+																	</div>
+																</div>
+															);
+														}
+														return (
+															<div>
+																<div
+																	className={
+																		styles.propertyWrapper
+																	}
+																>
+																	<div
+																		className={
+																			styles.propertyHeader
+																		}
+																	>
+																		<div
+																			className={
+																				styles.namespace
+																			}
+																		>
+																			{propertyNamespace}
+																		</div>
+																		{property}:
+																	</div>
+																	{item[property]}
+																</div>
+															</div>
+														);
+													})}
+													{Object.keys(existingRelationships).length >
+														0 && (
+														<div>
+															<div className={styles.title}>
+																Relationships
+															</div>
+															{Object.keys(existingRelationships).map(
+																(key) => {
+																	const targetRelationshipIndex =
+																		relationships.findIndex(
+																			(rel) => {
+																				return (
+																					rel.id === key
+																				);
+																			}
+																		);
+																	const targetRelationship =
+																		relationships[
+																			targetRelationshipIndex
+																		];
+
+																	return (
+																		<div
+																			className={styles.small}
+																		>
+																			{classBlock(
+																				targetRelationship,
+																				true,
+																				() => {
+																					if (
+																						!activeRelationshipIndexes.includes(
+																							targetRelationshipIndex
+																						)
+																					) {
+																						setActiveRelationshipIndexes(
+																							[
+																								...activeRelationshipIndexes,
+																								targetRelationshipIndex,
+																							]
+																						);
+																					}
+																					// setActiveNodes(
+																					// 	activeNodes
+																					// 		.slice(
+																					// 			0,
+																					// 			index +
+																					// 				1
+																					// 		)
+																					// 		.concat(
+																					// 			targetRelationshipIndex
+																					// 		)
+																					// );
+																					setActiveFilters(
+																						activeFilters
+																							.slice(
+																								0,
+																								nodeIndex
+																							)
+																							.concat(
+																								item.id
+																							)
+																					);
+																				},
+																				undefined,
+																				false
+																			)}
+																		</div>
+																	);
+																}
+															)}
+														</div>
+													)}
+												</div>
+											);
+										})}
+								</div>
+							);
+						})}
 				</div>
 			</div>
 			<Button

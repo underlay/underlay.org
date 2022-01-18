@@ -1,118 +1,121 @@
 import { InputGroup, HTMLSelect, ButtonGroup, Button } from "@blueprintjs/core";
 import { DragHandleHorizontal } from "@blueprintjs/icons";
+import { updateArrayWithNewElement } from "utils/shared/arrays";
 import { useState } from "react";
-import { Node } from "./data";
+import { FieldType, Node } from "./data";
 import styles from "./Editor.module.scss";
 
 interface Props {
 	node: Node;
+	onCancel: () => void;
 	onCommit: (node: Node) => void;
 }
 
-const SchemaEditor: React.FC<Props> = function ({ node, onCommit }) {
-	const [tempNode, setTempNode] = useState<Node>(node);
+const SchemaEditor: React.FC<Props> = function ({ node, onCancel, onCommit }) {
+	const [nodeId, setNodeId] = useState<string>(node.id);
+	const [fieldIds, setFieldIds] = useState<string[]>(node.fields.map((f) => f.id));
+	const [fieldTypes, setFieldTypes] = useState<FieldType[]>(node.fields.map((f) => f.type));
+	const [fieldIsRequireds, setFieldIsRequireds] = useState<boolean[]>(
+		node.fields.map((f) => f.isRequired)
+	);
 
-	function commitTempNode() {
-		onCommit(tempNode);
-	}
+	const nodeForm: JSX.Element = (
+		<InputGroup
+			placeholder="Class..."
+			value={nodeId}
+			large
+			key="classInput"
+			onChange={(ev) => {
+				setNodeId(ev.target.value);
+			}}
+		/>
+	);
+
+	const fieldForms: JSX.Element[] = [];
+	node.fields.forEach((f, fieldIndex) => {
+		fieldForms.push(
+			<div key={"field" + fieldIndex.toString()} className={styles.schemaRow}>
+				<div className={styles.namespace}>{f.namespace}</div>
+				<div className={styles.schemaRowContent}>
+					<DragHandleHorizontal style={{ opacity: 0.6 }} />
+					<InputGroup
+						value={fieldIds[fieldIndex]}
+						placeholder="Key..."
+						key={"fieldInput" + fieldIndex.toString()}
+						onChange={(ev) => {
+							setFieldIds(
+								updateArrayWithNewElement(fieldIds, fieldIndex, ev.target.value)
+							);
+						}}
+					/>
+
+					<HTMLSelect
+						key={"type" + fieldIndex.toString()}
+						value={fieldTypes[fieldIndex]}
+						onChange={(ev) => {
+							setFieldTypes(
+								updateArrayWithNewElement(
+									fieldTypes,
+									fieldIndex,
+									ev.target.value as FieldType
+								)
+							);
+						}}
+					>
+						<option value="string">string</option>
+						<option value="number">number</option>
+						<option value="boolean">boolean</option>
+					</HTMLSelect>
+
+					<ButtonGroup>
+						<Button
+							text="Optional"
+							active={!fieldIsRequireds[fieldIndex]}
+							onClick={() => {
+								setFieldIsRequireds(
+									updateArrayWithNewElement(fieldIsRequireds, fieldIndex, false)
+								);
+							}}
+						/>
+						<Button
+							text="Required"
+							active={fieldIsRequireds[fieldIndex]}
+							onClick={() => {
+								setFieldIsRequireds(
+									updateArrayWithNewElement(fieldIsRequireds, fieldIndex, true)
+								);
+							}}
+						/>
+					</ButtonGroup>
+				</div>
+			</div>
+		);
+	});
 
 	return (
 		<div className={styles.column} key={node.id}>
 			<div className={styles.contentHeader}>
 				<div className={styles.namespace}>{node.namespace}</div>
-				<InputGroup
-					placeholder="Class..."
-					value={tempNode.id}
-					large
-					key="classInput"
-					onChange={(event) => {
-						// tempNode.id = event.target.value;
-						setTempNode({
-							...tempNode,
-							id: event.target.value,
-						});
-					}}
-				/>
+				{nodeForm}
 			</div>
 
-			{tempNode.fields.map((field, fieldIndex) => {
-				return (
-					<div key={field.id} className={styles.schemaRow}>
-						<div className={styles.namespace}>{field.namespace}</div>
-						<div className={styles.schemaRowContent}>
-							<DragHandleHorizontal style={{ opacity: 0.6 }} />
-							<InputGroup
-								placeholder="Key..."
-								// asyncControl={true}
-								value={field.id}
-								// key={"fieldInput" + fieldIndex.toString()}
-								onChange={(event) => {
-									// tempNode.fields[fieldIndex].id = event.target.value;
-									setTempNode({
-										...tempNode,
-										fields: node.fields.map((f) => {
-											if (f.id === field.id) {
-												return {
-													...field,
-													id: event.target.value,
-												};
-											}
-
-											return f;
-										}),
-									});
-								}}
-							/>
-
-							<HTMLSelect
-								key="type"
-								value={field.type}
-								onChange={(event) => {
-									tempNode.fields[fieldIndex].type = event.target.value as any;
-									commitTempNode();
-								}}
-							>
-								<option value="string">string</option>
-								<option value="number">number</option>
-								<option value="boolean">boolean</option>
-							</HTMLSelect>
-
-							<ButtonGroup>
-								<Button
-									text="Optional"
-									active={!field.isRequired}
-									onClick={() => {
-										tempNode.fields[fieldIndex].isRequired = false;
-										commitTempNode();
-									}}
-								/>
-								<Button
-									text="Required"
-									active={field.isRequired}
-									onClick={() => {
-										tempNode.fields[fieldIndex].isRequired = true;
-										commitTempNode();
-									}}
-								/>
-							</ButtonGroup>
-						</div>
-					</div>
-				);
-			})}
+			{fieldForms}
 
 			<div>
 				<ButtonGroup>
 					<Button
 						text="Add Field"
-						onClick={(ev) => {
-							tempNode.fields.push({
-								id: "New Node",
+						onClick={() => {
+							node.fields.push({
+								id: "New Field",
 								namespace: "./",
 								type: "string",
 								isRequired: true,
 								allowMultiple: false,
 							});
-							commitTempNode();
+							setFieldIds([...fieldIds, "New Field"]);
+							setFieldTypes([...fieldTypes, "string"]);
+							setFieldIsRequireds([...fieldIsRequireds, true]);
 						}}
 					/>
 				</ButtonGroup>
@@ -122,14 +125,25 @@ const SchemaEditor: React.FC<Props> = function ({ node, onCommit }) {
 				<ButtonGroup className={styles.rightButton}>
 					<Button
 						text="Cancel"
-						onClick={(ev) => {
-							setMode("entities");
+						onClick={() => {
+							onCancel();
 						}}
 					/>
 					<Button
 						text="Commit"
-						onClick={(ev) => {
-							commitTempNode();
+						onClick={() => {
+							onCommit({
+								id: nodeId,
+								namespace: node.namespace,
+								fields: node.fields.map((field, i) => {
+									return {
+										...field,
+										id: fieldIds[i],
+										type: fieldTypes[i],
+										isRequired: fieldIsRequireds[i],
+									};
+								}),
+							});
 						}}
 					/>
 				</ButtonGroup>
