@@ -173,3 +173,11 @@
 	align-items: center;
 	justify-content: flex-end;
 }
+
+.rightButton {
+	float: right;
+
+	Button {
+		margin-left: 10px;
+	}
+}

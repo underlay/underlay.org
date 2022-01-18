@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from "react";
 import styles from "./Landing.module.scss";
 import SHA3 from "crypto-js/sha3";
@@ -6,10 +5,9 @@ import encHex from "crypto-js/enc-hex";
 import { ScopeNav } from "components";
 import { useS3Upload } from "next-s3-upload";
 import Editor from "components/Editor/Editor";
+import type { SchemaData } from "components/Editor/Editor";
 
-type Props = {};
-
-const Landing: React.FC<Props> = function () {
+const Landing: React.FC<SchemaData> = function ({ data }) {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [communityName, setCommunityName] = useState("");
@@ -34,7 +32,7 @@ const Landing: React.FC<Props> = function () {
 		});
 		window.location.href = "/";
 	};
-	const handleCommunityCreate = async (evt) => {
+	const handleCommunityCreate = async (evt: Event) => {
 		evt.preventDefault();
 		await fetch("/api/community", {
 			method: "POST",
@@ -43,7 +41,7 @@ const Landing: React.FC<Props> = function () {
 		});
 		// window.location.href = "/";
 	};
-	const handleCollectionCreate = async (evt) => {
+	const handleCollectionCreate = async (evt: Event) => {
 		evt.preventDefault();
 		await fetch("/api/collection", {
 			method: "POST",
@@ -147,7 +145,7 @@ const Landing: React.FC<Props> = function () {
 			{imageUrl && <img src={imageUrl} />}
 
 			<div style={{ margin: "50px 0px" }}>
-				<Editor />
+				<Editor data={data} />
 			</div>
 		</div>
 	);
