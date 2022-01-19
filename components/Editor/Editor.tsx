@@ -8,7 +8,9 @@ import styles from "./Editor.module.scss";
 import { Discussion, Provenance } from "components/Icons";
 import { Add } from "@blueprintjs/icons";
 import type { Entity, Node } from "./data";
-import { updateArrayWithNewElement } from "utils/shared/arrays";
+import { pushToArrayIfUnseen, updateArrayWithNewElement } from "utils/shared/arrays";
+import EntityCard from "components/EntityCard/EntityCard";
+import EntityRelationships from "components/EntityCard/EntityRelationships";
 
 export type SchemaData = {
 	data: {
@@ -21,7 +23,7 @@ export type SchemaData = {
 const Editor: React.FC<SchemaData> = function ({ data }) {
 	const initialNodes: Node[] = JSON.parse(data.schemaNodeJson);
 	const relationships: Node[] = JSON.parse(data.relationshipJson);
-	const entities: { [key: string]: Entity[] } = JSON.parse(data.entityJson);
+	const allEntities: { [key: string]: Entity[] } = JSON.parse(data.entityJson);
 
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 	const [filterVal, setFilterVal] = useState<string>("");
@@ -44,21 +46,21 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 	function getActiveEntities() {
 		const activeNodeEntities = activeNodeIndexes
 			.map((i) => nodes[i])
-			.filter((n) => n.id in entities)
+			.filter((n) => n.id in allEntities)
 			.map((n) => {
 				return {
 					node: n,
-					entities: entities[n.id],
+					entities: allEntities[n.id],
 				};
 			});
 
 		const activeRelationshipEntities = activeRelationshipIndexes
 			.map((i) => relationships[i])
-			.filter((r) => r.id in entities)
+			.filter((r) => r.id in allEntities)
 			.map((r) => {
 				return {
-					node: r,
-					entities: entities[r.id],
+					relationship: r,
+					entities: allEntities[r.id],
 				};
 			});
 
@@ -77,7 +79,7 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 		);
 	};
 	const findEntityById = (id) => {
-		const flatEntities = Object.values(entities).reduce((prev, curr) => {
+		const flatEntities = Object.values(allEntities).reduce((prev, curr) => {
 			return prev.concat(curr);
 		}, []);
 		return flatEntities.find((item) => {
@@ -86,7 +88,7 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 	};
 
 	const findNodeType = (id) => {
-		const typeMap = {
+		const typeMap: { [key: string]: string } = {
 			e: "employedAt",
 			a: "authored",
 			gdf: "gotDegreeFrom",
@@ -97,16 +99,6 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 		return nodes.find((node) => {
 			return node.id === typeMap[id.replace(/[0-9]/g, "")];
 		});
-	};
-
-	const findPropertyNamespace = (property, nodeId) => {
-		const entityThing = nodes.concat(relationships).find((entity) => {
-			return entity.id === nodeId;
-		});
-		const fieldThing = entityThing?.fields.find((field) => {
-			return field.id === property;
-		});
-		return fieldThing?.namespace;
 	};
 
 	return (
@@ -141,7 +133,6 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 										setActiveRelationshipIndexes([]);
 										setActiveFilters([]);
 										setMode("entities");
-										console.log("here");
 									}}
 									schemaClick={(ev) => {
 										setActiveNodeIndexes([nodeIndex]);
@@ -222,13 +213,324 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 					)}
 
 					{mode === "entities" &&
-						getActiveEntities().map(({ node, entities }) => {
+						getActiveEntities().map((args) => {
+							const nodeOrRelationship =
+								"node" in args ? args.node : args.relationship;
+
+							const header = (
+								<div className={styles.contentHeader}>
+									<NodeOrRelationshipBlock
+										node={nodeOrRelationship}
+										isRelationship={
+											nodeOrRelationship.fields[0]?.id === "source"
+										}
+										showSchema={false}
+									/>
+								</div>
+							);
+
 							return (
-								<div className={styles.column} key={`${node.id}Entities`}>
-									<div className={styles.contentHeader}>
-										<div>{node.id}</div>
-										<div>{entities.map((e) => e.id).join(",")}</div>
-									</div>
+								<div
+									className={styles.column}
+									key={`${nodeOrRelationship.id}Entities`}
+								>
+									{header}
+
+									{args.entities.map((entity) => {
+										/**
+										 * keyed by relationship name such as `authored`
+										 * values are relationship's ID and related entities
+										 */
+										const relatedEntities: {
+											[key: string]: Entity[];
+										} = {};
+										Object.keys(allEntities).map((entityKey) => {
+											const links = allEntities[entityKey].filter((e) => {
+												return (
+													e.source === entity.id || e.target === entity.id
+												);
+											});
+											if (links.length) {
+												relatedEntities[entityKey] = links;
+											}
+										});
+
+										/**
+										 * rendering entities of a node
+										 */
+										if ("node" in args) {
+											const relationshipAndIndexes = Object.keys(
+												relatedEntities
+											).map((relName) => {
+												const relationship = relationships.find(
+													(r) => r.id === relName
+												)!;
+												const relationshipIndex = relationships.findIndex(
+													(r) => r.id === relName
+												);
+												return {
+													relationship,
+													relationshipIndex,
+												};
+											});
+											const relationshipRendering = (
+												<EntityRelationships
+													relationshipAndIndexes={relationshipAndIndexes}
+													onRelationshipClick={(relationshipIndex) => {
+														setActiveRelationshipIndexes(
+															pushToArrayIfUnseen(
+																activeRelationshipIndexes,
+																relationshipIndex
+															)
+														);
+													}}
+												/>
+											);
+											return (
+												<EntityCard
+													entity={entity}
+													node={args.node}
+													relationshipRendering={relationshipRendering}
+												/>
+											);
+										} else {
+											/**
+											 * rendering entities of a relationship
+											 */
+										}
+										return (
+											<div key={entity.id} className={styles.entityCard}>
+												<div className={styles.topIcons}>
+													<ButtonGroup>
+														<Button minimal icon={<Provenance />} />
+														<Button
+															minimal
+															icon={<Discussion size={20} />}
+														/>
+													</ButtonGroup>
+												</div>
+
+												{Object.keys(entity).map((property) => {
+													const propertyNamespace =
+														nodeOrRelationship.fields.find(
+															(f) => f.id === property
+														)?.namespace;
+													if (property === "id") {
+														return null;
+													}
+													if (property === "source") {
+														const currNode = findEntityById(
+															entity[property]
+														);
+														const nodeType = findNodeType(
+															entity[property]
+														);
+														return (
+															<div>
+																<div
+																	className={
+																		styles.propertyWrapper
+																	}
+																>
+																	<div
+																		className={
+																			styles.propertyHeader
+																		}
+																	>
+																		<div
+																			className={
+																				styles.namespace
+																			}
+																		>
+																			{propertyNamespace}
+																		</div>
+																		Source:{" "}
+																	</div>
+
+																	<Button
+																		text={
+																			currNode.name ||
+																			currNode.title
+																		}
+																		onClick={() => {
+																			setActiveNodes(
+																				activeNodes
+																					.slice(
+																						0,
+																						nodeIndex +
+																							1
+																					)
+																					.concat(
+																						nodeType
+																					)
+																			);
+																			setActiveFilters(
+																				activeFilters
+																					.slice(
+																						0,
+																						nodeIndex
+																					)
+																					.concat(
+																						entity[
+																							property
+																						]
+																					)
+																			);
+																		}}
+																	/>
+																</div>
+															</div>
+														);
+													}
+													if (property === "target") {
+														const currNode = findEntityById(
+															entity[property]
+														);
+														const nodeType = findNodeType(
+															entity[property]
+														);
+														return (
+															<div>
+																<div
+																	className={
+																		styles.propertyWrapper
+																	}
+																>
+																	<div
+																		className={
+																			styles.propertyHeader
+																		}
+																	>
+																		<div
+																			className={
+																				styles.namespace
+																			}
+																		>
+																			{propertyNamespace}
+																		</div>
+																		Target:{" "}
+																	</div>
+																	<Button
+																		text={
+																			currNode.name ||
+																			currNode.title
+																		}
+																		onClick={() => {
+																			setActiveNodes(
+																				activeNodes
+																					.slice(
+																						0,
+																						nodeIndex +
+																							1
+																					)
+																					.concat(
+																						nodeType
+																					)
+																			);
+																			setActiveFilters(
+																				activeFilters
+																					.slice(
+																						0,
+																						nodeIndex
+																					)
+																					.concat(
+																						entity[
+																							property
+																						]
+																					)
+																			);
+																		}}
+																	/>
+																</div>
+															</div>
+														);
+													}
+													return (
+														<div>
+															<div className={styles.propertyWrapper}>
+																<div
+																	className={
+																		styles.propertyHeader
+																	}
+																>
+																	<div
+																		className={styles.namespace}
+																	>
+																		{propertyNamespace}
+																	</div>
+																	{property}:
+																</div>
+																{entity[property]}
+															</div>
+														</div>
+													);
+												})}
+
+												{Object.keys(relatedEntities).length > 0 && (
+													<div>
+														<div className={styles.title}>
+															Relationships
+														</div>
+														{Object.keys(relatedEntities).map((key) => {
+															const targetRelationshipIndex =
+																relationships.findIndex((rel) => {
+																	return rel.id === key;
+																});
+															const targetRelationship =
+																relationships[
+																	targetRelationshipIndex
+																];
+
+															return (
+																<div className={styles.small}>
+																	<NodeOrRelationshipBlock
+																		node={targetRelationship}
+																		isRelationship={true}
+																		classClick={() => {
+																			if (
+																				!activeRelationshipIndexes.includes(
+																					targetRelationshipIndex
+																				)
+																			) {
+																				setActiveRelationshipIndexes(
+																					[
+																						...activeRelationshipIndexes,
+																						targetRelationshipIndex,
+																					]
+																				);
+																			}
+																			// setActiveNodes(
+																			// 	activeNodes
+																			// 		.slice(
+																			// 			0,
+																			// 			index +
+																			// 				1
+																			// 		)
+																			// 		.concat(
+																			// 			targetRelationshipIndex
+																			// 		)
+																			// );
+																			setActiveFilters(
+																				activeFilters
+																					.slice(
+																						0,
+																						nodeIndex
+																					)
+																					.concat(
+																						entity.id
+																					)
+																			);
+																		}}
+																		showSchema={false}
+																	/>
+																</div>
+															);
+														})}
+													</div>
+												)}
+											</div>
+										);
+									})}
 								</div>
 							);
 						})}
@@ -246,14 +548,14 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 											showSchema={false}
 										/>
 									</div>
-									{(entities[node.id] || [])
+									{(allEntities[node.id] || [])
 										.filter((item) => {
 											return filterColumnItems(nodeIndex, item);
 										})
 										.map((item) => {
 											const existingRelationships: any = {};
-											Object.keys(entities).map((entityKey) => {
-												const links = entities[entityKey].reduce(
+											Object.keys(allEntities).map((entityKey) => {
+												const links = allEntities[entityKey].reduce(
 													(prev, curr) => {
 														if (
 															curr.source === item.id ||
@@ -281,11 +583,9 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 														</ButtonGroup>
 													</div>
 													{Object.keys(item).map((property) => {
-														const propertyNamespace =
-															findPropertyNamespace(
-																property,
-																node.id
-															);
+														const propertyNamespace = node.fields.find(
+															(f) => f.id === property
+														)?.namespace;
 														if (property === "id") {
 															return null;
 														}
@@ -487,17 +787,6 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 																							]
 																						);
 																					}
-																					// setActiveNodes(
-																					// 	activeNodes
-																					// 		.slice(
-																					// 			0,
-																					// 			index +
-																					// 				1
-																					// 		)
-																					// 		.concat(
-																					// 			targetRelationshipIndex
-																					// 		)
-																					// );
 																					setActiveFilters(
 																						activeFilters
 																							.slice(
@@ -536,7 +825,7 @@ const Editor: React.FC<SchemaData> = function ({ data }) {
 						body: JSON.stringify({
 							schemaNodeJson: JSON.stringify(nodes),
 							relationshipJson: JSON.stringify(relationships),
-							entityJson: JSON.stringify(entities),
+							entityJson: JSON.stringify(allEntities),
 						}),
 					});
 				}}

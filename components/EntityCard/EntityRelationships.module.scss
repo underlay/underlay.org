@@ -1,0 +1,20 @@
+.title {
+	margin: 24px 0px;
+	color: #888;
+	position: relative;
+	&:after {
+		content: "";
+		position: absolute;
+		height: 1px;
+		left: 110px;
+		right: 10px;
+		top: 10px;
+		background: #ccc;
+	}
+}
+
+.small {
+	transform: scale(0.8);
+	transform-origin: center left;
+	margin-bottom: -10px;
+}

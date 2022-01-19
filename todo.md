@@ -48,3 +48,10 @@
 - Versioning
 - Publication
 - Importing
+
+
+---
+
+## Pine's todo
+
+- reimplement filter logic => for large dataset, this requires server response so purely frontend logic for filtering won't work

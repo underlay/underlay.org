@@ -1,6 +1,7 @@
 export interface Entity {
 	id: string;
 	source?: string;
+	target?: string;
 	[prop: string]: any;
 }
 
