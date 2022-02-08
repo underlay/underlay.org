@@ -1,28 +1,23 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 import { IncomingMessage } from "http";
-import Iron from "@hapi/iron";
+import jwt from "jsonwebtoken";
 
-import { setTokenCookie, getTokenCookie, removeTokenCookie } from "./cookies";
+import { getTokenCookie } from "./cookies";
 
-const IRON_SECRET: string = process.env.IRON_SECRET || "";
+const JWT_SECRET: string = process.env.JWT_SECRET || "";
 
-export async function setLoginSession(res: NextApiResponse, userId: string) {
-	const sessionJWT = await Iron.seal(userId, IRON_SECRET, Iron.defaults);
-	setTokenCookie(res, sessionJWT);
-}
-
-export async function getLoginSession(req: NextApiRequest | IncomingMessage) {
+export async function getLoginSession(req: NextApiRequest | IncomingMessage): Promise<string> {
 	const sessionJWT = getTokenCookie(req);
-	if (!sessionJWT) return;
+	if (!sessionJWT) return "";
 
 	try {
-		const sessionUserId = await Iron.unseal(sessionJWT, IRON_SECRET, Iron.defaults);
-		return sessionUserId;
+		const { sub: userId } = await jwt.verify(sessionJWT, JWT_SECRET);
+		if (typeof userId !== "string") {
+			throw "userId is not a string";
+		}
+		return userId;
 	} catch (error) {
-		return undefined;
+		console.error("In getLoginSession", error);
+		return "";
 	}
-}
-
-export async function removeLoginSession(_req: NextApiRequest, res: NextApiResponse) {
-	removeTokenCookie(res);
 }

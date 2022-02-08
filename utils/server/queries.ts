@@ -1,50 +1,35 @@
 import prisma from "prisma/db";
 
-export const getProfileData = (profileSlug: string) => {
-	return prisma.profile.findUnique({
-		where: { slug: profileSlug },
+export const getNamespaceData = (namespaceSlug: string) => {
+	return prisma.namespace.findUnique({
+		where: { slug: namespaceSlug },
 		include: {
+			collections: true,
 			community: {
 				include: {
-					members: { include: { user: { include: { profile: true } } } },
-					collections: true,
+					members: { include: { user: { include: { namespace: true } } } },
 				},
 			},
 			user: {
 				include: {
-					profile: true,
-					memberships: { include: { community: { include: { profile: true } } } },
-					collections: true,
+					namespace: true,
+					memberships: { include: { community: { include: { namespace: true } } } },
 				},
 			},
 		},
 	});
 };
 
-export const getCollectionData = async (profileSlug: string, collectionSlug: string) => {
-	const profileData = await prisma.profile.findUnique({
-		where: { slug: profileSlug },
+export const getCollectionData = async (namespaceSlug: string, collectionSlug: string) => {
+	const profileData = await prisma.namespace.findUnique({
+		where: { slug: namespaceSlug },
 		include: {
-			community: {
-				include: {
-					members: true,
-					collections: {
-						where: {
-							slug: collectionSlug,
-						},
-					},
-				},
-			},
-			user: {
-				include: {
-					collections: {
-						where: {
-							slug: collectionSlug,
-						},
-					},
+			collections: {
+				where: {
+					slug: collectionSlug,
 				},
 			},
 		},
 	});
-	return profileData?.community?.collections[0] || profileData?.user?.collections[0];
+	return profileData?.collections[0];
 };

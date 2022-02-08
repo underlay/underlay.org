@@ -13,7 +13,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	const community = await prisma.community.create({
 		data: {
 			name: req.body.name,
-			profile: {
+			namespace: {
 				create: {
 					slug: slugifyString(req.body.name),
 				},

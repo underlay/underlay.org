@@ -9,24 +9,24 @@ type Props = {
 	slug: string;
 };
 
-const CollectionConnections: React.FC<Props> = function ({}) {
+const CollectionDiscussions: React.FC<Props> = function ({}) {
 	return (
 		<div>
 			<CollectionHeader
-				mode="connections"
+				mode="discussions"
 				// details={slug}
 			/>
 		</div>
 	);
 };
 
-export default CollectionConnections;
+export default CollectionDiscussions;
 
 export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
 	context
 ) => {
-	const { profileSlug, collectionSlug } = context.params!;
-	const collectionData = await getCollectionData(profileSlug, collectionSlug);
+	const { namespaceSlug, collectionSlug } = context.params!;
+	const collectionData = await getCollectionData(namespaceSlug, collectionSlug);
 
 	if (!collectionData) {
 		return { notFound: true };
