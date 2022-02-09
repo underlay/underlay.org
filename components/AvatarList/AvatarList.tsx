@@ -17,7 +17,7 @@ const AvatarList: React.FC<Props> = function ({ title = "Members", users }) {
 					// @ts-ignore
 					users.map((user) => {
 						const { name, avatar } = user;
-						const { slug } = user.profile;
+						const { slug } = user.namespace;
 						return (
 							<a key={slug} href={`/${slug}`} title={name} className={styles.anchor}>
 								<Avatar

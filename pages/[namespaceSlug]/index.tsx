@@ -12,28 +12,30 @@ import {
 } from "components";
 import { getNamespaceData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
-import { Community, Namespace, Profile } from "@prisma/client";
+import { Collection, Community, Namespace, User } from "@prisma/client";
 
-type ExtendedCommunity = Community & Namespace;
-type ExtendedUser = Profile & Namespace;
+type ExtendNamespace = Namespace & { collections: Collection[] };
+type ExtendedCommunity = Community & { namespace: Partial<ExtendNamespace> };
+type ExtendedUser = User & { namespace: Partial<ExtendNamespace> };
 type Props = {
 	community?: ExtendedCommunity;
-	profile?: ExtendedUser;
+	user?: ExtendedUser;
 };
 
 const CommunityOverview: React.FC<Props> = function ({ community, user }) {
+	console.log(community);
 	return (
 		<div>
 			<Head>
 				<title>
-					{community?.name || user?.name} ({slug}) · Underlay
+					{community?.name || user?.name} ({community?.slug || user?.slug}) · Underlay
 				</title>
 			</Head>
 			<ProfileHeader
 				type={community ? "community" : "user"}
 				mode="overview"
 				name={community?.name || user?.name}
-				slug={slug}
+				slug={community?.slug || user?.slug}
 				avatar={community?.avatar || user?.avatar}
 				verifiedUrl={community?.verifiedUrl}
 				location={community?.location}
@@ -41,7 +43,11 @@ const CommunityOverview: React.FC<Props> = function ({ community, user }) {
 			<ResourceContentFrame
 				content={
 					<Section title="Collections">
-						<CollectionList collections={community?.collections || user?.collections} />
+						<CollectionList
+							collections={
+								community?.namespace.collections || user?.namespace.collections
+							}
+						/>
 					</Section>
 				}
 				sideContent={

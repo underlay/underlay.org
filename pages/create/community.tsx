@@ -22,7 +22,6 @@ const CreateCommunity: React.FC<{}> = ({}) => {
 			body: JSON.stringify({ name, description, avatar }),
 		});
 		const { communitySlug } = await response.json();
-		console.log(communitySlug);
 		if (communitySlug) {
 			window.location.href = `/${communitySlug}`;
 		} else {

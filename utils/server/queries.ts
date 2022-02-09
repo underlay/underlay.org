@@ -23,7 +23,11 @@ export const getNamespaceData = async (namespaceSlug: string) => {
 		return undefined;
 	}
 
-	const namespace = { id: namespaceData.id, slug: namespaceData.slug };
+	const namespace = {
+		id: namespaceData.id,
+		slug: namespaceData.slug,
+		collections: namespaceData.collections,
+	};
 	const community = namespaceData.community
 		? {
 				...namespaceData.community,
