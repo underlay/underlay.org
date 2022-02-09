@@ -1,12 +1,26 @@
 import prisma from "prisma/db";
 import { NextApiRequest } from "next";
 import { IncomingMessage } from "http";
+import jwt from "jsonwebtoken";
 
-import { getLoginSession } from "utils/server/auth/session";
+import { getTokenCookie } from "utils/server/auth/cookies";
+
+const JWT_SECRET: string = process.env.JWT_SECRET || "";
 
 export async function getLoginId(req: NextApiRequest | IncomingMessage): Promise<string> {
-	const sessionUserId = await getLoginSession(req);
-	return sessionUserId;
+	const sessionJWT = getTokenCookie(req);
+	if (!sessionJWT) return "";
+
+	try {
+		const { sub: userId } = await jwt.verify(sessionJWT, JWT_SECRET);
+		if (typeof userId !== "string") {
+			throw "userId is not a string";
+		}
+		return userId;
+	} catch (error) {
+		console.error("In getLoginSession", error);
+		return "";
+	}
 }
 
 export async function findUserById(id: string) {
