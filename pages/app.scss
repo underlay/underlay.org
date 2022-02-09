@@ -35,6 +35,11 @@ a {
 	cursor: pointer;
 }
 
+.narrow {
+	max-width: 500px;
+	margin: 0 auto;
+}
+
 .hoverline {
 	color: inherit;
 	text-decoration: none;

@@ -5,7 +5,7 @@ import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
 import { Button, Intent, FormGroup, InputGroup, NonIdealState } from "@blueprintjs/core";
 
-import { Avatar, AvatarUpload } from "components";
+import { Avatar, AvatarUpload, Form } from "components";
 import { supabase } from "utils/client/supabase";
 import { getLoginId } from "utils/server/auth/user";
 
@@ -13,7 +13,7 @@ const Signup: React.FC<{}> = ({}) => {
 	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
 	const [email, setEmail] = useState("");
-	const [avatar, setAvatar] = useState(undefined);
+	const [avatar, setAvatar] = useState<string | undefined>(undefined);
 	const [isLoading, setIsLoading] = useState(false);
 	const [signupComplete, setSignupComplete] = useState(false);
 
@@ -44,15 +44,8 @@ const Signup: React.FC<{}> = ({}) => {
 		setIsLoading(false);
 	};
 
-	const bodyStyle = {
-		maxWidth: "500px",
-		margin: "0 auto",
-	};
-	const formStyle = {
-		margin: "40px 0px",
-	};
 	return (
-		<div style={bodyStyle}>
+		<div className="narrow">
 			<Head>
 				<title>Sign up · Underlay</title>
 			</Head>
@@ -60,7 +53,7 @@ const Signup: React.FC<{}> = ({}) => {
 			{!signupComplete && (
 				<React.Fragment>
 					<h1>Sign up</h1>
-					<form onSubmit={handleSubmit} style={formStyle}>
+					<Form onSubmit={handleSubmit}>
 						<FormGroup label="Name" labelFor="name-input">
 							<InputGroup
 								id="name-input"
@@ -102,7 +95,7 @@ const Signup: React.FC<{}> = ({}) => {
 										icon="trash"
 										minimal
 										onClick={() => {
-											setAvatar(null);
+											setAvatar(undefined);
 										}}
 									/>
 								)}
@@ -116,7 +109,7 @@ const Signup: React.FC<{}> = ({}) => {
 							loading={isLoading}
 							disabled={!name || !password || !email}
 						/>
-					</form>
+					</Form>
 				</React.Fragment>
 			)}
 			{signupComplete && (
