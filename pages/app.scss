@@ -35,6 +35,10 @@ body {
 a {
 	text-decoration: underline;
 	cursor: pointer;
+	color: inherit;
+	&:hover {
+		color: inherit;
+	}
 }
 
 .narrow {

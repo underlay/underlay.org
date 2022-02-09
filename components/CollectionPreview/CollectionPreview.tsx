@@ -9,7 +9,7 @@ import { Collection } from "components/Icons";
 type Props = {
 	slug: string;
 	description?: string;
-	isPrivate: boolean;
+	isPublic: boolean;
 	version: string;
 	lastPublished: Date;
 };
@@ -17,7 +17,7 @@ type Props = {
 const CollectionPreview: React.FC<Props> = function ({
 	slug,
 	description,
-	isPrivate,
+	isPublic,
 	// version,
 	// lastPublished,
 }) {
@@ -42,7 +42,7 @@ const CollectionPreview: React.FC<Props> = function ({
 			</div>
 			{description && <div className={styles.description}>{description}</div>}
 			<div className={styles.details}>
-				<span>{isPrivate ? "Private" : "Public"}</span>
+				<span>{!isPublic ? "Private" : "Public"}</span>
 				<span className={styles.dot}>·</span>
 				<span>{version}</span>
 				<span className={styles.dot}>·</span>
