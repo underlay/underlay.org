@@ -27,9 +27,8 @@ export async function findUserById(id: string) {
 	if (!id) {
 		return undefined;
 	}
-	const user = await prisma.profile.findUnique({
+	return prisma.user.findUnique({
 		where: { id },
 		include: { namespace: true },
 	});
-	return user;
 }
