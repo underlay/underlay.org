@@ -1,77 +1,52 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import Head from "next/head";
+import { Prisma } from "@prisma/client";
 
-import {
-	ProfileHeader,
-	CollectionList,
-	AvatarList,
-	ResourceContentFrame,
-	Section,
-	CommunityList,
-} from "components";
-import { getNamespaceData } from "utils/server/queries";
+import { CommunityOverview, UserOverview } from "components";
+import { getUserData, getCommunityData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
 
+export type ExtendedCommunity = Prisma.PromiseReturnType<typeof getCommunityData>;
+export type ExtendedUser = Prisma.PromiseReturnType<typeof getUserData>;
+
 type Props = {
-	slug: string;
-	community?: any;
-	user?: any;
+	community: ExtendedCommunity;
+	user: ExtendedUser;
 };
 
-const CommunityOverview: React.FC<Props> = function ({ slug, community, user }) {
-	return (
-		<div>
-			<Head>
-				<title>
-					{community?.name || user?.name} ({slug}) · Underlay
-				</title>
-			</Head>
-			<ProfileHeader
-				type={community ? "community" : "user"}
-				mode="overview"
-				name={community?.name || user?.name}
-				slug={slug}
-				avatar={community?.avatar || user?.avatar}
-				verifiedUrl={community?.verifiedUrl}
-				location={community?.location}
-			/>
-			<ResourceContentFrame
-				content={
-					<Section title="Collections">
-						<CollectionList collections={community?.collections || user?.collections} />
-					</Section>
-				}
-				sideContent={
-					community ? (
-						<React.Fragment>
-							<Section title="About">{community.description}</Section>
-							<AvatarList users={community.members.map((x: any) => x.user)} />
-						</React.Fragment>
-					) : (
-						<CommunityList memberships={user.memberships} />
-					)
-				}
-			/>
-		</div>
-	);
+const NamespaceOverview: React.FC<Props> = function ({ community, user }) {
+	if (community) {
+		return <CommunityOverview community={community} />;
+	}
+	if (user) {
+		return <UserOverview user={user} />;
+	}
+	return null;
 };
 
-export default CommunityOverview;
+export default NamespaceOverview;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug } = context.params!;
-	const profileData = await getNamespaceData(namespaceSlug);
 
-	if (!profileData) {
+	const [communityData, userData] = await Promise.all([
+		getCommunityData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+		getUserData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+	]);
+
+	if (!communityData && !userData) {
 		return { notFound: true };
 	}
-
 	return {
 		props: {
-			slug: profileData.slug,
-			community: profileData.community,
-			user: profileData.user,
+			user: userData,
+			community: communityData,
 		},
 	};
 };

@@ -2,7 +2,9 @@ type LocalUser = {
 	id: string;
 	name: string;
 	avatar?: string;
-	slug: string;
+	namespace: {
+		slug: string;
+	};
 };
 
 export type LocalUserData = LocalUser | undefined;
@@ -15,6 +17,7 @@ export type LocationData = {
 		mode?: string;
 		subMode?: string;
 		versionNumber?: string;
+		redirect?: string;
 	};
 };
 

@@ -20,9 +20,6 @@ const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, l
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
-				<div className={styles.icon}>
-					<Collection size={28} />
-				</div>
 				<div className={styles.content}>
 					<div className={styles.title}>
 						<a className={styles.profilePrefix} href={buildUrl({ namespaceSlug })}>
@@ -40,6 +37,9 @@ const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, l
 					</div>
 
 					<div className={styles.details}>
+						<div className={styles.icon}>
+							<Collection size={20} />
+						</div>
 						{labels?.map((label) => {
 							return (
 								<Tag key={label} large minimal round className={styles.label}>

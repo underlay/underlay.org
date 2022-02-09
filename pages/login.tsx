@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Head from "next/head";
 import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
 import { Button, FormGroup, InputGroup, Intent } from "@blueprintjs/core";
 
+import { Form } from "components";
 import { supabase } from "utils/client/supabase";
+import { useLocationContext } from "utils/client/hooks";
 
 const Login: React.FC<{}> = ({}) => {
+	const { query } = useLocationContext();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handleLogin = async (evt: any) => {
+	const handleLogin = async (evt: FormEvent<EventTarget>) => {
 		setIsLoading(true);
 		evt.preventDefault();
 		const { session, error } = await supabase.auth.signIn({
@@ -26,24 +29,17 @@ const Login: React.FC<{}> = ({}) => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ token: session.access_token }),
 			});
-			window.location.href = "/";
+			window.location.href = query.redirect || "/";
 		}
 	};
 
-	const bodyStyle = {
-		maxWidth: "500px",
-		margin: "0 auto",
-	};
-	const formStyle = {
-		margin: "40px 0px",
-	};
 	return (
-		<div style={bodyStyle}>
+		<div className="narrow">
 			<Head>
 				<title>Login · Underlay</title>
 			</Head>
 			<h2>Login</h2>
-			<form onSubmit={handleLogin} style={formStyle}>
+			<Form onSubmit={handleLogin}>
 				<FormGroup label="Email" labelFor="email-input">
 					<InputGroup
 						id="email-input"
@@ -72,7 +68,7 @@ const Login: React.FC<{}> = ({}) => {
 					loading={isLoading}
 					disabled={!email || !password}
 				/>
-			</form>
+			</Form>
 		</div>
 	);
 };

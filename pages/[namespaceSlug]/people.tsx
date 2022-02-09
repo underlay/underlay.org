@@ -1,55 +1,46 @@
 import React from "react";
 import { GetServerSideProps } from "next";
+import { Prisma } from "@prisma/client";
 
-import { ProfileHeader, ResourceContentFrame, Section, UserList } from "components";
-import { getNamespaceData } from "utils/server/queries";
+import { getUserData, getCommunityData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
 
+export type ExtendedCommunity = Prisma.PromiseReturnType<typeof getCommunityData>;
+export type ExtendedUser = Prisma.PromiseReturnType<typeof getUserData>;
+
 type Props = {
-	name: string;
-	slug: string;
-	avatar?: string;
-	members: any;
+	community: ExtendedCommunity;
+	user: ExtendedUser;
 };
 
-const CommunityPeople: React.FC<Props> = function ({ name, slug, avatar, members }) {
-	return (
-		<div>
-			<ProfileHeader type="community" mode="people" name={name} slug={slug} avatar={avatar} />
-			<ResourceContentFrame
-				content={
-					<React.Fragment>
-						<Section title="Members">
-							<UserList
-								users={
-									// @ts-ignore
-									members.map((x) => x.user)
-								}
-							/>
-						</Section>
-					</React.Fragment>
-				}
-			/>
-		</div>
-	);
+const NamespacePeople: React.FC<Props> = function ({ community, user }) {
+	console.log(community, user);
+	return null;
 };
 
-export default CommunityPeople;
+export default NamespacePeople;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug } = context.params!;
-	const profileData = await getNamespaceData(namespaceSlug);
 
-	if (!profileData?.community) {
+	const [communityData, userData] = await Promise.all([
+		getCommunityData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+		getUserData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+	]);
+
+	if (!communityData && !userData) {
 		return { notFound: true };
 	}
-
 	return {
 		props: {
-			slug: profileData?.slug,
-			name: profileData?.community.name,
-			avatar: profileData?.community.avatar || undefined,
-			members: profileData?.community.members,
+			user: userData,
+			community: communityData,
 		},
 	};
 };

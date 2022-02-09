@@ -5,8 +5,7 @@
 	max-width: 100%;
 	margin-bottom: 50px;
 	.icon {
-		position: absolute;
-		left: -40px;
+		display: flex;
 	}
 	.avatarComponent {
 		flex: 0 0 auto;
@@ -37,6 +36,10 @@
 		top: -6px;
 		margin-left: 15px;
 		font-weight: 400;
+	}
+	.details {
+		display: flex;
+		align-items: center;
 	}
 	.details > * {
 		margin-right: 20px;

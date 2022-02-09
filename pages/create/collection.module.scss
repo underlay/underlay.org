@@ -1,0 +1,24 @@
+.form {
+	margin-top: 35px;
+}
+.nameRow {
+	display: flex;
+	align-items: center;
+	& > * {
+		margin-right: 15px;
+	}
+	.slash {
+		position: relative;
+		top: 5px;
+		font-size: 22px;
+	}
+}
+.namespace {
+	display: flex;
+	& > *:first-child {
+		margin-right: 10px;
+	}
+}
+.menuItem {
+	padding-left: 31px;
+}

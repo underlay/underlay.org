@@ -3,25 +3,17 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
-import {
-	Button,
-	Intent,
-	FormGroup,
-	InputGroup,
-	/* Checkbox, */
-	NonIdealState,
-} from "@blueprintjs/core";
+import { Button, Intent, FormGroup, InputGroup, NonIdealState } from "@blueprintjs/core";
+
+import { Avatar, AvatarUpload, Form } from "components";
 import { supabase } from "utils/client/supabase";
 import { getLoginId } from "utils/server/auth/user";
-
-// import { SignupPostBody } from "pages/api/signup";
 
 const Signup: React.FC<{}> = ({}) => {
 	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
 	const [email, setEmail] = useState("");
-	// const [slug, setSlug] = useState("");
-	// const [avatar, setAvatar] = useState(undefined);
+	const [avatar, setAvatar] = useState<string | undefined>(undefined);
 	const [isLoading, setIsLoading] = useState(false);
 	const [signupComplete, setSignupComplete] = useState(false);
 
@@ -34,7 +26,7 @@ const Signup: React.FC<{}> = ({}) => {
 				password: SHA3(password).toString(encHex),
 			},
 			{
-				data: { name },
+				data: { name, avatar },
 				redirectTo: `${window.location.origin}?signupCompleted=true`,
 			}
 		);
@@ -50,38 +42,10 @@ const Signup: React.FC<{}> = ({}) => {
 			setSignupComplete(true);
 		}
 		setIsLoading(false);
-		// evt.preventDefault();
-		// setIsLoading(true);
-
-		// const fetchData: SignupPostBody = {
-		// 	name,
-		// 	email,
-		// 	slug,
-		// 	// avatar,
-		// 	passwordHash: SHA3(password).toString(encHex),
-		// };
-
-		// const result = await fetch("/api/signup", {
-		// 	method: "POST",
-		// 	headers: { "Content-Type": "application/json" },
-		// 	body: JSON.stringify(fetchData),
-		// });
-		// if (!result.ok) {
-		// 	setIsLoading(false);
-		// 	return console.log(result.statusText);
-		// }
-		// window.location.href = `/${slug}`;
 	};
 
-	const bodyStyle = {
-		maxWidth: "500px",
-		margin: "0 auto",
-	};
-	const formStyle = {
-		margin: "40px 0px",
-	};
 	return (
-		<div style={bodyStyle}>
+		<div className="narrow">
 			<Head>
 				<title>Sign up · Underlay</title>
 			</Head>
@@ -89,7 +53,7 @@ const Signup: React.FC<{}> = ({}) => {
 			{!signupComplete && (
 				<React.Fragment>
 					<h1>Sign up</h1>
-					<form onSubmit={handleSubmit} style={formStyle}>
+					<Form onSubmit={handleSubmit}>
 						<FormGroup label="Name" labelFor="name-input">
 							<InputGroup
 								id="name-input"
@@ -116,7 +80,7 @@ const Signup: React.FC<{}> = ({}) => {
 								onChange={(evt) => setPassword(evt.target.value)}
 							/>
 						</FormGroup>
-						{/* <FormGroup label="Avatar" labelFor="avatar-input">
+						<FormGroup label="Avatar" labelFor="avatar-input">
 							<div style={{ display: "flex", alignItems: "center" }}>
 								<div style={{ marginRight: "10px" }}>
 									<Avatar src={avatar} name={name} size={50} />
@@ -126,15 +90,17 @@ const Signup: React.FC<{}> = ({}) => {
 										setAvatar(val);
 									}}
 								/>
-								<Button
-									icon="trash"
-									minimal
-									onClick={() => {
-										setAvatar(null);
-									}}
-								/>
+								{avatar && (
+									<Button
+										icon="trash"
+										minimal
+										onClick={() => {
+											setAvatar(undefined);
+										}}
+									/>
+								)}
 							</div>
-						</FormGroup> */}
+						</FormGroup>
 
 						<Button
 							type="submit"
@@ -143,7 +109,7 @@ const Signup: React.FC<{}> = ({}) => {
 							loading={isLoading}
 							disabled={!name || !password || !email}
 						/>
-					</form>
+					</Form>
 				</React.Fragment>
 			)}
 			{signupComplete && (

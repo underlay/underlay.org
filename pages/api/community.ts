@@ -10,12 +10,16 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	if (!loginId) {
 		return res.status(403).json({ ok: false });
 	}
-	const community = await prisma.community.create({
+	const { name, description, avatar } = req.body;
+	const newSlug = slugifyString(name);
+	await prisma.community.create({
 		data: {
-			name: req.body.name,
+			name,
+			description,
+			avatar,
 			namespace: {
 				create: {
-					slug: slugifyString(req.body.name),
+					slug: newSlug,
 				},
 			},
 			members: {
@@ -27,5 +31,5 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		},
 	});
 
-	return res.status(200).json(community);
+	return res.status(200).json({ communitySlug: newSlug });
 });

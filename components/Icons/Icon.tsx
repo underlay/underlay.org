@@ -26,6 +26,7 @@ const Icon: React.FC<Props> = ({
 			data-icon={icon.toLowerCase().replace(/_/gi, "-")}
 			aria-label={ariaLabel}
 			aria-hidden={ariaHidden}
+			style={{ display: "inline-flex" }}
 		>
 			<svg
 				width={`${size}px`}

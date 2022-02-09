@@ -5,7 +5,7 @@ RETURNS TRIGGER AS $$
   BEGIN
 	INSERT INTO public.namespaces (id, slug) VALUES (uuid_generate_v4(), new_slug);
 
-    INSERT INTO public.profiles (
+    INSERT INTO public.users (
       id,
       email,
       name,
@@ -36,7 +36,7 @@ FOR EACH ROW EXECUTE PROCEDURE handle_new_user();
 CREATE OR REPLACE FUNCTION handle_updated_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE public.profiles
+  UPDATE public.users
   SET email = new.email
   WHERE id = new.id::text;
   RETURN NEW;

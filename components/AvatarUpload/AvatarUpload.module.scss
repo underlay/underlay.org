@@ -1,0 +1,35 @@
+@import "pages/variables.scss";
+
+.dialog {
+	position: relative;
+	width: 50vw;
+	height: 60vh;
+	@include for-mobile {
+		width: 80vw;
+		height: 70vh;
+	}
+}
+.cropContainer {
+	position: absolute;
+	top: 0;
+	bottom: 50px;
+	left: 0;
+	right: 0;
+}
+.controls {
+	position: absolute;
+	top: calc(100% - 50px);
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	display: flex;
+}
+.slider {
+	flex: 1 1 auto;
+	padding: 18px 25px;
+}
+.buttonWrapper {
+	flex: 0 0 auto;
+	width: 65px;
+	padding: 10px 0px;
+}

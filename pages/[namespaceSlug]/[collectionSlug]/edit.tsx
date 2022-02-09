@@ -12,11 +12,11 @@ import Editor from "components/Editor/Editor";
 
 type Props = {
 	slug: string;
-	permission: string;
+	isPublic: boolean;
 	labels?: any;
 };
 
-const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
+const CollectionEdit: React.FC<Props> = function ({ isPublic, labels }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
@@ -25,11 +25,7 @@ const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
 					{namespaceSlug}/{collectionSlug} · Underlay
 				</title>
 			</Head>
-			<CollectionHeader
-				mode="edit"
-				isPrivate={true || permission === "private"}
-				labels={labels}
-			/>
+			<CollectionHeader mode="edit" isPrivate={!isPublic} labels={labels} />
 			{/* <img
 				style={{ marginTop: 50 }}
 				width="100%"
@@ -117,7 +113,7 @@ export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams>
 	return {
 		props: {
 			slug: collectionData.slug,
-			permission: collectionData.permission,
+			isPublic: collectionData.isPublic,
 			labels: collectionData.labels || undefined,
 		},
 	};

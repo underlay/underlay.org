@@ -11,11 +11,11 @@ import { getCollectionData } from "utils/server/queries";
 
 type Props = {
 	slug: string;
-	permission: string;
+	isPublic: boolean;
 	labels?: any;
 };
 
-const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
+const CollectionOverview: React.FC<Props> = function ({ isPublic, labels }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
@@ -24,11 +24,7 @@ const CollectionOverview: React.FC<Props> = function ({ permission, labels }) {
 					{namespaceSlug}/{collectionSlug} · Underlay
 				</title>
 			</Head>
-			<CollectionHeader
-				mode="overview"
-				isPrivate={true || permission === "private"}
-				labels={labels}
-			/>
+			<CollectionHeader mode="overview" isPrivate={!isPublic} labels={labels} />
 			<ResourceContentFrame content={<MainContent />} sideContent={<SideContent />} />
 		</div>
 	);
@@ -49,7 +45,7 @@ export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams>
 	return {
 		props: {
 			slug: collectionData.slug,
-			permission: collectionData.permission,
+			isPublic: collectionData.isPublic,
 			labels: collectionData.labels || undefined,
 		},
 	};
