@@ -16,9 +16,11 @@ body {
 
 .app {
 	max-width: $max-content-width;
-	min-width: $min-content-width;
-
+	// min-width: $min-content-width;
 	padding: 0 $gutter-padding;
+	@include for-mobile {
+		padding: 0 $mobile-gutter-padding;
+	}
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;

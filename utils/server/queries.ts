@@ -47,6 +47,46 @@ export const getNamespaceData = async (namespaceSlug: string) => {
 	};
 };
 
+type CommunityDataRequest = {
+	slug: string;
+	includeCollections: boolean;
+};
+export const getCommunityData = async ({ slug, includeCollections }: CommunityDataRequest) => {
+	return prisma.community.findFirst({
+		where: {
+			namespace: { slug: slug },
+		},
+		include: {
+			members: { include: { user: { include: { namespace: true } } } },
+			namespace: {
+				include: {
+					collections: includeCollections,
+				},
+			},
+		},
+	});
+};
+
+type UserDataRequest = {
+	slug: string;
+	includeCollections: boolean;
+};
+export const getUserData = async ({ slug, includeCollections }: UserDataRequest) => {
+	return prisma.user.findFirst({
+		where: {
+			namespace: { slug: slug },
+		},
+		include: {
+			memberships: { include: { community: { include: { namespace: true } } } },
+			namespace: {
+				include: {
+					collections: includeCollections,
+				},
+			},
+		},
+	});
+};
+
 export const getCollectionData = async (namespaceSlug: string, collectionSlug: string) => {
 	const profileData = await prisma.namespace.findUnique({
 		where: { slug: namespaceSlug },

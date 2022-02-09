@@ -7,18 +7,25 @@ import { getLoginId } from "utils/server/auth/user";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
 	const loginId = await getLoginId(req);
-	if (loginId) {
+	if (!loginId) {
 		return res.status(403).json({ ok: false });
 	}
-	// TODO: validate that user has permissions for namespaceId
 
-	const collection = await prisma.collection.create({
+	// TODO: Make sure loginId has permissions for associated namespaceId
+	const { namespaceId, name, description, isPublic } = req.body;
+	const newSlug = slugifyString(name);
+	const newCollection = await prisma.collection.create({
 		data: {
-			slug: slugifyString(req.body.slug),
-			permission: "public",
-			namespaceId: req.body.namespaceId,
+			slug: newSlug,
+			description,
+			isPublic,
+			namespaceId,
 		},
 	});
 
-	return res.status(200).json(collection);
+	const populatedCollection = await prisma.collection.findUnique({
+		where: { id: newCollection.id },
+		include: { namespace: true },
+	});
+	return res.status(200).json(populatedCollection);
 });

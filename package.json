@@ -26,6 +26,7 @@
 	"dependencies": {
 		"@blueprintjs/core": "^4.0.0-beta.10",
 		"@blueprintjs/icons": "^4.0.0-beta.6",
+		"@blueprintjs/select": "^3.18.12",
 		"@hapi/iron": "^6.0.0",
 		"@next/bundle-analyzer": "^12.0.7",
 		"@prisma/client": "^3.6.0",

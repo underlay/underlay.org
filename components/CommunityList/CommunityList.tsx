@@ -16,7 +16,7 @@ const CommunityList: React.FC<Props> = function ({ memberships }) {
 					// @ts-ignore
 					memberships.map((membership) => {
 						const { name, avatar } = membership.community;
-						const { slug } = membership.community.profile;
+						const { slug } = membership.community.namespace;
 						return (
 							<a key={slug} href={`/${slug}`} title={name} className={styles.anchor}>
 								<Avatar

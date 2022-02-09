@@ -14,9 +14,9 @@ type Props = {
 	mode: "overview" | "settings" | "people" | "discussions";
 	name: string;
 	slug: string;
-	avatar?: string;
-	verifiedUrl?: string;
-	location?: string;
+	avatar?: string | null;
+	verifiedUrl?: string | null;
+	location?: string | null;
 };
 
 const ProfileHeader: React.FC<Props> = function ({
@@ -32,9 +32,6 @@ const ProfileHeader: React.FC<Props> = function ({
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
-				<div className={styles.icon}>
-					{type === "user" ? <User size={28} /> : <Community size={28} />}
-				</div>
 				<Avatar className={styles.avatarComponent} name={name} src={avatar} size={100} />
 
 				<div className={styles.content}>
@@ -43,6 +40,9 @@ const ProfileHeader: React.FC<Props> = function ({
 					</div>
 
 					<div className={styles.details}>
+						<div className={styles.icon}>
+							{type === "user" ? <User size={20} /> : <Community size={20} />}
+						</div>
 						<span className={styles.slug}>{slug}</span>
 						{verifiedUrl && (
 							<Tag intent={Intent.SUCCESS} minimal large>

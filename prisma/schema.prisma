@@ -71,7 +71,8 @@ model Collection {
     namespace   Namespace @relation(fields: [namespaceId], references: [id])
     namespaceId String    @map(name: "namespace_id")
     slug        String
-    permission  String
+    description String
+    isPublic    Boolean
     readme      String?
     labels      Json?
     createdAt   DateTime  @default(now()) @map(name: "created_at")

@@ -4,7 +4,7 @@ import styles from "./Avatar.module.scss";
 
 type Props = {
 	name?: string;
-	src?: string;
+	src?: string | null;
 	size?: number;
 	className?: string;
 };

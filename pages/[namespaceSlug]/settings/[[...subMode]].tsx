@@ -95,7 +95,7 @@ export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = 
 
 	return {
 		props: {
-			slug: profileData.slug,
+			slug: profileData.community?.namespace.slug || profileData.user?.namespace.slug || "",
 			community: profileData.community,
 			user: profileData.user,
 		},

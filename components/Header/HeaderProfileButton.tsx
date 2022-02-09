@@ -21,8 +21,8 @@ const HeaderProfileButton = () => {
 				<Menu>
 					<MenuDivider title={loginData?.name} />
 					<MenuDivider />
-					<MenuItem text="Profile" href={`/${loginData?.slug}`} />
-					<MenuItem text="Settings" href={`/${loginData?.slug}/settings`} />
+					<MenuItem text="Profile" href={`/${loginData?.namespace.slug}`} />
+					<MenuItem text="Settings" href={`/${loginData?.namespace.slug}/settings`} />
 					<MenuDivider />
 					<MenuItem text="Sign out" onClick={handleSignout} />
 				</Menu>

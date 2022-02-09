@@ -1,45 +1,46 @@
 import React from "react";
 import { GetServerSideProps } from "next";
+import { Prisma } from "@prisma/client";
 
-import { ProfileHeader } from "components";
+import { getUserData, getCommunityData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
-import { getNamespaceData } from "utils/server/queries";
+
+export type ExtendedCommunity = Prisma.PromiseReturnType<typeof getCommunityData>;
+export type ExtendedUser = Prisma.PromiseReturnType<typeof getUserData>;
 
 type Props = {
-	name: string;
-	slug: string;
-	avatar?: string;
+	community: ExtendedCommunity;
+	user: ExtendedUser;
 };
 
-const CommunityDiscussions: React.FC<Props> = function ({ name, slug, avatar }) {
-	return (
-		<div>
-			<ProfileHeader
-				type="community"
-				mode="discussions"
-				name={name}
-				slug={slug}
-				avatar={avatar}
-			/>
-		</div>
-	);
+const NamespaceDiscussions: React.FC<Props> = function ({ community, user }) {
+	console.log(community, user);
+	return null;
 };
 
-export default CommunityDiscussions;
+export default NamespaceDiscussions;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug } = context.params!;
-	const profileData = await getNamespaceData(namespaceSlug);
 
-	if (!profileData?.community) {
+	const [communityData, userData] = await Promise.all([
+		getCommunityData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+		getUserData({
+			slug: namespaceSlug,
+			includeCollections: true,
+		}),
+	]);
+
+	if (!communityData && !userData) {
 		return { notFound: true };
 	}
-
 	return {
 		props: {
-			slug: profileData?.slug,
-			name: profileData?.community.name,
-			avatar: profileData?.community.avatar || undefined,
+			user: userData,
+			community: communityData,
 		},
 	};
 };
