@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent } from "react";
 import Head from "next/head";
 import SHA3 from "crypto-js/sha3";
 import encHex from "crypto-js/enc-hex";
@@ -13,11 +13,7 @@ const Login: React.FC<{}> = ({}) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	useEffect(() => {
-		setTimeout(() => {
-			supabase.auth.signIn;
-		}, 3000);
-	}, []);
+
 	const handleLogin = async (evt: FormEvent<EventTarget>) => {
 		setIsLoading(true);
 		evt.preventDefault();
