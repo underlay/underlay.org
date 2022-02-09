@@ -3,11 +3,15 @@ import { Popover, Button, Menu, MenuItem, MenuDivider, Position } from "@bluepri
 
 import { useLoginContext } from "utils/client/hooks";
 import { Avatar } from "components";
+import { supabase } from "utils/client/supabase";
 
 const HeaderProfileButton = () => {
 	const loginData = useLoginContext();
 	const handleSignout = async () => {
-		await fetch("/api/logout", { method: "POST" });
+		await supabase.auth.signOut();
+		await fetch("/api/token", {
+			method: "DELETE",
+		});
 		window.location.href = "/";
 	};
 

@@ -5,26 +5,27 @@ import { serialize, parse, CookieSerializeOptions } from "cookie";
 const TOKEN_NAME = "token";
 const MAX_AGE = 60 * 60 * 24 * 30; /* 30 days */
 
+const cookieOptions: CookieSerializeOptions = {
+	maxAge: MAX_AGE,
+	expires: new Date(Date.now() + MAX_AGE * 1000),
+	httpOnly: true,
+	secure: process.env.NODE_ENV === "production",
+	path: "/",
+	sameSite: "lax",
+};
+
 export function setTokenCookie(res: NextApiResponse, token: string) {
-	const cookieOptions: CookieSerializeOptions = {
-		maxAge: MAX_AGE,
-		expires: new Date(Date.now() + MAX_AGE * 1000),
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		path: "/",
-		sameSite: "lax",
-	};
 	const cookie = serialize(TOKEN_NAME, token, cookieOptions);
 	res.setHeader("Set-Cookie", cookie);
 }
 
 export function removeTokenCookie(res: NextApiResponse) {
-	const cookieOptions = {
+	const removeOptions = {
+		...cookieOptions,
 		maxAge: -1,
 		path: "/",
 	};
-	const cookie = serialize(TOKEN_NAME, "", cookieOptions);
-
+	const cookie = serialize(TOKEN_NAME, "", removeOptions);
 	res.setHeader("Set-Cookie", cookie);
 }
 

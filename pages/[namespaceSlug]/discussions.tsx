@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next";
 
 import { ProfileHeader } from "components";
 import { ProfilePageParams } from "utils/shared/types";
-import { getProfileData } from "utils/server/queries";
+import { getNamespaceData } from "utils/server/queries";
 
 type Props = {
 	name: string;
@@ -28,8 +28,8 @@ const CommunityDiscussions: React.FC<Props> = function ({ name, slug, avatar }) 
 export default CommunityDiscussions;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
-	const { profileSlug } = context.params!;
-	const profileData = await getProfileData(profileSlug);
+	const { namespaceSlug } = context.params!;
+	const profileData = await getNamespaceData(namespaceSlug);
 
 	if (!profileData?.community) {
 		return { notFound: true };

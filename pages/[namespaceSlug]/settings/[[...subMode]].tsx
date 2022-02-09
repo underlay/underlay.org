@@ -6,7 +6,7 @@ import { useLocationContext } from "utils/client/hooks";
 import { ProfilePageParams } from "utils/shared/types";
 import { getLoginId } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
-import { getProfileData } from "utils/server/queries";
+import { getNamespaceData } from "utils/server/queries";
 
 type Props = {
 	slug: string;
@@ -15,7 +15,7 @@ type Props = {
 };
 
 const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
-	const { profileSlug = "", subMode } = useLocationContext().query;
+	const { namespaceSlug = "", subMode } = useLocationContext().query;
 	const activeSubMode = subMode && subMode[0];
 	return (
 		<div>
@@ -35,7 +35,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 							{
 								text: "Profile",
 								href: buildUrl({
-									profileSlug: profileSlug,
+									namespaceSlug: namespaceSlug,
 									mode: "settings",
 									subMode: "",
 								}),
@@ -44,7 +44,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 							{
 								text: "Account",
 								href: buildUrl({
-									profileSlug: profileSlug,
+									namespaceSlug: namespaceSlug,
 									mode: "settings",
 									subMode: "account",
 								}),
@@ -71,8 +71,8 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 export default UserSettings;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
-	const { profileSlug, subMode } = context.params!;
-	const profileData = await getProfileData(profileSlug);
+	const { namespaceSlug, subMode } = context.params!;
+	const profileData = await getNamespaceData(namespaceSlug);
 	const validSubModes = ["account"];
 	const isValidSubmode = !subMode || (subMode.length === 1 && validSubModes.includes(subMode[0]));
 	if (!profileData || !isValidSubmode) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { buildUrl } from "utils/shared/urls";
 import { useLocationContext } from "utils/client/hooks";
@@ -21,11 +21,17 @@ const CollectionPreview: React.FC<Props> = function ({
 	// version,
 	// lastPublished,
 }) {
-	const { profileSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "" } = useLocationContext().query;
+	const [version] = useState(
+		`${Math.round(Math.random() * 10)}.${Math.round(Math.random() * 10)}.${Math.round(
+			Math.random() * 10
+		)}`
+	);
+	const [lastPublished] = useState(Math.round(Math.random() * 25));
 	return (
 		<a
 			href={buildUrl({
-				profileSlug: profileSlug,
+				namespaceSlug: namespaceSlug,
 				collectionSlug: slug,
 			})}
 			className={styles.previewBlock}
@@ -38,14 +44,10 @@ const CollectionPreview: React.FC<Props> = function ({
 			<div className={styles.details}>
 				<span>{isPrivate ? "Private" : "Public"}</span>
 				<span className={styles.dot}>·</span>
-				{/* <span>{version}</span> */}
-				<span>
-					{Math.round(Math.random() * 10)}.{Math.round(Math.random() * 10)}.
-					{Math.round(Math.random() * 10)}
-				</span>
+				<span>{version}</span>
 				<span className={styles.dot}>·</span>
 				{/* <span>{lastPublished}</span> */}
-				<span>Last Published {Math.round(Math.random() * 25)} days ago</span>
+				<span>Last Published {lastPublished} days ago</span>
 			</div>
 		</a>
 	);
