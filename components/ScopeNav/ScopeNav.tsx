@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
 	return (
 		<div className={styles.primary}>
@@ -44,7 +44,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
 							large
 							key={modeSlug}
 							href={buildUrl({
-								profileSlug: profileSlug,
+								namespaceSlug: namespaceSlug,
 								collectionSlug: collectionSlug,
 								mode: modeSlug,
 							})}
@@ -65,7 +65,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
 												text={title}
 												active={isActive}
 												href={buildUrl({
-													profileSlug: profileSlug,
+													namespaceSlug: namespaceSlug,
 													collectionSlug: collectionSlug,
 													mode: modeSlug,
 												})}
@@ -96,7 +96,7 @@ const ScopeNav: React.FC<Props> = function ({ navItems, mode }) {
 						large
 						key={modeSlug}
 						href={buildUrl({
-							profileSlug: profileSlug,
+							namespaceSlug: namespaceSlug,
 							collectionSlug: collectionSlug,
 							mode: modeSlug,
 						})}

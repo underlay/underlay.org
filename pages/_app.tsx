@@ -1,18 +1,31 @@
 import App, { AppContext, AppProps } from "next/app";
 import Head from "next/head";
 
-import initClient from "utils/client/initClient";
-import { LocalUserData } from "utils/shared/types";
+import { initClient } from "utils/client/initClient";
 import { LoginContext, LocationContext } from "utils/client/hooks";
-import { useFathom } from "utils/client/fathom";
+import { LocalUserData } from "utils/shared/types";
 import { Header, Footer } from "components";
 
 import "./app.scss";
 
-type ExpandedAppProps = AppProps & { loginData: LocalUserData };
+type ExpandedAppProps = AppProps & {
+	loginData: LocalUserData;
+	tokenData: string;
+	vercelEnv: string;
+	supabaseUrl: string;
+	supabaseKey: string;
+};
 
-function MyApp({ Component, router, pageProps, loginData }: ExpandedAppProps) {
-	useFathom();
+function MyApp({
+	Component,
+	router,
+	pageProps,
+	loginData,
+	vercelEnv,
+	supabaseUrl,
+	supabaseKey,
+}: ExpandedAppProps) {
+	initClient(vercelEnv, supabaseUrl, supabaseKey, router);
 	return (
 		<LocationContext.Provider value={router}>
 			<LoginContext.Provider value={loginData}>
@@ -50,11 +63,17 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 	if (typeof window === "undefined") {
 		const { getLoginId, findUserById } = require("../utils/server/auth/user.ts");
 		const appProps = await App.getInitialProps(appContext);
+
 		const loginId = await getLoginId(appContext.ctx.req);
 		const loginData = await findUserById(loginId);
-		return { ...appProps, loginData: loginData };
+		return {
+			...appProps,
+			loginData: loginData,
+			vercelEnv: process.env.VERCEL_ENV,
+			supabaseUrl: process.env.SUPABASE_URL,
+			supabaseKey: process.env.SUPABASE_PUBLIC_KEY,
+		};
 	}
 };
 
 export default MyApp;
-initClient();

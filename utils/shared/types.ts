@@ -10,7 +10,7 @@ export type LocalUserData = LocalUser | undefined;
 export type LocationData = {
 	pathname: string;
 	query: {
-		profileSlug?: string;
+		namespaceSlug?: string;
 		collectionSlug?: string;
 		mode?: string;
 		subMode?: string;
@@ -19,12 +19,12 @@ export type LocationData = {
 };
 
 export type ProfilePageParams = {
-	profileSlug: string;
+	namespaceSlug: string;
 	subMode?: string;
 };
 
 export type CollectionPageParams = {
-	profileSlug: string;
+	namespaceSlug: string;
 	collectionSlug: string;
 	subMode?: string;
 };

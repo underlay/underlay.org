@@ -21,7 +21,7 @@ const CollectionPreview: React.FC<Props> = function ({
 	// version,
 	// lastPublished,
 }) {
-	const { profileSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "" } = useLocationContext().query;
 	const [version] = useState(
 		`${Math.round(Math.random() * 10)}.${Math.round(Math.random() * 10)}.${Math.round(
 			Math.random() * 10
@@ -31,7 +31,7 @@ const CollectionPreview: React.FC<Props> = function ({
 	return (
 		<a
 			href={buildUrl({
-				profileSlug: profileSlug,
+				namespaceSlug: namespaceSlug,
 				collectionSlug: slug,
 			})}
 			className={styles.previewBlock}

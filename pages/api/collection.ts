@@ -10,13 +10,13 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	if (loginId) {
 		return res.status(403).json({ ok: false });
 	}
+	// TODO: validate that user has permissions for namespaceId
+
 	const collection = await prisma.collection.create({
 		data: {
 			slug: slugifyString(req.body.slug),
 			permission: "public",
-			user: {
-				connect: [{ id: loginId }],
-			},
+			namespaceId: req.body.namespaceId,
 		},
 	});
 

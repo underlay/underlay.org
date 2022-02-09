@@ -16,7 +16,7 @@ type Props = {
 };
 
 const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, labels = [] }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
@@ -25,11 +25,11 @@ const CollectionHeader: React.FC<Props> = function ({ isPrivate = false, mode, l
 				</div>
 				<div className={styles.content}>
 					<div className={styles.title}>
-						<a className={styles.profilePrefix} href={buildUrl({ profileSlug })}>
-							{profileSlug}
+						<a className={styles.profilePrefix} href={buildUrl({ namespaceSlug })}>
+							{namespaceSlug}
 						</a>
 						<span>/</span>
-						<a href={buildUrl({ profileSlug, collectionSlug })}>{collectionSlug}</a>
+						<a href={buildUrl({ namespaceSlug, collectionSlug })}>{collectionSlug}</a>
 
 						{isPrivate && (
 							<Tag className={styles.privateTag} minimal large>
