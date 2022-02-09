@@ -1,7 +1,7 @@
 import prisma from "prisma/db";
 
-export const getNamespaceData = (namespaceSlug: string) => {
-	return prisma.namespace.findUnique({
+export const getNamespaceData = async (namespaceSlug: string) => {
+	const namespaceData = await prisma.namespace.findUnique({
 		where: { slug: namespaceSlug },
 		include: {
 			collections: true,
@@ -18,6 +18,29 @@ export const getNamespaceData = (namespaceSlug: string) => {
 			},
 		},
 	});
+
+	if (!namespaceData) {
+		return undefined;
+	}
+
+	const namespace = { id: namespaceData.id, slug: namespaceData.slug };
+	const community = namespaceData.community
+		? {
+				...namespaceData.community,
+				namespace,
+		  }
+		: undefined;
+	const user = namespaceData.user
+		? {
+				...namespaceData.user,
+				namespace,
+		  }
+		: undefined;
+
+	return {
+		community,
+		user,
+	};
 };
 
 export const getCollectionData = async (namespaceSlug: string, collectionSlug: string) => {

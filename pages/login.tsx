@@ -6,8 +6,10 @@ import { Button, FormGroup, InputGroup, Intent } from "@blueprintjs/core";
 
 import { Form } from "components";
 import { supabase } from "utils/client/supabase";
+import { useLocationContext } from "utils/client/hooks";
 
 const Login: React.FC<{}> = ({}) => {
+	const { query } = useLocationContext();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +29,7 @@ const Login: React.FC<{}> = ({}) => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ token: session.access_token }),
 			});
-			window.location.href = "/";
+			window.location.href = query.redirect || "/";
 		}
 	};
 

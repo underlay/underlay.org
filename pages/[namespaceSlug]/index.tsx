@@ -12,14 +12,16 @@ import {
 } from "components";
 import { getNamespaceData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
+import { Community, Namespace, Profile } from "@prisma/client";
 
+type ExtendedCommunity = Community & Namespace;
+type ExtendedUser = Profile & Namespace;
 type Props = {
-	slug: string;
-	community?: any;
-	user?: any;
+	community?: ExtendedCommunity;
+	profile?: ExtendedUser;
 };
 
-const CommunityOverview: React.FC<Props> = function ({ slug, community, user }) {
+const CommunityOverview: React.FC<Props> = function ({ community, user }) {
 	return (
 		<div>
 			<Head>
@@ -61,17 +63,13 @@ export default CommunityOverview;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug } = context.params!;
-	const profileData = await getNamespaceData(namespaceSlug);
-
-	if (!profileData) {
+	const namespaceData = await getNamespaceData(namespaceSlug);
+	console.log(namespaceData);
+	if (!namespaceData) {
 		return { notFound: true };
 	}
 
 	return {
-		props: {
-			slug: profileData.slug,
-			community: profileData.community,
-			user: profileData.user,
-		},
+		props: namespaceData,
 	};
 };

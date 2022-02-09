@@ -17,9 +17,10 @@ const readFile = (file: File) => {
 
 type Props = {
 	onComplete: any;
+	buttonText?: string;
 };
 
-const AvatarUpload: React.FC<Props> = function ({ onComplete }) {
+const AvatarUpload: React.FC<Props> = function ({ onComplete, buttonText = "Set Profile Photo" }) {
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [dialogFinishedOpen, setDialogFinishedOpen] = useState(false);
@@ -68,7 +69,7 @@ const AvatarUpload: React.FC<Props> = function ({ onComplete }) {
 
 	return (
 		<div>
-			<Button onClick={handleClick} outlined text="Set Profile Photo" />
+			<Button onClick={handleClick} outlined text={buttonText} />
 			<input
 				type="file"
 				ref={hiddenFileInput}
