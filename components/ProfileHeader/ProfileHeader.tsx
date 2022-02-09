@@ -28,7 +28,7 @@ const ProfileHeader: React.FC<Props> = function ({
 	verifiedUrl,
 	location,
 }) {
-	const { profileSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
@@ -39,7 +39,7 @@ const ProfileHeader: React.FC<Props> = function ({
 
 				<div className={styles.content}>
 					<div className={styles.title}>
-						<a href={buildUrl({ profileSlug })}>{name}</a>
+						<a href={buildUrl({ namespaceSlug })}>{name}</a>
 					</div>
 
 					<div className={styles.details}>

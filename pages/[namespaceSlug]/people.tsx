@@ -2,7 +2,7 @@ import React from "react";
 import { GetServerSideProps } from "next";
 
 import { ProfileHeader, ResourceContentFrame, Section, UserList } from "components";
-import { getProfileData } from "utils/server/queries";
+import { getNamespaceData } from "utils/server/queries";
 import { ProfilePageParams } from "utils/shared/types";
 
 type Props = {
@@ -37,8 +37,8 @@ const CommunityPeople: React.FC<Props> = function ({ name, slug, avatar, members
 export default CommunityPeople;
 
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
-	const { profileSlug } = context.params!;
-	const profileData = await getProfileData(profileSlug);
+	const { namespaceSlug } = context.params!;
+	const profileData = await getNamespaceData(namespaceSlug);
 
 	if (!profileData?.community) {
 		return { notFound: true };

@@ -2,188 +2,94 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
-// model Session {
-//   id        String   @id
-//   userId    String   @map(name: "user_id")
-//   expiresAt DateTime @map(name: "expires_at")
-//   createdAt DateTime @default(now()) @map(name: "created_at")
-//   updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+model Namespace {
+    id        String   @id @default(uuid())
+    slug      String   @unique
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
-//   @@map(name: "sessions")
-// }
+    user        Profile?
+    community   Community?
+    collections Collection[]
+    @@map(name: "namespaces")
+}
 
 model Profile {
-  id   String @id @default(uuid())
-  slug String @unique
+    id          String    @id @default(uuid())
+    namespace   Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId String    @unique @map(name: "namespace_id")
+    email       String    @unique
+    name        String
+    avatar      String?
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  user      User?
-  community Community?
-
-  @@map(name: "profiles")
-}
-
-model User {
-  id                String    @id @default(uuid())
-  profile           Profile   @relation(fields: [profileId], references: [id])
-  profileId         String    @unique
-  email             String    @unique
-  name              String
-  avatar            String?
-  hash              String
-  salt              String
-  signupToken       String    @unique @map(name: "signup_token")
-  signupEmailCount  Int       @map(name: "signup_email_count")
-  signupCompletedAt DateTime? @map(name: "signup_completed_at")
-  createdAt         DateTime  @default(now()) @map(name: "created_at")
-  updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
-
-  memberships       CommunityMember[]
-  collections       Collection[]
-  collabCollections CollectionCollaborator[]
-  discussions       Discussion[]
-  discussionItems   DiscussionItem[]
-  @@map(name: "users")
+    memberships    Member[]
+    collaborations Collaborator[]
+    @@map(name: "profiles")
 }
 
 model Community {
-  id          String   @id @default(uuid())
-  profile     Profile  @relation(fields: [profileId], references: [id])
-  profileId   String   @unique
-  name        String
-  avatar      String?
-  description String?
-  location    String?
-  verifiedUrl String?
-  createdAt   DateTime @default(now()) @map(name: "created_at")
-  updatedAt   DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    id          String    @id @default(uuid())
+    namespace   Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId String    @unique @map(name: "namespace_id")
+    name        String
+    avatar      String?
+    description String?
+    location    String?
+    verifiedUrl String?
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  members     CommunityMember[]
-  collections Collection[]
-  discussions Discussion[]
-  @@map(name: "communities")
+    members Member[]
+    @@map(name: "communities")
 }
 
-model CommunityMember {
-  id          String    @id @default(uuid())
-  community   Community @relation(fields: [communityId], references: [id])
-  communityId String    @map(name: "community_id")
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String    @map(name: "user_id")
-  permission  String
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+model Member {
+    id          String    @id @default(uuid())
+    community   Community @relation(fields: [communityId], references: [id])
+    communityId String    @map(name: "community_id")
+    user        Profile   @relation(fields: [userId], references: [id])
+    userId      String    @map(name: "user_id")
+    permission  String
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  @@map(name: "community_members")
+    @@map(name: "members")
 }
 
 model Collection {
-  id         String   @id @default(uuid())
-  slug       String
-  permission String
-  readme     String?
-  labels     Json?
-  createdAt  DateTime @default(now()) @map(name: "created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    id          String    @id @default(uuid())
+    namespace   Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId String    @map(name: "namespace_id")
+    slug        String
+    permission  String
+    readme      String?
+    labels      Json?
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  user          User[]
-  community     Community[]
-  collaborators CollectionCollaborator[]
-  discussions   Discussion[]
-  @@map(name: "collections")
+    collaborators Collaborator[]
+    @@map(name: "collections")
 }
 
-// model UserCollection {
-//     id           String     @id @default(uuid())
-//     collection   Collection @relation(fields: [collectionId], references: [id])
-//     collectionId String     @unique @map(name: "collection_id")
-//     user         User       @relation(fields: [userId], references: [id])
-//     userId       String     @map(name: "user_id")
-//     createdAt    DateTime   @default(now()) @map(name: "created_at")
-//     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+model Collaborator {
+    id           String     @id @default(uuid())
+    collection   Collection @relation(fields: [collectionId], references: [id])
+    collectionId String     @map(name: "collection_id")
+    user         Profile    @relation(fields: [userId], references: [id])
+    userId       String     @map(name: "user_id")
+    permission   String
+    createdAt    DateTime   @default(now()) @map(name: "created_at")
+    updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
-//     @@map(name: "user_collections")
-// }
-
-// model CommunityCollection {
-//     id           String     @id @default(uuid())
-//     community    Community  @relation(fields: [communityId], references: [id])
-//     communityId  String     @map(name: "community_id")
-//     collection   Collection @relation(fields: [collectionId], references: [id])
-//     collectionId String     @unique @map(name: "collection_id")
-//     createdAt    DateTime   @default(now()) @map(name: "created_at")
-//     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-
-//     @@map(name: "community_collections")
-// }
-
-model CollectionCollaborator {
-  id           String     @id @default(uuid())
-  collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String     @map(name: "collection_id")
-  user         User       @relation(fields: [userId], references: [id])
-  userId       String     @map(name: "user_id")
-  permission   String
-  createdAt    DateTime   @default(now()) @map(name: "created_at")
-  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-
-  @@map(name: "collection_collaborators")
+    @@map(name: "collaborators")
 }
-
-model Discussion {
-  id        String   @id @default(uuid())
-  privacy   String
-  userId    String   @map(name: "user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
-
-  discussionItems DiscussionItem[]
-  community       Community[]
-  collection      Collection[]
-  @@map(name: "discussions")
-}
-
-model DiscussionItem {
-  id           String     @id @default(uuid())
-  markdown     String
-  discussionId String     @map(name: "discussion_id")
-  discussion   Discussion @relation(fields: [discussionId], references: [id])
-  userId       String     @map(name: "user_id")
-  user         User       @relation(fields: [userId], references: [id])
-  createdAt    DateTime   @default(now()) @map(name: "created_at")
-  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-
-  @@map(name: "discussion_items")
-}
-
-// model CommunityDiscussion {
-//     id           String     @id @default(uuid())
-//     discussion   Discussion @relation(fields: [discussionId], references: [id])
-//     discussionId String     @unique @map(name: "discussion_id")
-//     community    Community  @relation(fields: [communityId], references: [id])
-//     communityId  String     @map(name: "community_id")
-//     createdAt    DateTime   @default(now()) @map(name: "created_at")
-//     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-
-//     @@map(name: "community_discussions")
-// }
-
-// model CollectionDiscussion {
-//     id           String     @id @default(uuid())
-//     discussion   Discussion @relation(fields: [discussionId], references: [id])
-//     discussionId String     @unique @map(name: "discussion_id")
-//     collection   Collection @relation(fields: [collectionId], references: [id])
-//     collectionId String     @map(name: "collection_id")
-//     createdAt    DateTime   @default(now()) @map(name: "created_at")
-//     updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
-
-//     @@map(name: "collection_discussions")
-// }

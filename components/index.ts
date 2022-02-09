@@ -1,4 +1,5 @@
 export { default as Avatar } from "./Avatar/Avatar";
+export { default as AvatarUpload } from "./AvatarUpload/AvatarUpload";
 export { default as Footer } from "./Footer/Footer";
 export { default as Header } from "./Header/Header";
 export { default as Landing } from "./Landing/Landing";

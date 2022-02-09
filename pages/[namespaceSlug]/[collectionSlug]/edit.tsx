@@ -17,12 +17,12 @@ type Props = {
 };
 
 const CollectionEdit: React.FC<Props> = function ({ permission, labels }) {
-	const { profileSlug = "", collectionSlug = "" } = useLocationContext().query;
+	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	return (
 		<div>
 			<Head>
 				<title>
-					{profileSlug}/{collectionSlug} · Underlay
+					{namespaceSlug}/{collectionSlug} · Underlay
 				</title>
 			</Head>
 			<CollectionHeader
@@ -107,8 +107,8 @@ export default CollectionEdit;
 export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
 	context
 ) => {
-	const { profileSlug, collectionSlug } = context.params!;
-	const collectionData = await getCollectionData(profileSlug, collectionSlug);
+	const { namespaceSlug, collectionSlug } = context.params!;
+	const collectionData = await getCollectionData(namespaceSlug, collectionSlug);
 
 	if (!collectionData) {
 		return { notFound: true };
