@@ -3,7 +3,7 @@ import React from "react";
 import { Section } from "components";
 import Editor from "components/Editor/Editor";
 import { CollectionProps } from "utils/server/collections";
-import Readme from "./Readme";
+import ReadmeSection from "./ReadmeSection";
 
 type Props = CollectionProps & {
 	setCollection: ({}) => {};
@@ -14,7 +14,7 @@ const CollectionOverviewMain: React.FC<Props> = function ({ collection, setColle
 	// console.log(marked.parse(collection.readme));
 	return (
 		<React.Fragment>
-			<Readme collection={collection} setCollection={setCollection} />
+			<ReadmeSection collection={collection} setCollection={setCollection} />
 
 			<Section title="Schema">
 				<img

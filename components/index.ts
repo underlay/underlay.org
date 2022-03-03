@@ -20,3 +20,4 @@ export { default as UserList } from "./UserList/UserList";
 export { default as UserOverview } from "./UserOverview/UserOverview";
 export { default as CollectionOverviewMain } from "./CollectionOverview/CollectionOverviewMain";
 export { default as CollectionOverviewSide } from "./CollectionOverview/CollectionOverviewSide";
+export { default as EmptyState } from "./EmptyState/EmptyState";
