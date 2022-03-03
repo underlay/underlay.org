@@ -7,5 +7,11 @@
 		color: #888;
 		letter-spacing: 1px;
 		margin-bottom: 15px;
+		position: relative;
+	}
+	.action {
+		position: absolute;
+		top: 0;
+		right: 0;
 	}
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
 	CollectionOverviewMain,
@@ -8,12 +8,15 @@ import {
 } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
-const CollectionOverview: React.FC<CollectionProps> = function ({ collection }) {
+const CollectionOverview: React.FC<CollectionProps> = function ({ collection: initCollection }) {
+	const [collection, setCollection] = useState(initCollection);
 	return (
 		<div>
 			<CollectionHeader mode="overview" collection={collection} />
 			<ThreeColumnFrame
-				content={<CollectionOverviewMain collection={collection} />}
+				content={
+					<CollectionOverviewMain collection={collection} setCollection={setCollection} />
+				}
 				sideContent={<CollectionOverviewSide collection={collection} />}
 			/>
 		</div>

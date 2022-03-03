@@ -1,36 +1,20 @@
+import React from "react";
+
 import { Section } from "components";
 import Editor from "components/Editor/Editor";
-import React from "react";
-// import styles from "./Avatar.module.scss";
 import { CollectionProps } from "utils/server/collections";
+import Readme from "./Readme";
 
-const CollectionOverviewMain: React.FC<CollectionProps> = function ({ collection }) {
+type Props = CollectionProps & {
+	setCollection: ({}) => {};
+};
+
+const CollectionOverviewMain: React.FC<Props> = function ({ collection, setCollection }) {
 	console.log("yeehaw", collection);
+	// console.log(marked.parse(collection.readme));
 	return (
 		<React.Fragment>
-			<Section title="Readme">
-				<p>
-					This collection contains basic biography data as compiled by various sources and
-					validated by the Arnold foundation.
-				</p>
-
-				<p>
-					Contributions to this collection are welcome and this collection provides the
-					default source of media headshots and information for requests to the
-					foundation.
-				</p>
-				<h4>Project Timeframe</h4>
-				<p>First test scores: February 2018 with latest update on test scores: May 2020</p>
-				<h4>Problem</h4>
-				<p>
-					Analysis can monitor watching behavior: The full dataset are sets that connect
-					to the internet, making it easy to stream videos from services. Most are
-					equipped with “automated content recognition” (“ACR”) that scans images on
-					viewers’ screens and identifies the content by comparing it to its own known
-					videos, shows, and movies. In doing so, they can generate a detailed log without
-					clear notice or permission.
-				</p>
-			</Section>
+			<Readme collection={collection} setCollection={setCollection} />
 
 			<Section title="Schema">
 				<img
