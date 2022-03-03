@@ -5,7 +5,7 @@ import styles from "./CollectionOverviewSide.module.scss";
 
 import { CollectionProps } from "utils/server/collections";
 
-const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection }) {
+const CollectionOverviewSide: React.FC<CollectionProps> = function ({}) {
 	return (
 		<div className={styles.side}>
 			<Section title="Version" className={styles.small}>

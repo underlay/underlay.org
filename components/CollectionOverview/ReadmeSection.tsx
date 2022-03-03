@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 
 import { Section, EmptyState } from "components";
 import { CollectionProps } from "utils/server/collections";
-import { Button, Intent, NonIdealState, TextArea } from "@blueprintjs/core";
+import { Button, Intent, TextArea } from "@blueprintjs/core";
 
 import styles from "./ReadmeSection.module.scss";
 

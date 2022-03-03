@@ -6,7 +6,7 @@ import { CollectionProps } from "utils/server/collections";
 import ReadmeSection from "./ReadmeSection";
 
 type Props = CollectionProps & {
-	setCollection: ({}) => {};
+	setCollection: any;
 };
 
 const CollectionOverviewMain: React.FC<Props> = function ({ collection, setCollection }) {
