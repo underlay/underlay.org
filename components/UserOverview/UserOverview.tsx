@@ -4,7 +4,7 @@ import Head from "next/head";
 import {
 	ProfileHeader,
 	CollectionList,
-	ResourceContentFrame,
+	ThreeColumnFrame,
 	Section,
 	CommunityList,
 } from "components";
@@ -29,7 +29,7 @@ const UserOverview: React.FC<Props> = function ({ user }) {
 				slug={user.namespace.slug}
 				avatar={user.avatar}
 			/>
-			<ResourceContentFrame
+			<ThreeColumnFrame
 				content={
 					<Section title="Collections">
 						<CollectionList collections={user.namespace.collections} />

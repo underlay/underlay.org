@@ -1,40 +1,16 @@
 import React from "react";
-import { GetServerSideProps } from "next";
 
 import { CollectionHeader } from "components";
-import { CollectionPageParams } from "utils/shared/types";
-import { getCollectionData } from "utils/server/queries";
+import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
-type Props = {
-	slug: string;
-};
-
-const CollectionDiscussions: React.FC<Props> = function ({}) {
+const CollectionDiscussions: React.FC<CollectionProps> = function ({ collection }) {
 	return (
 		<div>
-			<CollectionHeader
-				mode="discussions"
-				// details={slug}
-			/>
+			<CollectionHeader mode="discussions" collection={collection} />
+			Discussions
 		</div>
 	);
 };
 
 export default CollectionDiscussions;
-
-export const getServerSideProps: GetServerSideProps<Props, CollectionPageParams> = async (
-	context
-) => {
-	const { namespaceSlug, collectionSlug } = context.params!;
-	const collectionData = await getCollectionData(namespaceSlug, collectionSlug);
-
-	if (!collectionData) {
-		return { notFound: true };
-	}
-
-	return {
-		props: {
-			slug: collectionData.slug,
-		},
-	};
-};
+export const getServerSideProps = getCollectionProps;

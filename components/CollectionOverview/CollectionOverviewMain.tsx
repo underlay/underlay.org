@@ -2,10 +2,10 @@ import { Section } from "components";
 import Editor from "components/Editor/Editor";
 import React from "react";
 // import styles from "./Avatar.module.scss";
+import { CollectionProps } from "utils/server/collections";
 
-type Props = {};
-
-const MainContent: React.FC<Props> = function ({}) {
+const CollectionOverviewMain: React.FC<CollectionProps> = function ({ collection }) {
+	console.log("yeehaw", collection);
 	return (
 		<React.Fragment>
 			<Section title="Readme">
@@ -50,4 +50,4 @@ const MainContent: React.FC<Props> = function ({}) {
 	);
 };
 
-export default MainContent;
+export default CollectionOverviewMain;

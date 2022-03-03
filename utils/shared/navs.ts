@@ -34,8 +34,12 @@ export const collectionNavItems = [
 		title: "Overview",
 	},
 	{
-		slug: "edit",
-		title: "Edit",
+		slug: "schema",
+		title: "Schema",
+	},
+	{
+		slug: "data",
+		title: "Data",
 	},
 	{
 		slug: "versions",
