@@ -4,6 +4,10 @@ export const userNavItems = [
 		title: "Overview",
 	},
 	{
+		slug: "communities",
+		title: "Communities",
+	},
+	{
 		slug: "settings",
 		title: "Settings",
 	},
@@ -15,12 +19,8 @@ export const communityNavItems = [
 		title: "Overview",
 	},
 	{
-		slug: "people",
-		title: "People",
-	},
-	{
-		slug: "discussions",
-		title: "Discussions",
+		slug: "members",
+		title: "Members",
 	},
 	{
 		slug: "settings",
@@ -34,8 +34,12 @@ export const collectionNavItems = [
 		title: "Overview",
 	},
 	{
-		slug: "edit",
-		title: "Edit",
+		slug: "schema",
+		title: "Schema",
+	},
+	{
+		slug: "data",
+		title: "Data",
 	},
 	{
 		slug: "versions",
@@ -46,8 +50,8 @@ export const collectionNavItems = [
 		title: "Discussions",
 	},
 	{
-		slug: "connections",
-		title: "Connections",
+		slug: "exports",
+		title: "Exports",
 	},
 	{
 		slug: "settings",

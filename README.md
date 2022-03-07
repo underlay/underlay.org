@@ -6,7 +6,7 @@
 npm install
 ```
 
-You will also need to generate an `.env.local` file. For Collector team members, check our password sharing infrastructure for credentials.
+You will also need to generate an `.env.local` file. For Underlay team members, check our password sharing infrastructure for credentials.
 
 ## To Run Dev Mode
 
@@ -37,4 +37,5 @@ Preferred practice is to prefix commits with one of the following categories:
 -   `dev`: for commits focused on documentation, refactoring code, or developer experience updates
 
 ## Code of Conduct
+
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://github.com/knowledgefutures/general/blob/master/CODE_OF_CONDUCT.md)

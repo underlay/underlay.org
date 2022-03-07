@@ -14,8 +14,8 @@ export type LocationData = {
 	query: {
 		namespaceSlug?: string;
 		collectionSlug?: string;
-		mode?: string;
-		subMode?: string;
+		mode?: string[];
+		subMode?: string[];
 		versionNumber?: string;
 		redirect?: string;
 	};
@@ -29,5 +29,6 @@ export type ProfilePageParams = {
 export type CollectionPageParams = {
 	namespaceSlug: string;
 	collectionSlug: string;
-	subMode?: string;
+	mode?: string[];
+	subMode?: string[];
 };

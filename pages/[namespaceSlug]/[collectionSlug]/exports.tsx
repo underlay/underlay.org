@@ -3,14 +3,14 @@ import React from "react";
 import { CollectionHeader } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
-const CollectionVersions: React.FC<CollectionProps> = function ({ collection }) {
+const CollectionExports: React.FC<CollectionProps> = function ({ collection }) {
 	return (
 		<div>
-			<CollectionHeader mode="versions" collection={collection} />
-			Versions
+			<CollectionHeader mode="exports" collection={collection} />
+			Exports
 		</div>
 	);
 };
 
-export default CollectionVersions;
+export default CollectionExports;
 export const getServerSideProps = getCollectionProps;

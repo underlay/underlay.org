@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 
-import { ProfileHeader, ResourceContentFrame, Section, SideNav } from "components";
+import { ProfileHeader, ThreeColumnFrame, Section, SideNav } from "components";
 import { useLocationContext } from "utils/client/hooks";
 import { ProfilePageParams } from "utils/shared/types";
 import { getLoginId } from "utils/server/auth/user";
@@ -28,7 +28,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 				verifiedUrl={community?.verifiedUrl}
 				location={community?.location}
 			/>
-			<ResourceContentFrame
+			<ThreeColumnFrame
 				navContent={
 					<SideNav
 						menuItems={[

@@ -1,13 +1,7 @@
 import React from "react";
 import Head from "next/head";
 
-import {
-	ProfileHeader,
-	CollectionList,
-	AvatarList,
-	ResourceContentFrame,
-	Section,
-} from "components";
+import { ProfileHeader, CollectionList, AvatarList, ThreeColumnFrame, Section } from "components";
 import { ExtendedCommunity } from "pages/[namespaceSlug]";
 
 type Props = {
@@ -31,7 +25,7 @@ const CommunityOverview: React.FC<Props> = function ({ community }) {
 				verifiedUrl={community.verifiedUrl}
 				location={community.location}
 			/>
-			<ResourceContentFrame
+			<ThreeColumnFrame
 				content={
 					<Section title="Collections">
 						<CollectionList collections={community.namespace.collections} />

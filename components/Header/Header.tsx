@@ -1,7 +1,7 @@
 import React from "react";
 import { AnchorButton } from "@blueprintjs/core";
 
-import { useLocationContext, useLoginContext } from "utils/client/hooks";
+import { useLoginContext } from "utils/client/hooks";
 
 import styles from "./Header.module.scss";
 import HeaderNewButton from "./HeaderNewButton";
@@ -9,7 +9,6 @@ import HeaderProfileButton from "./HeaderProfileButton";
 
 const Header = () => {
 	const loginData = useLoginContext();
-	const { pathname } = useLocationContext();
 	return (
 		<nav className={styles.header}>
 			<div className={styles.content}>
@@ -20,29 +19,27 @@ const Header = () => {
 					href="/"
 					minimal
 				/>
-				{pathname !== "/" && (
-					<div>
-						<AnchorButton
-							className={styles.discover}
-							text="Discover"
-							href="/discover"
-							large
-							minimal
-						/>
-						{!loginData && (
-							<React.Fragment>
-								<AnchorButton text="Login" href="/login" large minimal />
-								<AnchorButton text="Sign up" href="/signup" large outlined />
-							</React.Fragment>
-						)}
-						{!!loginData && (
-							<React.Fragment>
-								<HeaderNewButton />
-								<HeaderProfileButton />
-							</React.Fragment>
-						)}
-					</div>
-				)}
+				<div>
+					<AnchorButton
+						className={styles.discover}
+						text="Discover"
+						href="/discover"
+						large
+						minimal
+					/>
+					{!loginData && (
+						<React.Fragment>
+							<AnchorButton text="Login" href="/login" large minimal />
+							<AnchorButton text="Sign up" href="/signup" large outlined />
+						</React.Fragment>
+					)}
+					{!!loginData && (
+						<React.Fragment>
+							<HeaderNewButton />
+							<HeaderProfileButton />
+						</React.Fragment>
+					)}
+				</div>
 			</div>
 		</nav>
 	);

@@ -1,23 +1,23 @@
 import React from "react";
 import classNames from "classnames";
 
-import styles from "./ResourceContentFrame.module.scss";
+import styles from "./ThreeColumnFrame.module.scss";
 
 type Props = {
-	content?: React.ReactNode;
 	navContent?: React.ReactNode;
+	content?: React.ReactNode;
 	sideContent?: React.ReactNode;
 	className?: string;
 };
 
-const ResourceContentFrame: React.FC<Props> = function ({
+const ThreeColumnFrame: React.FC<Props> = function ({
+	navContent = null,
 	content = null,
 	sideContent = null,
-	navContent = null,
 	className = "",
 }) {
 	return (
-		<div className={classNames(styles.resourceContentFrame, className)}>
+		<div className={classNames(styles.threeColumnFrame, className)}>
 			{navContent && <div className={styles.nav}>{navContent}</div>}
 			<div className={styles.main}>{content}</div>
 			{sideContent && <div className={styles.side}>{sideContent}</div>}
@@ -25,4 +25,4 @@ const ResourceContentFrame: React.FC<Props> = function ({
 	);
 };
 
-export default ResourceContentFrame;
+export default ThreeColumnFrame;

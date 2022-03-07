@@ -1,11 +1,11 @@
 import { Button, ButtonGroup } from "@blueprintjs/core";
 import { Section } from "components";
 import React from "react";
-import styles from "./SideContent.module.scss";
+import styles from "./CollectionOverviewSide.module.scss";
 
-type Props = {};
+import { CollectionProps } from "utils/server/collections";
 
-const SideContent: React.FC<Props> = function ({}) {
+const CollectionOverviewSide: React.FC<CollectionProps> = function ({}) {
 	return (
 		<div className={styles.side}>
 			<Section title="Version" className={styles.small}>
@@ -33,4 +33,4 @@ const SideContent: React.FC<Props> = function ({}) {
 	);
 };
 
-export default SideContent;
+export default CollectionOverviewSide;
