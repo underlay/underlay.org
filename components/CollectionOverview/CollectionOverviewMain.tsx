@@ -28,7 +28,7 @@ const CollectionOverviewMain: React.FC<Props> = function ({ collection, setColle
 					width="100%"
 					src="https://s3.amazonaws.com/assets.underlay.org/dev-user-uploads/20223645ee209717b4c6f7c874bedd96.png"
 				/> */}
-				<Editor />
+				<Editor collection={collection} />
 			</Section>
 		</React.Fragment>
 	);

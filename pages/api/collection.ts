@@ -46,4 +46,22 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 			include: { namespace: true },
 		});
 		return res.status(200).json(populatedCollection);
+	})
+	.patch(async (req, res) => {
+		const loginId = await getLoginId(req);
+		if (!loginId) {
+			return res.status(403).json({ ok: false });
+		}
+		console.log(req.body);
+
+		await prisma.collection.update({
+			where: {
+				id: req.body.id,
+			},
+			data: {
+				version: req.body.version,
+			},
+		});
+
+		return res.status(200);
 	});

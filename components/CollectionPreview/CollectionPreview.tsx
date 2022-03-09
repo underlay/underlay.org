@@ -18,15 +18,10 @@ const CollectionPreview: React.FC<Props> = function ({
 	slug,
 	description,
 	isPublic,
-	// version,
+	version,
 	// lastPublished,
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
-	const [version] = useState(
-		`${Math.round(Math.random() * 10)}.${Math.round(Math.random() * 10)}.${Math.round(
-			Math.random() * 10
-		)}`
-	);
 	const [lastPublished] = useState(Math.round(Math.random() * 25));
 	return (
 		<a

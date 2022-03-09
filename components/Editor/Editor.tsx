@@ -1,13 +1,21 @@
-// @ts-nocheck
-import React, { useState } from "react";
+//@ts-nocheck
+import React, { useEffect, useState } from "react";
+import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
 import { Button, ButtonGroup, Checkbox, Icon, InputGroup } from "@blueprintjs/core";
 
 import styles from "./Editor.module.scss";
-import { nodes, relationships, entities } from "./data";
+import { nodes, relationships, entities as mockEntities } from "./data";
 import { Discussion, Provenance, Schema } from "components/Icons";
+import { downloadData, getCSVHeaders, getData } from "utils/client/data";
+import { CollectionProps } from "utils/server/collections";
+import { getNextVersion } from "utils/shared/version";
 
-type Props = {};
+const MAPPING = {
+	id: "id",
+	name: "name",
+	age: "age",
+};
 
 const classBlock = (item, isRelationship, classClick, schemaClick, showSchema) => {
 	return (
@@ -29,11 +37,31 @@ const classBlock = (item, isRelationship, classClick, schemaClick, showSchema) =
 	);
 };
 
-const Editor: React.FC<Props> = function ({}) {
+let dataFetched = false;
+
+const Editor: React.FC<CollectionProps> = function ({ collection }) {
 	const [filterVal, setFilterVal] = useState("");
 	const [activeNodes, setActiveNodes] = useState([]);
 	const [activeFilters, setActiveFilters] = useState([]);
 	const [mode, setMode] = useState("entities");
+	const [entities, setEntities] = useState(mockEntities);
+
+	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
+
+	useEffect(() => {
+		if (!dataFetched) {
+			setTimeout(() => {
+				getData(
+					namespaceSlug + "/" + collectionSlug + ".csv",
+					MAPPING,
+					collection.version
+				).then((data) => {
+					setEntities({ Person: data });
+					dataFetched = true;
+				});
+			}, 100);
+		}
+	});
 
 	const filterColumnItems = (index, item) => {
 		if (index === 0) {
@@ -196,163 +224,85 @@ const Editor: React.FC<Props> = function ({}) {
 									false
 								)}
 							</div>
-							{entities[node.id]
-								.filter((item) => {
-									return filterColumnItems(index, item);
-								})
-								.map((item) => {
-									const existingRelationships: any = {};
-									Object.keys(entities).map((entityKey) => {
-										const links = entities[entityKey].reduce((prev, curr) => {
-											if (
-												curr.source === item.id ||
-												curr.target === item.id
-											) {
-												return prev.concat(curr);
+							{entities[node.id] &&
+								entities[node.id]
+									.filter((item) => {
+										return filterColumnItems(index, item);
+									})
+									.map((item) => {
+										const existingRelationships: any = {};
+										Object.keys(entities).map((entityKey) => {
+											const links = entities[entityKey].reduce(
+												(prev, curr) => {
+													if (
+														curr.source === item.id ||
+														curr.target === item.id
+													) {
+														return prev.concat(curr);
+													}
+													return prev;
+												},
+												[]
+											);
+											if (links.length) {
+												existingRelationships[entityKey] = links;
 											}
-											return prev;
-										}, []);
-										if (links.length) {
-											existingRelationships[entityKey] = links;
-										}
-									});
-									return (
-										<div key={item.id} className={styles.entityCard}>
-											<div className={styles.topIcons}>
-												<ButtonGroup>
-													<Button minimal icon={<Provenance />} />
-													<Button
-														minimal
-														icon={<Discussion size={20} />}
-													/>
-												</ButtonGroup>
-											</div>
-											{/* {item.id} */}
-											{Object.keys(item).map((property) => {
-												const propertyNamespace = findPropertyNamespace(
-													property,
-													node.id
-												);
-												if (property === "id") {
-													return null;
-												}
-												if (property === "source") {
-													const currNode = findEntityById(item[property]);
-													const nodeType = findNodeType(item[property]);
-													return (
-														<div>
-															<div className={styles.propertyWrapper}>
+										});
+										return (
+											<div key={item.id} className={styles.entityCard}>
+												<div className={styles.topIcons}>
+													<ButtonGroup>
+														<Button minimal icon={<Provenance />} />
+														<Button
+															minimal
+															icon={<Discussion size={20} />}
+														/>
+													</ButtonGroup>
+												</div>
+												{/* {item.id} */}
+												{Object.keys(item).map((property) => {
+													const propertyNamespace = findPropertyNamespace(
+														property,
+														node.id
+													);
+													if (property === "id") {
+														return null;
+													}
+													if (property === "source") {
+														const currNode = findEntityById(
+															item[property]
+														);
+														const nodeType = findNodeType(
+															item[property]
+														);
+														return (
+															<div>
 																<div
 																	className={
-																		styles.propertyHeader
+																		styles.propertyWrapper
 																	}
 																>
 																	<div
-																		className={styles.namespace}
+																		className={
+																			styles.propertyHeader
+																		}
 																	>
-																		{propertyNamespace}
+																		<div
+																			className={
+																				styles.namespace
+																			}
+																		>
+																			{propertyNamespace}
+																		</div>
+																		Source:{" "}
 																	</div>
-																	Source:{" "}
-																</div>
 
-																<Button
-																	text={
-																		currNode.name ||
-																		currNode.title
-																	}
-																	onClick={() => {
-																		setActiveNodes(
-																			activeNodes
-																				.slice(0, index + 1)
-																				.concat(nodeType)
-																		);
-																		setActiveFilters(
-																			activeFilters
-																				.slice(0, index)
-																				.concat(
-																					item[property]
-																				)
-																		);
-																	}}
-																/>
-															</div>
-														</div>
-													);
-												}
-												if (property === "target") {
-													const currNode = findEntityById(item[property]);
-													const nodeType = findNodeType(item[property]);
-													return (
-														<div>
-															<div className={styles.propertyWrapper}>
-																<div
-																	className={
-																		styles.propertyHeader
-																	}
-																>
-																	<div
-																		className={styles.namespace}
-																	>
-																		{propertyNamespace}
-																	</div>
-																	Target:{" "}
-																</div>
-																<Button
-																	text={
-																		currNode.name ||
-																		currNode.title
-																	}
-																	onClick={() => {
-																		setActiveNodes(
-																			activeNodes
-																				.slice(0, index + 1)
-																				.concat(nodeType)
-																		);
-																		setActiveFilters(
-																			activeFilters
-																				.slice(0, index)
-																				.concat(
-																					item[property]
-																				)
-																		);
-																	}}
-																/>
-															</div>
-														</div>
-													);
-												}
-												return (
-													<div>
-														<div className={styles.propertyWrapper}>
-															<div className={styles.propertyHeader}>
-																<div className={styles.namespace}>
-																	{propertyNamespace}
-																</div>
-																{property}:
-															</div>
-															{item[property]}
-														</div>
-													</div>
-												);
-											})}
-											{Object.keys(existingRelationships).length > 0 && (
-												<div>
-													<div className={styles.title}>
-														Relationships
-													</div>
-													{Object.keys(existingRelationships).map(
-														(key) => {
-															const nodeType = relationships.find(
-																(rel) => {
-																	return rel.id === key;
-																}
-															);
-															return (
-																<div className={styles.small}>
-																	{classBlock(
-																		nodeType,
-																		true,
-																		() => {
+																	<Button
+																		text={
+																			currNode.name ||
+																			currNode.title
+																		}
+																		onClick={() => {
 																			setActiveNodes(
 																				activeNodes
 																					.slice(
@@ -366,21 +316,149 @@ const Editor: React.FC<Props> = function ({}) {
 																			setActiveFilters(
 																				activeFilters
 																					.slice(0, index)
-																					.concat(item.id)
+																					.concat(
+																						item[
+																							property
+																						]
+																					)
 																			);
-																		},
-																		undefined,
-																		false
-																	)}
+																		}}
+																	/>
 																</div>
-															);
-														}
-													)}
-												</div>
-											)}
-										</div>
-									);
-								})}
+															</div>
+														);
+													}
+													if (property === "target") {
+														const currNode = findEntityById(
+															item[property]
+														);
+														const nodeType = findNodeType(
+															item[property]
+														);
+														return (
+															<div>
+																<div
+																	className={
+																		styles.propertyWrapper
+																	}
+																>
+																	<div
+																		className={
+																			styles.propertyHeader
+																		}
+																	>
+																		<div
+																			className={
+																				styles.namespace
+																			}
+																		>
+																			{propertyNamespace}
+																		</div>
+																		Target:{" "}
+																	</div>
+																	<Button
+																		text={
+																			currNode.name ||
+																			currNode.title
+																		}
+																		onClick={() => {
+																			setActiveNodes(
+																				activeNodes
+																					.slice(
+																						0,
+																						index + 1
+																					)
+																					.concat(
+																						nodeType
+																					)
+																			);
+																			setActiveFilters(
+																				activeFilters
+																					.slice(0, index)
+																					.concat(
+																						item[
+																							property
+																						]
+																					)
+																			);
+																		}}
+																	/>
+																</div>
+															</div>
+														);
+													}
+													return (
+														<div>
+															<div className={styles.propertyWrapper}>
+																<div
+																	className={
+																		styles.propertyHeader
+																	}
+																>
+																	<div
+																		className={styles.namespace}
+																	>
+																		{propertyNamespace}
+																	</div>
+																	{property}:
+																</div>
+																{item[property]}
+															</div>
+														</div>
+													);
+												})}
+												{Object.keys(existingRelationships).length > 0 && (
+													<div>
+														<div className={styles.title}>
+															Relationships
+														</div>
+														{Object.keys(existingRelationships).map(
+															(key) => {
+																const nodeType = relationships.find(
+																	(rel) => {
+																		return rel.id === key;
+																	}
+																);
+																return (
+																	<div className={styles.small}>
+																		{classBlock(
+																			nodeType,
+																			true,
+																			() => {
+																				setActiveNodes(
+																					activeNodes
+																						.slice(
+																							0,
+																							index +
+																								1
+																						)
+																						.concat(
+																							nodeType
+																						)
+																				);
+																				setActiveFilters(
+																					activeFilters
+																						.slice(
+																							0,
+																							index
+																						)
+																						.concat(
+																							item.id
+																						)
+																				);
+																			},
+																			undefined,
+																			false
+																		)}
+																	</div>
+																);
+															}
+														)}
+													</div>
+												)}
+											</div>
+										);
+									})}
 						</div>
 					);
 				})}

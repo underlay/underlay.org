@@ -1,0 +1,13 @@
+@import "pages/variables.scss";
+
+.uploadRow {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.message {
+	line-height: 32px;
+	text-align: center;
+	vertical-align: middle;
+}
