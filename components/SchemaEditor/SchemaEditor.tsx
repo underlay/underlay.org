@@ -1,4 +1,4 @@
-import { Button } from "@blueprintjs/core";
+import { Button, Intent } from "@blueprintjs/core";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -29,8 +29,10 @@ type Props = {
 
 const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version }) {
 	const [schema, setSchema] = useState(initSchema || []);
-	console.log(schema);
+	const [canSave, setCanSave] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 	const addNode = (addAtEnd: boolean) => {
+		setCanSave(true);
 		const defaultNode = {
 			id: uuidv4(),
 			key: "",
@@ -43,6 +45,7 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 		}
 	};
 	const addRelationship = (addAtEnd) => {
+		setCanSave(true);
 		const defaultRelationship = {
 			id: uuidv4(),
 			key: "",
@@ -71,6 +74,7 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 		}
 	};
 	const updateClass = (classId: string, updates: { key: string }) => {
+		setCanSave(true);
 		setSchema(
 			schema
 				.map((iterClass) => {
@@ -83,6 +87,7 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 		);
 	};
 	const updateAttribute = (classId: string, attributeId: string, updates: Attribute) => {
+		setCanSave(true);
 		setSchema(
 			schema.map((iterClass) => {
 				if (iterClass.id === classId) {
@@ -101,6 +106,13 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 				return iterClass;
 			})
 		);
+	};
+	const handleSave = () => {
+		setIsSaving(true);
+		setTimeout(() => {
+			setIsSaving(false);
+			setCanSave(false);
+		}, 1500);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
 		if (version) {
@@ -123,6 +135,14 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 		<ThreeColumnFrame
 			content={
 				<div className={styles.editor}>
+					<Button
+						className={styles.sticky}
+						disabled={!canSave}
+						intent={Intent.SUCCESS}
+						text={canSave ? "Save Schema" : "Schema Saved"}
+						loading={isSaving}
+						onClick={handleSave}
+					/>
 					{buttonRow(false)}
 
 					{schema.map((schemaClass) => {

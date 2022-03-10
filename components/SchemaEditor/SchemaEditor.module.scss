@@ -1,5 +1,11 @@
 .editor {
+	position: relative;
 	.classWrapper {
 		margin: 30px 0px;
+	}
+	.sticky {
+		position: sticky;
+		top: 15px;
+		float: right;
 	}
 }
