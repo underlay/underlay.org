@@ -10,8 +10,6 @@ type Props = CollectionProps & {
 };
 
 const CollectionOverviewMain: React.FC<Props> = function ({ collection, setCollection }) {
-	console.log("yeehaw", collection);
-	// console.log(marked.parse(collection.readme));
 	return (
 		<React.Fragment>
 			<ReadmeSection collection={collection} setCollection={setCollection} />
