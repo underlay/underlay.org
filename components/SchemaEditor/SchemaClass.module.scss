@@ -1,7 +1,14 @@
 .schemaClass {
-	margin: 30px 0px;
+	.classHeader {
+		display: flex;
+		margin-bottom: 15px;
+		align-items: center;
+		& > span {
+			margin-right: 10px;
+		}
+	}
 }
 .attributeWrapper {
+	margin: 15px 0px;
 	margin-left: 25px;
-	margin-bottom: 10px;
 }

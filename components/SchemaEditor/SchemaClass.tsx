@@ -26,9 +26,12 @@ const SchemaClass: React.FC<Props> = function ({ schemaClass, updateClass, updat
 		};
 		updateClass(schemaClass.id, { attributes: [...schemaClass.attributes, defaultAttribute] });
 	};
+	const removeClass = () => {
+		updateClass(schemaClass.id, { id: null });
+	};
 	return (
 		<div className={styles.schemaClass}>
-			<div style={{ display: "flex" }}>
+			<div className={styles.classHeader}>
 				<Icon icon={schemaClass.isRelationship ? "arrow-top-right" : "circle"} />
 				<InputGroup
 					id={`${schemaClass.id}-Class-Key`}
@@ -39,6 +42,7 @@ const SchemaClass: React.FC<Props> = function ({ schemaClass, updateClass, updat
 						schemaClass.isRelationship ? "Relationship name..." : "Node name..."
 					}
 				/>
+				<Button onClick={removeClass} icon="trash" small minimal />
 			</div>
 			{schemaClass.attributes.map((attribute) => {
 				return (

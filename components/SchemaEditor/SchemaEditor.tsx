@@ -30,15 +30,19 @@ type Props = {
 const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version }) {
 	const [schema, setSchema] = useState(initSchema || []);
 	console.log(schema);
-	const addNode = () => {
+	const addNode = (addAtEnd: boolean) => {
 		const defaultNode = {
 			id: uuidv4(),
 			key: "",
 			attributes: [],
 		};
-		setSchema([defaultNode, ...schema]);
+		if (addAtEnd) {
+			setSchema([...schema, defaultNode]);
+		} else {
+			setSchema([defaultNode, ...schema]);
+		}
 	};
-	const addRelationship = () => {
+	const addRelationship = (addAtEnd) => {
 		const defaultRelationship = {
 			id: uuidv4(),
 			key: "",
@@ -60,16 +64,22 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 				},
 			],
 		};
-		setSchema([defaultRelationship, ...schema]);
+		if (addAtEnd) {
+			setSchema([...schema, defaultRelationship]);
+		} else {
+			setSchema([defaultRelationship, ...schema]);
+		}
 	};
 	const updateClass = (classId: string, updates: { key: string }) => {
 		setSchema(
-			schema.map((iterClass) => {
-				if (iterClass.id === classId) {
-					return { ...iterClass, ...updates };
-				}
-				return iterClass;
-			})
+			schema
+				.map((iterClass) => {
+					if (iterClass.id === classId) {
+						return { ...iterClass, ...updates };
+					}
+					return iterClass;
+				})
+				.filter((x) => !!x.id)
 		);
 	};
 	const updateAttribute = (classId: string, attributeId: string, updates: Attribute) => {
@@ -78,42 +88,56 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 				if (iterClass.id === classId) {
 					return {
 						...iterClass,
-						attributes: iterClass.attributes.map((iterAttribute) => {
-							if (iterAttribute.id === attributeId) {
-								return { ...iterAttribute, ...updates };
-							}
-							return iterAttribute;
-						}),
+						attributes: iterClass.attributes
+							.map((iterAttribute) => {
+								if (iterAttribute.id === attributeId) {
+									return { ...iterAttribute, ...updates };
+								}
+								return iterAttribute;
+							})
+							.filter((x) => !!x.id),
 					};
 				}
 				return iterClass;
 			})
 		);
 	};
-	const buttonRow = version ? null : (
-		<div>
-			<Button onClick={addNode}>Add Node</Button>
-			<Button onClick={addRelationship}>Add Relationship</Button>
-		</div>
-	);
+	const buttonRow = (addAtEnd: boolean) => {
+		if (version) {
+			return null;
+		}
+		const nodeFunc = () => {
+			addNode(addAtEnd);
+		};
+		const relationshipFunc = () => {
+			addRelationship(addAtEnd);
+		};
+		return (
+			<div>
+				<Button onClick={nodeFunc}>Add Node</Button>
+				<Button onClick={relationshipFunc}>Add Relationship</Button>
+			</div>
+		);
+	};
 	return (
 		<ThreeColumnFrame
 			content={
-				<React.Fragment>
-					{buttonRow}
+				<div className={styles.editor}>
+					{buttonRow(false)}
 
 					{schema.map((schemaClass) => {
 						return (
-							<SchemaClass
-								key={schemaClass.id}
-								schemaClass={schemaClass}
-								updateClass={updateClass}
-								updateAttribute={updateAttribute}
-							/>
+							<div key={schemaClass.id} className={styles.classWrapper}>
+								<SchemaClass
+									schemaClass={schemaClass}
+									updateClass={updateClass}
+									updateAttribute={updateAttribute}
+								/>
+							</div>
 						);
 					})}
-					{schema.length > 0 && buttonRow}
-				</React.Fragment>
+					{schema.length > 0 && buttonRow(true)}
+				</div>
 			}
 		/>
 	);

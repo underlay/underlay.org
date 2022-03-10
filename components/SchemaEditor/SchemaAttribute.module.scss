@@ -1,0 +1,14 @@
+.attribute {
+	display: flex;
+	& > * {
+		margin-right: 15px;
+	}
+	.select {
+		select {
+			height: 24px;
+		}
+		& > span {
+			top: 4px;
+		}
+	}
+}
