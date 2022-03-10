@@ -1,13 +1,14 @@
 import React from "react";
 
-import { CollectionHeader } from "components";
+import { CollectionHeader, SchemaEditor } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
+import { Schema } from "components/SchemaEditor/SchemaEditor";
 
 const CollectionSchema: React.FC<CollectionProps> = function ({ collection }) {
 	return (
 		<div>
 			<CollectionHeader mode="schema" collection={collection} />
-			Schema
+			<SchemaEditor version={collection.version} schema={collection.schema as Schema} />
 		</div>
 	);
 };

@@ -60,3 +60,17 @@ a {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+.narrow-line-input input {
+	background: transparent;
+	max-width: 300px;
+	border: 0px;
+	border-bottom: 1px solid #000;
+	box-shadow: none;
+	border-radius: 0px;
+	font-size: 16px;
+	padding: 0px 5px;
+	&:focus {
+		box-shadow: none;
+	}
+}
