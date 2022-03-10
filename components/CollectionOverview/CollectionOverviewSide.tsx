@@ -1,16 +1,20 @@
 import { Button, ButtonGroup } from "@blueprintjs/core";
-import { Section } from "components";
-import DataUpload from "components/DataUpload/DataUpload";
 import React from "react";
+
+import { Section, DataUpload } from "components";
 import { downloadData } from "utils/client/data";
 import { useLocationContext } from "utils/client/hooks";
-import styles from "./CollectionOverviewSide.module.scss";
-
 import { CollectionProps } from "utils/server/collections";
 import { getNextVersion } from "utils/shared/version";
 
+import styles from "./CollectionOverviewSide.module.scss";
+import SideGettingStarted from "./SideGettingStarted";
+
 const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
+	if (!collection.version) {
+		return <SideGettingStarted collection={collection} />;
+	}
 	return (
 		<div className={styles.side}>
 			<Section title="Version" className={styles.small}>
@@ -33,6 +37,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 					outlined
 					text=".json"
 					onClick={(_ev: any) =>
+						collection.version &&
 						downloadData(
 							`${namespaceSlug}/${collectionSlug}.csv`,
 							"json",
@@ -44,6 +49,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 					outlined
 					text=".csv"
 					onClick={(_ev: any) =>
+						collection.version &&
 						downloadData(
 							`${namespaceSlug}/${collectionSlug}.csv`,
 							"csv",
@@ -61,12 +67,12 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 							headers: { "Content-Type": "application/json" },
 							body: JSON.stringify({
 								...collection,
-								version: getNextVersion(collection.version),
+								version: getNextVersion(collection.version || ""),
 							}),
 						});
 					}}
 					fullSlug={`${namespaceSlug}/${collectionSlug}`}
-					version={collection.version}
+					version={collection.version || ""}
 				/>
 			</Section>
 		</div>

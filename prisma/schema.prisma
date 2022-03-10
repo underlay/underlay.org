@@ -75,9 +75,10 @@ model Collection {
     isPublic    Boolean
     readme      String?
     labels      Json?
+	schema      Json?
+    version     String?
     createdAt   DateTime  @default(now()) @map(name: "created_at")
     updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
-    version     String    @default("0.0.1")
 
     collaborators Collaborator[]
     @@map(name: "collections")
