@@ -10,7 +10,7 @@ import classNames from "classnames";
 
 const SideGettingStarted: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
-	console.log(collection);
+
 	const steps = [
 		{
 			title: "Add a Readme",
