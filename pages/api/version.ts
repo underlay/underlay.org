@@ -19,7 +19,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().patch(async (req, 
 			id: req.body.id,
 		},
 		data: {
-			version: getNextVersion(collection.version),
+			version: getNextVersion(collection.version || ""),
 		},
 	});
 

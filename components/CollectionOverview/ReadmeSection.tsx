@@ -34,6 +34,7 @@ const Readme: React.FC<Props> = function ({ collection, setCollection }) {
 	return (
 		<Section
 			title="Readme"
+			className="readme-section"
 			action={
 				<React.Fragment>
 					{isEditing && (

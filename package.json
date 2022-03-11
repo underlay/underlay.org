@@ -6,6 +6,7 @@
 	"sideEffects": false,
 	"scripts": {
 		"dev": "next",
+		"prebuild": "prisma generate",
 		"build": "next build",
 		"start": "NODE_ENV=production node server.js",
 		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
