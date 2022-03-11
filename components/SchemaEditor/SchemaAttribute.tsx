@@ -1,8 +1,6 @@
-import { FormEvent } from "react";
-import { Button, ButtonGroup, Checkbox, HTMLSelect, InputGroup } from "@blueprintjs/core";
-import { v4 as uuidv4 } from "uuid";
+import { Button, ButtonGroup, HTMLSelect, InputGroup } from "@blueprintjs/core";
 
-import { Schema, Attribute } from "./SchemaEditor";
+import { Attribute } from "./SchemaEditor";
 import styles from "./SchemaAttribute.module.scss";
 
 type Props = {

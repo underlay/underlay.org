@@ -44,7 +44,7 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 			setSchema([defaultNode, ...schema]);
 		}
 	};
-	const addRelationship = (addAtEnd) => {
+	const addRelationship = (addAtEnd: boolean) => {
 		setCanSave(true);
 		const defaultRelationship = {
 			id: uuidv4(),

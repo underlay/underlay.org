@@ -1,8 +1,7 @@
-import { FormEvent } from "react";
 import { Button, Icon, InputGroup } from "@blueprintjs/core";
 import { v4 as uuidv4 } from "uuid";
 
-import { Schema, Class, Attribute } from "./SchemaEditor";
+import { Class, Attribute } from "./SchemaEditor";
 import SchemaAttribute from "./SchemaAttribute";
 import styles from "./SchemaClass.module.scss";
 
