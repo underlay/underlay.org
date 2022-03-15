@@ -1,7 +1,8 @@
+//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
-import { Button, ButtonGroup, Checkbox, Icon, InputGroup } from "@blueprintjs/core";
+import { Button, InputGroup } from "@blueprintjs/core";
 
 import styles from "./Editor.module.scss";
 import type { Entity, Node } from "./data";
