@@ -73,7 +73,6 @@ export const downloadData = async (
 };
 
 export const getData = async (fileName: string, version: string) => {
-	const mapping = {};
 	fileName = fileName.replace(/.csv$/, version + ".csv");
 
 	const { data, error } = await supabase.storage.from("data").download(fileName);
@@ -127,7 +126,7 @@ export const getData = async (fileName: string, version: string) => {
 							obj[nodeProp] = r[i];
 						}
 					});
-					if (recordObj[n].findIndex((o) => o.id === obj.id) === -1) {
+					if (recordObj[n].findIndex((o: any) => o.id === obj.id) === -1) {
 						recordObj[n].push(obj);
 					}
 				});
