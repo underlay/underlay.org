@@ -72,13 +72,9 @@ export const downloadData = async (
 	}
 };
 
-export const getData = async (
-	fileName: string,
-	mapping: { [key: string]: string },
-	version: string
-) => {
+export const getData = async (fileName: string, version: string) => {
+	const mapping = {};
 	fileName = fileName.replace(/.csv$/, version + ".csv");
-	console.log(fileName);
 
 	const { data, error } = await supabase.storage.from("data").download(fileName);
 
@@ -86,7 +82,6 @@ export const getData = async (
 		throw error;
 	}
 	const text = await data.text();
-	console.log(text);
 
 	return new Promise((resolve, reject) => {
 		const parser = parse();
@@ -94,11 +89,22 @@ export const getData = async (
 		let headerRow: string[];
 		let isHeaderRow = true;
 
+		const recordObj: { [nodeId: string]: any[] } = {};
+		const nodes: string[] = [];
+
 		parser.on("readable", () => {
 			let record;
 			while ((record = parser.read()) !== null) {
 				if (isHeaderRow) {
 					headerRow = record;
+
+					headerRow
+						.filter((colName) => colName.endsWith("_id"))
+						.forEach((colName) => {
+							nodes.push(colName.slice(0, -3));
+							recordObj[colName.slice(0, -3)] = [];
+						});
+
 					isHeaderRow = false;
 				} else {
 					records.push(record);
@@ -107,15 +113,27 @@ export const getData = async (
 		});
 
 		parser.on("end", () => {
-			resolve(
-				records.map((r) => {
-					const recordObj: any = {};
-					headerRow.forEach((rowName, i) => {
-						recordObj[mapping[rowName]] = r[i];
+			const recordObj: any = {};
+			nodes.forEach((n) => {
+				recordObj[n] = [];
+			});
+
+			records.map((r) => {
+				nodes.forEach((n) => {
+					const obj: any = {};
+					headerRow.forEach((colName, i) => {
+						if (colName.startsWith(n + "_")) {
+							const [_nodeName, nodeProp] = colName.split("_");
+							obj[nodeProp] = r[i];
+						}
 					});
-					return recordObj;
-				})
-			);
+					if (recordObj[n].findIndex((o) => o.id === obj.id) === -1) {
+						recordObj[n].push(obj);
+					}
+				});
+			});
+
+			resolve(recordObj);
 		});
 
 		parser.on("error", (err) => reject(err));

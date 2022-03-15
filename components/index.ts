@@ -22,4 +22,8 @@ export { default as CollectionOverviewMain } from "./CollectionOverview/Collecti
 export { default as CollectionOverviewSide } from "./CollectionOverview/CollectionOverviewSide";
 export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";
+export { default as SchemaEditor2 } from "./SchemaEditor2/SchemaEditor2";
+export { default as EntityCard } from "./EntityCard/EntityCard";
+export { default as EntityRelationships } from "./EntityCard/EntityRelationships";
+export { default as RelationshipCard } from "./RelationshipCard/RelationshipCard";
 export { default as DataUpload } from "./DataUpload/DataUpload";

@@ -1,4 +1,26 @@
-export const entities = {
+export interface Entity {
+	id: string;
+	source?: string;
+	target?: string;
+	[prop: string]: any;
+}
+
+export type FieldType = "string" | "boolean" | "number";
+export interface Field {
+	id: string;
+	namespace: string;
+	type: FieldType;
+	isRequired: boolean;
+	allowMultiple: boolean;
+}
+
+export interface Node {
+	id: string;
+	namespace: string;
+	fields: Field[];
+}
+
+export const entities: { [key: string]: Entity[] } = {
 	Person: [
 		{ id: "p0", name: "Carmen Peterson", age: "28" },
 		{ id: "p1", name: "Alice Owens", age: "64" },
@@ -68,7 +90,7 @@ export const entities = {
 	],
 };
 
-export const nodes = [
+export const nodes: Node[] = [
 	{
 		id: "Person",
 		namespace: "./",
@@ -131,7 +153,7 @@ export const nodes = [
 	},
 ];
 
-export const relationships = [
+export const relationships: Node[] = [
 	{
 		id: "gotDegreeFrom",
 		namespace: "./",
