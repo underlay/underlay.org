@@ -1,5 +1,6 @@
 ## Development Guide
 
+- *Optional*: If using VS Code, install [Prisma extension](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
 - Install dependencies:
 
 ```
@@ -14,3 +15,7 @@ npm install --target_arch=x64 # For Apple M1 machines
 npm run dev
 npx prisma generate # if you encounter errors with Prisma client
 ```
+
+### Formatting
+
+- Always format `schema.prisma` with `npx prisma format`
