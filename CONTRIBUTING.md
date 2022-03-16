@@ -23,3 +23,10 @@ npx prisma generate # if you encounter errors with Prisma client
 ### Formatting
 
 - Always format `schema.prisma` with `npx prisma format`
+
+### Committing
+
+- For small changes, push directly.
+- For larger features, open an PR and request reviews from others.
+  - Do the merge yourself upon approval.
+  - If there's no response, you can still merge. The PR is still useful as a container of changes for others to read through.
