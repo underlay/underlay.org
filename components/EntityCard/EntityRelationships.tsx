@@ -1,5 +1,5 @@
-import { Node } from "components/Editor/data";
-import NodeOrRelationshipBlock from "components/Editor/NodeOrRelationshipBlock";
+import type { Node } from "utils/shared/types";
+import { NodeOrRelationshipBlock } from "components/Editor/NodeOrRelationshipBlock";
 import styles from "./EntityRelationships.module.scss";
 
 interface Props {

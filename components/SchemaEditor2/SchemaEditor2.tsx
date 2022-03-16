@@ -1,7 +1,7 @@
 import { Icon, InputGroup, HTMLSelect, ButtonGroup, Button } from "@blueprintjs/core";
 import { updateArrayWithNewElement } from "utils/shared/arrays";
 import { useState } from "react";
-import { FieldType, Node } from "../Editor/data";
+import type { FieldType, Node } from "utils/shared/types";
 import styles from "./SchemaEditor2.module.scss";
 
 interface Props {

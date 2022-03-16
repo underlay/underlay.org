@@ -1,26 +1,6 @@
-export interface Entity {
-	id: string;
-	source?: string;
-	target?: string;
-	[prop: string]: any;
-}
+import { Node, Entity } from "utils/shared/types";
 
-export type FieldType = "string" | "boolean" | "number";
-export interface Field {
-	id: string;
-	namespace: string;
-	type: FieldType;
-	isRequired: boolean;
-	allowMultiple: boolean;
-}
-
-export interface Node {
-	id: string;
-	namespace: string;
-	fields: Field[];
-}
-
-export const entities: { [key: string]: Entity[] } = {
+export const mockEntities: { [key: string]: Entity[] } = {
 	Person: [
 		{ id: "p0", name: "Carmen Peterson", age: "28" },
 		{ id: "p1", name: "Alice Owens", age: "64" },
@@ -90,7 +70,7 @@ export const entities: { [key: string]: Entity[] } = {
 	],
 };
 
-export const nodes: Node[] = [
+export const mockNodes: Node[] = [
 	{
 		id: "Person",
 		namespace: "./",
@@ -153,7 +133,7 @@ export const nodes: Node[] = [
 	},
 ];
 
-export const relationships: Node[] = [
+export const mockRelationships: Node[] = [
 	{
 		id: "gotDegreeFrom",
 		namespace: "./",

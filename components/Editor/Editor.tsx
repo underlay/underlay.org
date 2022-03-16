@@ -1,20 +1,15 @@
-//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
 import { Button, InputGroup } from "@blueprintjs/core";
 
 import styles from "./Editor.module.scss";
-import type { Entity, Node } from "./data";
-import {
-	nodes as mockNodes,
-	relationships as mockRelationships,
-	entities as mockEntities,
-} from "./data";
+import type { Entity, Node } from "utils/shared/types";
+import { mockEntities } from "utils/client/mockData";
 import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
-import { EntityCard, EntityRelationships, SchemaEditor2 } from "components";
-import { default as NodeOrRelationshipBlock } from "./NodeOrRelationshipBlock";
+import { EntityCard, EntityRelationships, RelationshipCard, SchemaEditor2 } from "components";
+import { NodeOrRelationshipBlock } from "./NodeOrRelationshipBlock";
 import { pushToArrayIfUnseen, updateArrayWithNewElement } from "utils/shared/arrays";
 
 let dataFetched = false;
@@ -37,8 +32,6 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 	const [activeRelationshipIndexes, setActiveRelationshipIndexes] = useState<number[]>([]);
 
 	const [filterVal, setFilterVal] = useState("");
-	const [activeNodes, setActiveNodes] = useState([]);
-	const [activeFilters, setActiveFilters] = useState([]);
 	const [mode, setMode] = useState("entities");
 	const [entities, setEntities] = useState(mockEntities);
 
@@ -51,7 +44,6 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 					namespaceSlug + "/" + collectionSlug + ".csv",
 					collection.version || "0.0.1"
 				).then((data) => {
-					console.log(data);
 					setEntities(data);
 					dataFetched = true;
 				});
@@ -83,18 +75,7 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 		return [...activeNodeEntities, ...activeRelationshipEntities];
 	}
 
-	const filterColumnItems = (index, item) => {
-		if (index === 0) {
-			return true;
-		}
-		const currentFilter = activeFilters[index - 1];
-		return (
-			item.id === currentFilter ||
-			item.source === currentFilter ||
-			item.target === currentFilter
-		);
-	};
-	const findEntityById = (id) => {
+	const findEntityById = (id: string) => {
 		const flatEntities = Object.values(entities).reduce((prev, curr) => {
 			return prev.concat(curr);
 		}, []);
@@ -102,8 +83,8 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 			return item.id === id;
 		});
 	};
-	const findNodeType = (id) => {
-		const typeMap = {
+	const findNodeType = (id: string) => {
+		const typeMap: { [k: string]: string } = {
 			e: "employedAt",
 			a: "authored",
 			gdf: "gotDegreeFrom",
@@ -116,15 +97,6 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 		});
 	};
 
-	const findPropertyNamespace = (property, nodeId) => {
-		const entityThing = nodes.concat(relationships).find((entity) => {
-			return entity.id === nodeId;
-		});
-		const fieldThing = entityThing?.fields.find((field) => {
-			return field.id === property;
-		});
-		return fieldThing?.namespace;
-	};
 	return (
 		<div>
 			<div className={styles.editor}>
@@ -155,7 +127,6 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 									classClick={() => {
 										setActiveNodeIndexes([nodeIndex]);
 										setActiveRelationshipIndexes([]);
-										setActiveFilters([]);
 										setMode("entities");
 									}}
 									schemaClick={(ev) => {

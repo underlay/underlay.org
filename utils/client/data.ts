@@ -1,5 +1,6 @@
 import { supabase } from "utils/client/supabase";
 import { parse } from "csv-parse";
+import type { Entity } from "utils/shared/types";
 
 export const uploadData = async (file: File, fileName: string, version: string) => {
 	fileName = fileName.replace(".csv", version + ".csv");
@@ -72,7 +73,10 @@ export const downloadData = async (
 	}
 };
 
-export const getData = async (fileName: string, version: string) => {
+export const getData = async (
+	fileName: string,
+	version: string
+): Promise<{ [key: string]: Entity[] }> => {
 	fileName = fileName.replace(/.csv$/, version + ".csv");
 
 	const { data, error } = await supabase.storage.from("data").download(fileName);

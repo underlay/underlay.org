@@ -1,4 +1,4 @@
-import type { Node } from "./data";
+import type { Node } from "utils/shared/types";
 import classNames from "classnames";
 import styles from "./Editor.module.scss";
 import { Button } from "@blueprintjs/core";
@@ -12,7 +12,7 @@ interface Props {
 	showSchema: boolean;
 }
 
-const NodeOrRelationshipBlock: React.FC<Props> = function ({
+export const NodeOrRelationshipBlock: React.FC<Props> = function ({
 	node,
 	isRelationship,
 	classClick,
@@ -37,5 +37,3 @@ const NodeOrRelationshipBlock: React.FC<Props> = function ({
 		</div>
 	);
 };
-
-export default NodeOrRelationshipBlock;

@@ -1,5 +1,5 @@
 import { ButtonGroup, Button } from "@blueprintjs/core";
-import { Entity, Node } from "components/Editor/data";
+import type { Entity, Node } from "utils/shared/types";
 import { Provenance, Discussion } from "components/Icons";
 import React from "react";
 import styles from "./RelationshipCard.module.scss";
