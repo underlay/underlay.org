@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { buildUrl } from "utils/shared/urls";
 import { useLocationContext } from "utils/client/hooks";
@@ -11,7 +11,7 @@ type Props = {
 	description?: string;
 	isPublic: boolean;
 	version: string;
-	lastPublished: Date;
+	publishedAt: Date;
 };
 
 const CollectionPreview: React.FC<Props> = function ({
@@ -19,10 +19,9 @@ const CollectionPreview: React.FC<Props> = function ({
 	description,
 	isPublic,
 	version,
-	// lastPublished,
+	publishedAt,
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
-	const [lastPublished] = useState(Math.round(Math.random() * 25));
 	return (
 		<a
 			href={buildUrl({
@@ -40,9 +39,8 @@ const CollectionPreview: React.FC<Props> = function ({
 				<span>{!isPublic ? "Private" : "Public"}</span>
 				<span className={styles.dot}>·</span>
 				<span>{version}</span>
-				<span className={styles.dot}>·</span>
-				{/* <span>{lastPublished}</span> */}
-				<span>Last Published {lastPublished} days ago</span>
+				{publishedAt && <span className={styles.dot}>·</span>}
+				{publishedAt && <span>Last Published at {publishedAt.toLocaleString()}</span>}
 			</div>
 		</a>
 	);

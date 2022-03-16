@@ -6,6 +6,7 @@ import { CollectionProps } from "utils/server/collections";
 
 import styles from "./CollectionOverviewSide.module.scss";
 import SideGettingStarted from "./SideGettingStarted";
+import { humanFileSize } from "utils/shared/filesize";
 
 const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection }) {
 	if (!collection.version) {
@@ -17,15 +18,17 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 				{collection.version}
 			</Section>
 			<Section title="Last Published" className={styles.small}>
-				June {Math.round(Math.random() * 30)}, 201{Math.round(Math.random() * 9)}
+				{collection.publishedAt ? collection.publishedAt.toLocaleString() : "N/A"}
 			</Section>
 			<Section title="Size" className={styles.small}>
-				{Math.round(Math.random() * 12)}.{Math.round(Math.random() * 99)} MB
+				{collection.publishedDataSize
+					? humanFileSize(Number(collection.publishedDataSize))
+					: "N/A"}
 			</Section>
 			<Section title="Download" className={styles.small}>
 				<ButtonGroup>
-					<Button outlined small text=".instance" />
-					<Button outlined small text=".schema" />
+					<Button disabled outlined small text=".instance" />
+					<Button disabled outlined small text=".schema" />
 				</ButtonGroup>
 			</Section>
 		</div>

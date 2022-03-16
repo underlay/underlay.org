@@ -1,12 +1,13 @@
 import { Button } from "@blueprintjs/core";
 import React, { useState, useRef } from "react";
 import { uploadData } from "utils/client/data";
+import { humanFileSize } from "utils/shared/filesize";
 import { getNextVersion } from "utils/shared/version";
 
 import styles from "./DataUpload.module.scss";
 
 type Props = {
-	onComplete: (url: string) => any;
+	onComplete: ({ url, bytes }: { url: string; bytes: number }) => any;
 	fullSlug: string;
 	buttonText?: string;
 	version: string;
@@ -19,44 +20,51 @@ const DataUpload: React.FC<Props> = function ({
 	version,
 }) {
 	const [saving, setSaving] = useState(false);
-	const [fileName, setFilename] = useState("No file selected");
+	const [fileInfo, setFileInfo] = useState("No file selected");
 	const [uploadStatus, setUplodStatus] = useState("");
 
-	const hiddenFileInput = useRef(null);
+	const hiddenFileInput = useRef<HTMLInputElement>(null);
 
 	/* Programatically click the hidden file input element */
 	/* when the Button component is clicked */
 	const handleClick = () => {
-		// @ts-ignore
-		hiddenFileInput.current.click();
+		hiddenFileInput.current!.click();
 	};
 
 	const handleChange = async (evt: any) => {
-		const uploadedFile = evt.target.files[0];
+		const uploadedFile: File = evt.target.files[0];
+		const readableFileSize = humanFileSize(uploadedFile.size);
 
-		setFilename(uploadedFile.name);
+		setFileInfo(`${uploadedFile.name} ${readableFileSize}`);
 	};
 	const handleSave = async () => {
 		setSaving(true);
 		setUplodStatus("Uploading");
 
-		// @ts-ignore
-		const file = hiddenFileInput.current.files[0];
+		if (!hiddenFileInput.current!.files) {
+			/**
+			 * TODO: Handle error case here
+			 */
+			return;
+		}
+		const file = hiddenFileInput.current!.files[0];
 
 		const url = await uploadData(file, fullSlug + ".csv", getNextVersion(version));
 
 		setSaving(false);
 		setUplodStatus("Uploaded");
 
-		onComplete(url!);
-		onComplete("test");
+		onComplete({
+			url: url!,
+			bytes: file.size,
+		});
 	};
 
 	return (
 		<div>
 			<div className={styles.uploadRow}>
 				<Button onClick={handleClick} outlined text={buttonText} />
-				<span className={styles.message}>{fileName}</span>
+				<span className={styles.message}>{fileInfo}</span>
 				<input
 					id="dataInput"
 					type="file"

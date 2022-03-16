@@ -52,7 +52,6 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 		if (!loginId) {
 			return res.status(403).json({ ok: false });
 		}
-		console.log(req.body);
 
 		await prisma.collection.update({
 			where: {
@@ -60,6 +59,8 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 			},
 			data: {
 				version: req.body.version,
+				publishedAt: req.body.publishedAt,
+				publishedDataSize: req.body.publishedDataSize,
 			},
 		});
 
