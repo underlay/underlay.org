@@ -1,4 +1,8 @@
 export function getNextVersion(ver: string) {
+	if (ver === "") {
+		return "0.0.1";
+	}
+
 	let [major, minor, patch] = ver.split(".").map((s) => parseInt(s, 10));
 
 	if (patch < 9) {

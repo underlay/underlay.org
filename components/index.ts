@@ -27,3 +27,4 @@ export { default as EntityCard } from "./EntityCard/EntityCard";
 export { default as EntityRelationships } from "./EntityCard/EntityRelationships";
 export { default as RelationshipCard } from "./RelationshipCard/RelationshipCard";
 export { default as DataUpload } from "./DataUpload/DataUpload";
+export { default as DataExport } from "./DataExport/DataExport";
