@@ -1,6 +1,5 @@
 ## Development Guide
 
-- *Optional*: If using VS Code, install [Prisma extension](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
 - Install dependencies:
 
 ```
@@ -15,6 +14,11 @@ npm install --target_arch=x64 # For Apple M1 machines
 npm run dev
 npx prisma generate # if you encounter errors with Prisma client
 ```
+
+### For VS Code
+
+- Install [Prisma extension](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
+- `F1` -> `Tasks: Run Build Task` to run `tsc --watch` in the background and show all errors in the VS Code `Problems` panel
 
 ### Formatting
 
