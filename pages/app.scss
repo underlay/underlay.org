@@ -71,6 +71,7 @@ a {
 	font-size: 16px;
 	padding: 0px 5px;
 	height: 24px;
+	box-shadow: 0px 0px 0px transparent !important;
 	&:focus {
 		border-bottom: 1px solid #000;
 		box-shadow: none;
