@@ -67,18 +67,20 @@ model Member {
 }
 
 model Collection {
-  id          String    @id @default(uuid())
-  namespace   Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId String    @map(name: "namespace_id")
-  slug        String
-  description String
-  isPublic    Boolean
-  readme      String?
-  labels      Json?
-  schema      Json?
-  version     String?
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  id                String    @id @default(uuid())
+  namespace         Namespace @relation(fields: [namespaceId], references: [id])
+  namespaceId       String    @map(name: "namespace_id")
+  slug              String
+  description       String
+  isPublic          Boolean
+  readme            String?
+  labels            Json?
+  schema            Json?
+  version           String?
+  publishedAt       DateTime?
+  publishedDataSize BigInt?
+  createdAt         DateTime  @default(now()) @map(name: "created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
   collaborators Collaborator[]
   @@map(name: "collections")

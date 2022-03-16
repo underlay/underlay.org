@@ -23,13 +23,15 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 					<div>
 						<Section title="Select Data to Import">
 							<DataUpload
-								onComplete={(_val: string) => {
+								onComplete={({ url: _url, bytes }) => {
 									fetch("/api/collection", {
 										method: "PATCH",
 										headers: { "Content-Type": "application/json" },
 										body: JSON.stringify({
 											...collection,
 											version: getNextVersion(collection.version || ""),
+											publishedAt: new Date(),
+											publishedDataSize: bytes,
 										}),
 									});
 								}}
