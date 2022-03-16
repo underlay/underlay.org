@@ -1,4 +1,4 @@
-import { Button, Intent } from "@blueprintjs/core";
+import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,7 +12,7 @@ export type Attribute = {
 	key: string;
 	type: string;
 	isOptional: boolean;
-	allowMultiple: boolean;
+	isUnique: boolean;
 };
 
 export type Class = {
@@ -23,11 +23,12 @@ export type Class = {
 };
 export type Schema = Class[];
 type Props = {
+	collectionId: string;
 	schema: Schema | null;
 	version: string | null;
 };
 
-const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version }) {
+const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSchema, version }) {
 	const [schema, setSchema] = useState(initSchema || []);
 	const [canSave, setCanSave] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -56,14 +57,14 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 					key: "source",
 					type: "reference",
 					isOptional: false,
-					allowMultiple: false,
+					isUnique: false,
 				},
 				{
 					id: uuidv4(),
-					key: "destination",
+					key: "target",
 					type: "reference",
 					isOptional: false,
-					allowMultiple: false,
+					isUnique: false,
 				},
 			],
 		};
@@ -107,12 +108,18 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 			})
 		);
 	};
-	const handleSave = () => {
+	const handleSave = async () => {
 		setIsSaving(true);
-		setTimeout(() => {
-			setIsSaving(false);
-			setCanSave(false);
-		}, 1500);
+		await fetch("/api/schema", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				collectionId: collectionId,
+				schema: schema,
+			}),
+		});
+		setIsSaving(false);
+		setCanSave(false);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
 		if (version) {
@@ -125,12 +132,20 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 			addRelationship(addAtEnd);
 		};
 		return (
-			<div>
+			<ButtonGroup>
 				<Button onClick={nodeFunc}>Add Node</Button>
 				<Button onClick={relationshipFunc}>Add Relationship</Button>
-			</div>
+			</ButtonGroup>
 		);
 	};
+	const schemaNodes = schema
+		.filter((schemaClass) => {
+			return !schemaClass.isRelationship;
+		})
+		.map((schemaClass) => {
+			return { id: schemaClass.id, key: schemaClass.key };
+		});
+
 	return (
 		<ThreeColumnFrame
 			content={
@@ -150,6 +165,7 @@ const SchemaEditor: React.FC<Props> = function ({ schema: initSchema, version })
 							<div key={schemaClass.id} className={styles.classWrapper}>
 								<SchemaClass
 									schemaClass={schemaClass}
+									schemaNodes={schemaNodes}
 									updateClass={updateClass}
 									updateAttribute={updateAttribute}
 								/>

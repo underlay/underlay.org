@@ -8,7 +8,11 @@ const CollectionSchema: React.FC<CollectionProps> = function ({ collection }) {
 	return (
 		<div>
 			<CollectionHeader mode="schema" collection={collection} />
-			<SchemaEditor version={collection.version} schema={collection.schema as Schema} />
+			<SchemaEditor
+				collectionId={collection.id}
+				version={collection.version}
+				schema={collection.schema as Schema}
+			/>
 		</div>
 	);
 };

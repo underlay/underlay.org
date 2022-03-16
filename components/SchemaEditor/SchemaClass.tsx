@@ -7,11 +7,17 @@ import styles from "./SchemaClass.module.scss";
 
 type Props = {
 	schemaClass: Class;
+	schemaNodes: Partial<Class>[];
 	updateClass: any;
 	updateAttribute: any;
 };
 
-const SchemaClass: React.FC<Props> = function ({ schemaClass, updateClass, updateAttribute }) {
+const SchemaClass: React.FC<Props> = function ({
+	schemaClass,
+	schemaNodes,
+	updateClass,
+	updateAttribute,
+}) {
 	const handleKeyUpdate = (evt: any) => {
 		updateClass(schemaClass.id, { key: evt.target.value });
 	};
@@ -21,7 +27,7 @@ const SchemaClass: React.FC<Props> = function ({ schemaClass, updateClass, updat
 			key: "",
 			type: "Text",
 			isOptional: false,
-			allowMultiple: false,
+			isUnique: false,
 		};
 		updateClass(schemaClass.id, { attributes: [...schemaClass.attributes, defaultAttribute] });
 	};
@@ -43,11 +49,13 @@ const SchemaClass: React.FC<Props> = function ({ schemaClass, updateClass, updat
 				/>
 				<Button onClick={removeClass} icon="trash" small minimal />
 			</div>
-			{schemaClass.attributes.map((attribute) => {
+			{schemaClass.attributes.map((attribute, index) => {
 				return (
 					<div key={attribute.id} className={styles.attributeWrapper}>
 						<SchemaAttribute
+							isFixed={index < 2 && !!schemaClass.isRelationship}
 							attribute={attribute}
+							schemaNodes={schemaNodes}
 							updateAttribute={(attributeId: string, updates: Attribute) => {
 								updateAttribute(schemaClass.id, attributeId, updates);
 							}}
