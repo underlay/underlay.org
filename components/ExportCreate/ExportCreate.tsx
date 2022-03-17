@@ -16,7 +16,7 @@ type Props = {
 const ExporCreate: React.FC<Props> = function ({
 	newExport,
 	setNewExport,
-	schema,
+	// schema,
 	generateExport,
 	isGenerating,
 }) {
