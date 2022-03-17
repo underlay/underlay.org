@@ -95,6 +95,9 @@ export const getCollectionData = async (namespaceSlug: string, collectionSlug: s
 				where: {
 					slug: collectionSlug,
 				},
+				include: {
+					exports: true,
+				},
 			},
 		},
 	});

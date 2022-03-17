@@ -12,7 +12,7 @@ type Props = {
 	action?: JSX.Element;
 };
 
-const Readme: React.FC<Props> = function ({
+const EmptyState: React.FC<Props> = function ({
 	className,
 	title,
 	icon = "widget",
@@ -30,4 +30,4 @@ const Readme: React.FC<Props> = function ({
 	);
 };
 
-export default Readme;
+export default EmptyState;
