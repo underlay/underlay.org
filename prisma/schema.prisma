@@ -2,99 +2,120 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 model Namespace {
-  id        String   @id @default(uuid())
-  slug      String   @unique
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+    id        String   @id @default(uuid())
+    slug      String   @unique
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
-  user        User?
-  community   Community?
-  collections Collection[]
-  @@map(name: "namespaces")
+    user        User?
+    community   Community?
+    collections Collection[]
+    @@map(name: "namespaces")
 }
 
 model User {
-  id          String    @id @default(uuid())
-  namespace   Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId String    @unique @map(name: "namespace_id")
-  email       String    @unique
-  name        String
-  avatar      String?
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+    id          String    @id @default(uuid())
+    namespace   Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId String    @unique @map(name: "namespace_id")
+    email       String    @unique
+    name        String
+    avatar      String?
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  memberships    Member[]
-  collaborations Collaborator[]
-  @@map(name: "users")
+    memberships    Member[]
+    collaborations Collaborator[]
+    exports        Export[]
+
+    @@map(name: "users")
 }
 
 model Community {
-  id          String    @id @default(uuid())
-  namespace   Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId String    @unique @map(name: "namespace_id")
-  name        String
-  avatar      String?
-  description String?
-  location    String?
-  verifiedUrl String?
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+    id          String    @id @default(uuid())
+    namespace   Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId String    @unique @map(name: "namespace_id")
+    name        String
+    avatar      String?
+    description String?
+    location    String?
+    verifiedUrl String?
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  members Member[]
-  @@map(name: "communities")
+    members Member[]
+    @@map(name: "communities")
 }
 
 model Member {
-  id          String    @id @default(uuid())
-  community   Community @relation(fields: [communityId], references: [id])
-  communityId String    @map(name: "community_id")
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String    @map(name: "user_id")
-  permission  String
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+    id          String    @id @default(uuid())
+    community   Community @relation(fields: [communityId], references: [id])
+    communityId String    @map(name: "community_id")
+    user        User      @relation(fields: [userId], references: [id])
+    userId      String    @map(name: "user_id")
+    permission  String
+    createdAt   DateTime  @default(now()) @map(name: "created_at")
+    updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  @@map(name: "members")
+    @@map(name: "members")
 }
 
 model Collection {
-  id                String    @id @default(uuid())
-  namespace         Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId       String    @map(name: "namespace_id")
-  slug              String
-  description       String
-  isPublic          Boolean
-  readme            String?
-  labels            Json?
-  schema            Json?
-  version           String?
-  publishedAt       DateTime?
-  publishedDataSize BigInt?
-  createdAt         DateTime  @default(now()) @map(name: "created_at")
-  updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+    id                String    @id @default(uuid())
+    namespace         Namespace @relation(fields: [namespaceId], references: [id])
+    namespaceId       String    @map(name: "namespace_id")
+    slug              String
+    description       String
+    isPublic          Boolean
+    readme            String?
+    labels            Json?
+    schema            Json?
+    version           String?
+    publishedAt       DateTime?
+    publishedDataSize BigInt?
+    createdAt         DateTime  @default(now()) @map(name: "created_at")
+    updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  collaborators Collaborator[]
-  @@map(name: "collections")
+    collaborators Collaborator[]
+    exports       Export[]
+
+    @@map(name: "collections")
 }
 
 model Collaborator {
-  id           String     @id @default(uuid())
-  collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String     @map(name: "collection_id")
-  user         User       @relation(fields: [userId], references: [id])
-  userId       String     @map(name: "user_id")
-  permission   String
-  createdAt    DateTime   @default(now()) @map(name: "created_at")
-  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+    id           String     @id @default(uuid())
+    collection   Collection @relation(fields: [collectionId], references: [id])
+    collectionId String     @map(name: "collection_id")
+    user         User       @relation(fields: [userId], references: [id])
+    userId       String     @map(name: "user_id")
+    permission   String
+    createdAt    DateTime   @default(now()) @map(name: "created_at")
+    updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
-  @@map(name: "collaborators")
+    @@map(name: "collaborators")
+}
+
+model Export {
+    id           String     @id @default(uuid())
+    name         String
+    format       String
+    size         String
+    isPublic     Boolean    @default(false)
+    mapping      Json
+    collection   Collection @relation(fields: [collectionId], references: [id])
+    collectionId String     @map(name: "collection_id")
+    user         User       @relation(fields: [userId], references: [id])
+    userId       String     @map(name: "user_id")
+    createdAt    DateTime   @default(now()) @map(name: "created_at")
+    updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+    @@map(name: "exports")
 }
