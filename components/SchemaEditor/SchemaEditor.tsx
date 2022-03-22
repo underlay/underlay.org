@@ -6,22 +6,8 @@ import { ThreeColumnFrame } from "components";
 
 import SchemaClass from "./SchemaClass";
 import styles from "./SchemaEditor.module.scss";
+import type { Attribute, Schema } from "utils/shared/types";
 
-export type Attribute = {
-	id: string;
-	key: string;
-	type: string;
-	isOptional: boolean;
-	isUnique: boolean;
-};
-
-export type Class = {
-	id: string;
-	key: string;
-	isRelationship?: boolean;
-	attributes: Attribute[];
-};
-export type Schema = Class[];
 type Props = {
 	collectionId: string;
 	schema: Schema | null;

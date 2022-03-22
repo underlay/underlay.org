@@ -54,3 +54,18 @@ export interface Node {
 	namespace: string;
 	fields: Field[];
 }
+
+export type Class = {
+	id: string;
+	key: string;
+	isRelationship?: boolean;
+	attributes: Attribute[];
+};
+export type Attribute = {
+	id: string;
+	key: string;
+	type: string;
+	isOptional: boolean;
+	isUnique: boolean;
+};
+export type Schema = Class[];

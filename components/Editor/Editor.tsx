@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
@@ -23,7 +24,6 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 		console.error(err);
 	}
 
-	// const relationships: Node[] = mockRelationships;
 	const relationships: Node[] = [];
 
 	const [nodes, setNodes] = useState<Node[]>(initialNodes || []);
@@ -44,7 +44,7 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 					namespaceSlug + "/" + collectionSlug + ".csv",
 					collection.version || "0.0.1"
 				).then((data) => {
-					setEntities(data);
+					setEntities(data.entities);
 					dataFetched = true;
 				});
 			}, 100);

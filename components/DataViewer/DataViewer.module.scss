@@ -1,0 +1,160 @@
+.dataViewer {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	display: flex;
+	height: 450px;
+}
+
+.side {
+	padding: 15px;
+	margin-right: 10px;
+	width: 260px;
+	border-right: 1px solid #ccc;
+	overflow-y: scroll;
+	flex: 0 0 auto;
+}
+
+.entities {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	overflow-x: hidden;
+	overflow-y: scroll;
+
+	padding-right: 15px;
+}
+
+.title {
+	margin: 12px 0px 12px 0px;
+	color: #888;
+	position: relative;
+	&:after {
+		content: "";
+		position: absolute;
+		height: 1px;
+		left: 110px;
+		right: 10px;
+		top: 10px;
+		background: #ccc;
+	}
+}
+.title:not(:first-child) {
+	margin-top: 24px;
+}
+
+.node {
+	border: 1px solid #888;
+	display: flex;
+	margin-bottom: 10px;
+	border-radius: 3px;
+	background: #ede9e4;
+	&:hover {
+		cursor: pointer;
+		border: 1px solid black;
+		// background: #f0eeec;
+	}
+	&.relationship {
+		&:hover {
+			border-top: 1px solid black;
+			border-bottom: 1px solid black;
+			// background: #f0eeec;
+			&:before,
+			&:after {
+				// background: #f0eeec;
+				border: 1px solid black;
+			}
+		}
+		// border-radius: 0px;
+		position: relative;
+		border-left: 0px solid black;
+		border-right: 0px solid black;
+		left: 20px;
+		width: calc(100% - 40px);
+		// z-index: 3;
+		&:before {
+			content: "";
+			position: absolute;
+			background: #ede9e4;
+			border: 1px solid #888;
+			width: 23px;
+			height: 23px;
+			top: 3px;
+			left: -10px;
+			z-index: -1;
+			border-radius: 3px;
+			transform: rotate(45deg);
+		}
+		&:after {
+			content: "";
+			position: absolute;
+			background: #ede9e4;
+			border: 1px solid #888;
+			width: 23px;
+			height: 23px;
+			top: 3px;
+			right: -10px;
+			z-index: -1;
+			border-radius: 3px;
+			transform: rotate(45deg);
+		}
+	}
+	// 2a2 = sqrt(c/2)
+	.key {
+		flex: 1 1 auto;
+		padding: 4px 10px;
+		.name {
+		}
+	}
+	&.narrowWidth {
+		width: auto;
+		display: inline-block;
+		// padding-right: 80px;
+		min-width: 175px;
+	}
+}
+
+.contentHeader {
+	border-bottom: 1px solid #ccc;
+	padding: 10px 2px 10px;
+	margin-bottom: 20px;
+}
+
+.schemaRow {
+	margin-bottom: 30px;
+	.namespace {
+		margin-left: 32px;
+	}
+	.schemaRowContent {
+		display: flex;
+		align-items: center;
+		& > * {
+			margin-right: 15px;
+		}
+	}
+}
+
+.small {
+	transform: scale(0.8);
+	transform-origin: center left;
+	margin-bottom: -10px;
+}
+.entityCard {
+	background: rgba(255, 255, 255, 0.4);
+	padding: 10px;
+	box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0),
+		0 1px 1px rgba(16, 22, 26, 0.2);
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	margin-bottom: 10px;
+	z-index: 0;
+	position: relative;
+}
+
+.propertyWrapper {
+	display: flex;
+	align-items: flex-end;
+	margin-bottom: 20px;
+}
+.propertyHeader {
+	min-width: 175px;
+}

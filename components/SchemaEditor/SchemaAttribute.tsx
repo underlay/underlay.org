@@ -1,8 +1,8 @@
 import { Button, ButtonGroup, Checkbox, HTMLSelect, InputGroup } from "@blueprintjs/core";
 
-import { Attribute, Class } from "./SchemaEditor";
 import styles from "./SchemaAttribute.module.scss";
 import React from "react";
+import type { Attribute, Class } from "utils/shared/types";
 
 type Props = {
 	isFixed: boolean;
