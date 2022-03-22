@@ -1,6 +1,6 @@
 import { supabase } from "utils/client/supabase";
 import { parse } from "csv-parse";
-import type { Entity } from "utils/shared/types";
+import type { Entity, Class } from "utils/shared/types";
 
 export const uploadData = async (file: File, fileName: string, version: string) => {
 	fileName = fileName.replace(".csv", version + ".csv");
@@ -75,8 +75,10 @@ export const downloadData = async (
 
 export const getData = async (
 	fileName: string,
-	version: string
-): Promise<{ [key: string]: Entity[] }> => {
+	version: string,
+	nodes: Class[] = [],
+	relationships: Class[] = []
+): Promise<{ entities: { [key: string]: Entity[] } }> => {
 	fileName = fileName.replace(/.csv$/, version + ".csv");
 
 	const { data, error } = await supabase.storage.from("data").download(fileName);
@@ -92,21 +94,11 @@ export const getData = async (
 		let headerRow: string[];
 		let isHeaderRow = true;
 
-		const recordObj: { [nodeId: string]: any[] } = {};
-		const nodes: string[] = [];
-
 		parser.on("readable", () => {
 			let record;
 			while ((record = parser.read()) !== null) {
 				if (isHeaderRow) {
 					headerRow = record;
-
-					headerRow
-						.filter((colName) => colName.endsWith("_id"))
-						.forEach((colName) => {
-							nodes.push(colName.slice(0, -3));
-							recordObj[colName.slice(0, -3)] = [];
-						});
 
 					isHeaderRow = false;
 				} else {
@@ -116,27 +108,97 @@ export const getData = async (
 		});
 
 		parser.on("end", () => {
-			const recordObj: any = {};
+			const entities: { [nodeId: string]: any[] } = {};
+
 			nodes.forEach((n) => {
-				recordObj[n] = [];
+				entities[n.key] = [];
+			});
+			relationships.map((r) => {
+				entities[r.key] = [];
 			});
 
-			records.map((r) => {
-				nodes.forEach((n) => {
-					const obj: any = {};
-					headerRow.forEach((colName, i) => {
-						if (colName.startsWith(n + "_")) {
-							const [_nodeName, nodeProp] = colName.split("_");
-							obj[nodeProp] = r[i];
-						}
-					});
-					if (recordObj[n].findIndex((o: any) => o.id === obj.id) === -1) {
-						recordObj[n].push(obj);
-					}
+			const nodeMappings = nodes.map((n) => {
+				const attrIndexMapping: [string, number][] = n.attributes.map((a) => {
+					const attrIndex = headerRow.findIndex(
+						(colName) => colName === `${n.key}_${a.key}`
+					);
+					return [a.key, attrIndex];
+				});
+
+				return {
+					name: n.key,
+					attrIndexMapping,
+				};
+			});
+
+			const relationshipMappings: {
+				name: string;
+				source: string;
+				target: string;
+				attrIndexMapping: [string, number][];
+			}[] = [];
+			relationships.map((r) => {
+				const sourceAttr = r.attributes.find((a) => a.key === "source");
+				const targetAttr = r.attributes.find((a) => a.key === "target");
+
+				if (!sourceAttr || !targetAttr) {
+					return;
+				}
+
+				const otherAttrs = r.attributes.filter(
+					(a) => a.key !== "source" && a.key !== "target"
+				);
+				const attrIndexMapping: [string, number][] = otherAttrs.map((a) => {
+					const attrIndex = headerRow.findIndex((colName) => colName === `${a.key}`);
+					return [a.key, attrIndex];
+				});
+
+				const sourceNode = nodes.find((n) => n.id === sourceAttr.type);
+				const targetNode = nodes.find((n) => n.id === targetAttr.type);
+
+				relationshipMappings.push({
+					name: r.key,
+					source: sourceNode!.key,
+					target: targetNode!.key,
+					attrIndexMapping,
 				});
 			});
 
-			resolve(recordObj);
+			records.map((r, ri) => {
+				const nameToNewNodeMapping: { [key: string]: any } = {};
+
+				nodeMappings.forEach(({ name, attrIndexMapping }) => {
+					const nodeEntity: any = {
+						id: `${name}${ri}`,
+					};
+					attrIndexMapping.forEach(([a, ai]) => {
+						nodeEntity[a] = r[ai];
+					});
+
+					// TODO: Use unique keys to determine uniqueness later
+					if (entities[name].findIndex((n) => n.name === nodeEntity.name) === -1) {
+						entities[name].push(nodeEntity);
+					}
+					nameToNewNodeMapping[name] = nodeEntity;
+				});
+
+				relationshipMappings.forEach(({ name, source, target, attrIndexMapping }) => {
+					const relationshipEntity: any = {
+						id: `${name}${ri}`,
+						source: nameToNewNodeMapping[source].name,
+						target: nameToNewNodeMapping[target].name,
+					};
+					attrIndexMapping.forEach(([a, ai]) => {
+						relationshipEntity[a] = r[ai];
+					});
+
+					entities[name].push(relationshipEntity);
+				});
+			});
+
+			resolve({
+				entities,
+			});
 		});
 
 		parser.on("error", (err) => reject(err));

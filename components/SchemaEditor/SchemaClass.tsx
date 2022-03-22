@@ -1,7 +1,7 @@
 import { Button, Icon, InputGroup } from "@blueprintjs/core";
 import { v4 as uuidv4 } from "uuid";
 
-import { Class, Attribute } from "./SchemaEditor";
+import type { Attribute, Class } from "utils/shared/types";
 import SchemaAttribute from "./SchemaAttribute";
 import styles from "./SchemaClass.module.scss";
 

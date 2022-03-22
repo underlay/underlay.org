@@ -11,6 +11,7 @@ import {
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { getNextVersion } from "utils/shared/version";
 import { useLocationContext } from "utils/client/hooks";
+import DataViewer from "components/DataViewer/DataViewer";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -41,6 +42,9 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 						</Section>
 						<Section title="Exports">
 							<DataExport collection={collection} />
+						</Section>
+						<Section title="Data Viewer">
+							<DataViewer collection={collection} />
 						</Section>
 					</div>
 				}

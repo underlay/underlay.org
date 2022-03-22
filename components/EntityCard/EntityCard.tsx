@@ -1,11 +1,9 @@
-import { ButtonGroup, Button } from "@blueprintjs/core";
-import type { Entity, Node } from "utils/shared/types";
-import { Provenance, Discussion } from "components/Icons";
+import type { Entity, Class } from "utils/shared/types";
 import React from "react";
 import styles from "./EntityCard.module.scss";
 
 interface Props {
-	node: Node;
+	node: Class;
 	entity: Entity;
 	relationshipRendering: React.ReactElement;
 }
@@ -13,26 +11,24 @@ interface Props {
 const EntityCard: React.FC<Props> = function ({ node, entity, relationshipRendering }) {
 	return (
 		<div key={entity.id} className={styles.entityCard}>
-			<div className={styles.topIcons}>
-				<ButtonGroup>
-					<Button minimal icon={<Provenance />} />
-					<Button minimal icon={<Discussion size={20} />} />
-				</ButtonGroup>
-			</div>
-
-			{Object.keys(entity).map((property) => {
-				if (property === "id") {
+			{Object.keys(entity).map((attribute) => {
+				if (attribute === "id") {
 					return null;
 				}
-				const propertyNamespace = node.fields.find((f) => f.id === property)?.namespace;
+
+				const matchAttr = node.attributes.find((a) => a.key === attribute);
+
 				return (
-					<div>
+					<div key={entity.id + attribute}>
 						<div className={styles.propertyWrapper}>
-							<div className={styles.propertyHeader}>
-								<div className={styles.namespace}>{propertyNamespace}</div>
-								{property}:
-							</div>
-							{entity[property]}
+							<div className={styles.propertyHeader}>{attribute}:</div>
+							{matchAttr && matchAttr.type === "URL" ? (
+								<a target="_blank" href={entity[attribute]}>
+									{entity[attribute]}
+								</a>
+							) : (
+								<span>{entity[attribute]}</span>
+							)}
 						</div>
 					</div>
 				);

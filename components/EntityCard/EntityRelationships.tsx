@@ -1,37 +1,22 @@
-import type { Node } from "utils/shared/types";
-import { NodeOrRelationshipBlock } from "components/Editor/NodeOrRelationshipBlock";
+import type { Class } from "utils/shared/types";
+import { NodeOrRelationshipBlock } from "components/DataViewer/DataViewer";
 import styles from "./EntityRelationships.module.scss";
 
 interface Props {
-	relationshipAndIndexes: { relationship: Node; relationshipIndex: number }[];
-	onRelationshipClick: (relationshipId: number) => void;
+	relationships: Class[];
 }
 
-const EntityRelationships: React.FC<Props> = function ({
-	relationshipAndIndexes,
-	onRelationshipClick,
-}) {
+const EntityRelationships: React.FC<Props> = function ({ relationships }) {
 	return (
 		<div>
-			{relationshipAndIndexes.length > 0 && (
-				<div>
-					<div className={styles.title}>Relationships</div>
-					{relationshipAndIndexes.map(({ relationship, relationshipIndex }) => {
-						return (
-							<div className={styles.small}>
-								<NodeOrRelationshipBlock
-									node={relationship}
-									isRelationship={true}
-									classClick={() => {
-										onRelationshipClick(relationshipIndex);
-									}}
-									showSchema={false}
-								/>
-							</div>
-						);
-					})}
-				</div>
-			)}
+			<div className={styles.title}>Relationships</div>
+			{relationships.map((r) => {
+				return (
+					<div className={styles.small}>
+						<NodeOrRelationshipBlock node={r} onClick={() => {}} />
+					</div>
+				);
+			})}
 		</div>
 	);
 };

@@ -2,7 +2,7 @@ import React from "react";
 
 import { CollectionHeader, SchemaEditor } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
-import { Schema } from "components/SchemaEditor/SchemaEditor";
+import { Schema } from "utils/shared/types";
 
 const CollectionSchema: React.FC<CollectionProps> = function ({ collection }) {
 	return (
