@@ -1,0 +1,34 @@
+.frame {
+	& > div:first-child {
+		width: 150px;
+		margin-right: 25px;
+	}
+	.schema {
+		margin-top: 45px;
+	}
+	.classRow {
+		margin-bottom: 5px;
+		justify-content: flex-start;
+		margin-left: -10px;
+		& > span:first-child {
+			margin-right: 5px;
+		}
+	}
+	.dataHeader {
+		display: flex;
+		justify-content: space-between;
+		font-size: 14px;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+	.dataFrame {
+		border: 1px solid #ccc;
+		border-radius: 2px;
+		padding: 20px;
+		min-height: 60vh;
+		max-height: 90vh;
+	}
+	.emptyState {
+		margin-top: 75px;
+	}
+}
