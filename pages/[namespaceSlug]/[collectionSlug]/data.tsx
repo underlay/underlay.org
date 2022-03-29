@@ -98,7 +98,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 								<AnchorButton
 									outlined
 									text={"Export Data"}
-									href={`/${namespaceSlug}/${collectionSlug}/export`}
+									href={`/${namespaceSlug}/${collectionSlug}/exports`}
 								/>
 							</div>
 						</div>
