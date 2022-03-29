@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import { Button, Dialog, Intent } from "@blueprintjs/core";
 
 import { CollectionHeader, ThreeColumnFrame, ExportTable, ExportCreate } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
-import { Button, Dialog, Intent } from "@blueprintjs/core";
 
 const CollectionExports: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const [collection, setCollection] = useState(initCollection);

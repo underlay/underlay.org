@@ -13,7 +13,7 @@ type Props = {
 	isGenerating: boolean;
 };
 
-const ExporCreate: React.FC<Props> = function ({
+const ExportCreate: React.FC<Props> = function ({
 	newExport,
 	setNewExport,
 	// schema,
@@ -96,4 +96,4 @@ const ExporCreate: React.FC<Props> = function ({
 	);
 };
 
-export default ExporCreate;
+export default ExportCreate;
