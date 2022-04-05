@@ -1,0 +1,7 @@
+@import "pages/variables.scss";
+
+.collectionHeader {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+}

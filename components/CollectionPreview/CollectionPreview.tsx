@@ -5,6 +5,7 @@ import { useLocationContext } from "utils/client/hooks";
 
 import styles from "./CollectionPreview.module.scss";
 import { Collection } from "components/Icons";
+import { convertToLocaleDateString } from "utils/shared/dates";
 
 type Props = {
 	slug: string;
@@ -40,7 +41,9 @@ const CollectionPreview: React.FC<Props> = function ({
 				<span className={styles.dot}>·</span>
 				<span>{version}</span>
 				{publishedAt && <span className={styles.dot}>·</span>}
-				{publishedAt && <span>Last Published at {publishedAt.toLocaleString()}</span>}
+				{publishedAt && (
+					<span>Last Published at {convertToLocaleDateString(publishedAt)}</span>
+				)}
 			</div>
 		</a>
 	);

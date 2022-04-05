@@ -7,6 +7,7 @@ import { CollectionProps } from "utils/server/collections";
 import styles from "./CollectionOverviewSide.module.scss";
 import SideGettingStarted from "./SideGettingStarted";
 import { humanFileSize } from "utils/shared/filesize";
+import { convertToLocaleDateString } from "utils/shared/dates";
 
 const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection }) {
 	if (!collection.version) {
@@ -18,7 +19,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 				{collection.version}
 			</Section>
 			<Section title="Last Published" className={styles.small}>
-				{collection.publishedAt ? collection.publishedAt.toLocaleString() : "N/A"}
+				{collection.publishedAt ? convertToLocaleDateString(collection.publishedAt) : "N/A"}
 			</Section>
 			<Section title="Size" className={styles.small}>
 				{collection.publishedDataSize
