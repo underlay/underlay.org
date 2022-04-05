@@ -8,6 +8,7 @@ import { AnchorButton, Button, Dialog, Intent, NonIdealState } from "@blueprintj
 import { Class } from "utils/shared/types";
 
 import styles from "./data.module.scss";
+import DataViewer from "components/DataViewer/DataViewer";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -31,6 +32,8 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const uploadData = () => {};
 	const schema = collection.schema as Class[];
 
+	const [activeNodes, setActiveNodes] = useState<Class[]>([schema[0]]);
+
 	return (
 		<div>
 			<CollectionHeader mode="data" collection={collection} />
@@ -48,6 +51,9 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 										<Button
 											key={classElement.id}
 											className={styles.classRow}
+											onClick={() => {
+												setActiveNodes([classElement]);
+											}}
 											minimal
 											fill
 											icon={"circle"}
@@ -67,6 +73,9 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 										<Button
 											key={classElement.id}
 											className={styles.classRow}
+											onClick={() => {
+												setActiveNodes([classElement]);
+											}}
 											minimal
 											fill
 											icon={"arrow-top-right"}
@@ -103,6 +112,8 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 							</div>
 						</div>
 						<div className={styles.dataFrame}>
+							<DataViewer collection={collection} activeNodes={activeNodes} />
+
 							{!collection.version && (
 								<NonIdealState
 									className={styles.emptyState}
@@ -133,42 +144,12 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 								schema={collection.schema}
 								uploadData={uploadData}
 								isUploading={isUploading}
+								collection={collection}
 							/>
 						</Dialog>
 					</div>
 				}
 			/>
-			{/* <ThreeColumnFrame
-				content={
-					<div>
-						<Section title="Select Data to Import">
-							<DataUpload
-								onComplete={({ url: _url, bytes }) => {
-									fetch("/api/collection", {
-										method: "PATCH",
-										headers: { "Content-Type": "application/json" },
-										body: JSON.stringify({
-											...collection,
-											version: getNextVersion(collection.version || ""),
-											publishedAt: new Date(),
-											publishedDataSize: bytes,
-										}),
-									});
-								}}
-								fullSlug={`${namespaceSlug}/${collectionSlug}`}
-								version={collection.version || ""}
-							/>
-						</Section>
-						<Section title="Exports">
-							<DataExport collection={collection} />
-						</Section>
-						<Section title="Data Viewer">
-							<DataViewer collection={collection} />
-						</Section>
-					</div>
-				}
-				sideContent={<CollectionOverviewSide collection={collection} />}
-			/> */}
 		</div>
 	);
 };

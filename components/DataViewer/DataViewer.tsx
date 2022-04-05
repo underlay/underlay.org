@@ -8,6 +8,7 @@ import { mockEntities } from "utils/client/mockData";
 import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
 import { EntityCard } from "components";
+import { Button } from "@blueprintjs/core";
 
 interface Props {
 	node: Class;
@@ -17,7 +18,7 @@ interface Props {
 export const NodeOrRelationshipBlock: React.FC<Props> = function ({ node, onClick }) {
 	return (
 		<div
-			key={node.id}
+			key={node.key}
 			className={classNames(styles.node, node.isRelationship && styles.relationship)}
 			onClick={onClick as any}
 		>
@@ -30,19 +31,24 @@ export const NodeOrRelationshipBlock: React.FC<Props> = function ({ node, onClic
 
 let dataFetched = false;
 
-const DataViewer: React.FC<CollectionProps> = function ({ collection }) {
+type DataViewerProps = {
+	activeNodes: Class[];
+};
+
+const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
+	activeNodes,
+	collection,
+}) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
 	const allNodes: Class[] = collection.schema as any;
 	const initNodes = allNodes.filter((n) => !n.isRelationship);
 	const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
 
-	const [nodes] = useState<Class[]>(initNodes);
-	const [relationships] = useState<Class[]>(initRelationships);
+	// const [nodes] = useState<Class[]>(initNodes);
+	// const [relationships] = useState<Class[]>(initRelationships);
 
 	const [entities, setEntities] = useState(mockEntities);
-
-	const [activeNodes, setActiveNodes] = useState<Class[]>([]);
 
 	useEffect(() => {
 		if (!dataFetched) {
@@ -71,45 +77,21 @@ const DataViewer: React.FC<CollectionProps> = function ({ collection }) {
 	return (
 		<div>
 			<div className={styles.dataViewer}>
-				<div className={styles.side}>
-					<div className={styles.title}>Nodes</div>
-					{nodes.map((node) => {
-						return (
-							<NodeOrRelationshipBlock
-								node={node}
-								onClick={() => {
-									setActiveNodes([node]);
-								}}
-							/>
-						);
-					})}
-
-					<div className={styles.title}>Relationships</div>
-					{relationships.map((relationship) => {
-						return (
-							<NodeOrRelationshipBlock
-								node={relationship}
-								onClick={() => {
-									setActiveNodes([relationship]);
-								}}
-							/>
-						);
-					})}
-				</div>
-
 				<div className={styles.entities}>
 					{activeNodes.length > 0 && (
 						<div className={styles.contentHeader}>
-							<NodeOrRelationshipBlock node={activeNodes[0]} />
+							<Button
+								key={activeNodes[0].id}
+								className={styles.classRow}
+								minimal
+								icon={activeNodes[0].isRelationship ? "arrow-top-right" : "circle"}
+							>
+								{activeNodes[0].key}
+							</Button>
 						</div>
 					)}
 					{getActiveEntities().map((entity) => {
-						const relationshipRendering = (
-							// <EntityRelationships
-							//   relationships={}
-							// />
-							<div></div>
-						);
+						const relationshipRendering = <div></div>;
 						return (
 							<EntityCard
 								node={activeNodes[0]}
