@@ -21,7 +21,6 @@ export const uploadData = async (file: File, fileName: string, version: string) 
 			throw uploadError;
 		}
 	}
-	console.log("done uploading");
 
 	return publicURL;
 };

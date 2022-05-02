@@ -46,6 +46,12 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 
 			const nextVer = getNextVersion(collection.version || "");
 
+			await uploadDataToSupabase(
+				newUpload.file,
+				`${namespaceSlug}/${collectionSlug}` + ".csv",
+				nextVer
+			);
+
 			await fetch("/api/collection", {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
@@ -57,12 +63,6 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 					schemaMapping: newUpload.mapping,
 				}),
 			});
-
-			await uploadDataToSupabase(
-				newUpload.file,
-				`${namespaceSlug}/${collectionSlug}` + ".csv",
-				nextVer
-			);
 
 			setNewUploadInProgress(false);
 			_setIsUploading(false);
