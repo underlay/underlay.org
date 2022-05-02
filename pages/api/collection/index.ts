@@ -61,8 +61,9 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 				version: req.body.version,
 				publishedAt: req.body.publishedAt,
 				publishedDataSize: req.body.publishedDataSize,
+				schemaMapping: req.body.schemaMapping,
 			},
 		});
 
-		return res.status(200);
+		return res.status(200).json({ ok: true });
 	});

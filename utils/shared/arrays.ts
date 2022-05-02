@@ -14,3 +14,9 @@ export function pushToArrayIfUnseen<T>(arr: T[], newEl: T) {
 
 	return [...arr, newEl];
 }
+
+export function zip<T, U>(as: T[], bs: U[]) {
+	return as.map((a, i) => {
+		return [a, bs[i]];
+	});
+}

@@ -63,10 +63,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 								intent={newExportInProgress ? Intent.WARNING : undefined}
 							/>
 						</div>
-						<ExportTable
-							exports={collection.exports}
-							setNewExportOpen={setNewExportOpen}
-						/>
+						<ExportTable collection={collection} setNewExportOpen={setNewExportOpen} />
 						<Dialog
 							style={{ width: "80vw" }}
 							isOpen={newExportOpen}

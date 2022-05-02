@@ -69,3 +69,5 @@ export type Attribute = {
 	isUnique: boolean;
 };
 export type Schema = Class[];
+
+export type Mapping = { class: string; attr: string; csvHeader: string }[];
