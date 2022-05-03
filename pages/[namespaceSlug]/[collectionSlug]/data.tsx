@@ -10,6 +10,7 @@ import { uploadData as uploadDataToSupabase } from "utils/client/data";
 import styles from "./data.module.scss";
 import DataViewer from "components/DataViewer/DataViewer";
 import { getNextVersion } from "utils/shared/version";
+import { convertToLocaleDateString } from "utils/shared/dates";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -130,9 +131,16 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 				content={
 					<div>
 						<div className={styles.dataHeader}>
-							{collection.version && (
-								<div>Version {collection.version} · Published Mar 5, 2020</div>
+							{collection.version && !collection.publishedAt && (
+								<div>Version {collection.version}</div>
 							)}
+							{collection.version && collection.publishedAt && (
+								<div>
+									Version {collection.version} · Published{" "}
+									{convertToLocaleDateString(collection.publishedAt)}
+								</div>
+							)}
+
 							{!collection.version && <div />}
 							<div>
 								<Button
