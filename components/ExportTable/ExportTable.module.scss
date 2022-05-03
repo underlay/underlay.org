@@ -20,3 +20,12 @@
 		padding: 10px 0px;
 	}
 }
+
+.downloadIcon {
+	opacity: 0.5;
+
+	&:hover {
+		opacity: 1;
+		cursor: pointer;
+	}
+}

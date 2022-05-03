@@ -1,6 +1,6 @@
 import { supabase } from "utils/client/supabase";
 import { parse } from "csv-parse";
-import type { Entity, Class } from "utils/shared/types";
+import type { Entity, Class, Mapping } from "utils/shared/types";
 
 export const uploadData = async (file: File, fileName: string, version: string) => {
 	fileName = fileName.replace(".csv", version + ".csv");
@@ -77,7 +77,8 @@ export const getData = async (
 	fileName: string,
 	version: string,
 	nodes: Class[] = [],
-	relationships: Class[] = []
+	relationships: Class[] = [],
+	mapping: Mapping
 ): Promise<{ entities: { [key: string]: Entity[] } }> => {
 	fileName = fileName.replace(/.csv$/, version + ".csv");
 
@@ -119,8 +120,10 @@ export const getData = async (
 
 			const nodeMappings = nodes.map((n) => {
 				const attrIndexMapping: [string, number][] = n.attributes.map((a) => {
+					const matchMapping = mapping.find((m) => m.class === n.key && m.attr === a.key);
+
 					const attrIndex = headerRow.findIndex(
-						(colName) => colName === `${n.key}_${a.key}`
+						(colName) => colName === matchMapping?.csvHeader
 					);
 					return [a.key, attrIndex];
 				});
@@ -149,7 +152,10 @@ export const getData = async (
 					(a) => a.key !== "source" && a.key !== "target"
 				);
 				const attrIndexMapping: [string, number][] = otherAttrs.map((a) => {
-					const attrIndex = headerRow.findIndex((colName) => colName === `${a.key}`);
+					const matchMapping = mapping.find((m) => m.class === r.key && m.attr === a.key);
+					const attrIndex = headerRow.findIndex(
+						(colName) => colName === matchMapping?.csvHeader
+					);
 					return [a.key, attrIndex];
 				});
 
@@ -209,7 +215,10 @@ export const getData = async (
 	});
 };
 
-export const getCSVHeaders = async (fileName: string, version: string) => {
+export const getCSVHeadersFromSupabase = async (
+	fileName: string,
+	version: string
+): Promise<string[]> => {
 	fileName = fileName.replace(/.csv$/, version + ".csv");
 
 	const { data, error } = await supabase.storage.from("data").download(fileName);
@@ -219,6 +228,10 @@ export const getCSVHeaders = async (fileName: string, version: string) => {
 	}
 	const text = await data.text();
 
+	return getCSVHeaders(text);
+};
+
+export const getCSVHeaders = async (text: string): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
 		const parser = parse();
 		parser.on("readable", function () {

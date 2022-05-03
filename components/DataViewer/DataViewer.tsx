@@ -3,7 +3,7 @@ import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
 
 import styles from "./DataViewer.module.scss";
-import type { Class } from "utils/shared/types";
+import type { Class, Mapping } from "utils/shared/types";
 import { mockEntities } from "utils/client/mockData";
 import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
@@ -45,9 +45,6 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	const initNodes = allNodes.filter((n) => !n.isRelationship);
 	const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
 
-	// const [nodes] = useState<Class[]>(initNodes);
-	// const [relationships] = useState<Class[]>(initRelationships);
-
 	const [entities, setEntities] = useState(mockEntities);
 
 	useEffect(() => {
@@ -57,7 +54,8 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 					namespaceSlug + "/" + collectionSlug + ".csv",
 					collection.version || "0.0.1",
 					initNodes,
-					initRelationships
+					initRelationships,
+					collection.schemaMapping as Mapping
 				).then(({ entities }) => {
 					setEntities(entities);
 					dataFetched = true;
@@ -75,32 +73,30 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	}
 
 	return (
-		<div>
-			<div className={styles.dataViewer}>
-				<div className={styles.entities}>
-					{activeNodes.length > 0 && (
-						<div className={styles.contentHeader}>
-							<Button
-								key={activeNodes[0].id}
-								className={styles.classRow}
-								minimal
-								icon={activeNodes[0].isRelationship ? "arrow-top-right" : "circle"}
-							>
-								{activeNodes[0].key}
-							</Button>
-						</div>
-					)}
-					{getActiveEntities().map((entity) => {
-						const relationshipRendering = <div></div>;
-						return (
-							<EntityCard
-								node={activeNodes[0]}
-								entity={entity}
-								relationshipRendering={relationshipRendering}
-							/>
-						);
-					})}
-				</div>
+		<div className={styles.dataViewer}>
+			<div className={styles.entities}>
+				{activeNodes.length > 0 && (
+					<div className={styles.contentHeader}>
+						<Button
+							key={activeNodes[0].id}
+							className={styles.classRow}
+							minimal
+							icon={activeNodes[0].isRelationship ? "arrow-top-right" : "circle"}
+						>
+							{activeNodes[0].key}
+						</Button>
+					</div>
+				)}
+				{getActiveEntities().map((entity) => {
+					const relationshipRendering = <div></div>;
+					return (
+						<EntityCard
+							node={activeNodes[0]}
+							entity={entity}
+							relationshipRendering={relationshipRendering}
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);

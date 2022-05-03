@@ -1,5 +1,5 @@
-export function getNextVersion(ver: string) {
-	if (ver === "") {
+export function getNextVersion(ver: string | undefined | null) {
+	if (!ver || ver === "") {
 		return "0.0.1";
 	}
 

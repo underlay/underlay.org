@@ -8,8 +8,8 @@ export { default as CollectionOverviewSide } from "./CollectionOverview/Collecti
 export { default as CollectionPreview } from "./CollectionPreview/CollectionPreview";
 export { default as CommunityList } from "./CommunityList/CommunityList";
 export { default as CommunityOverview } from "./CommunityOverview/CommunityOverview";
-export { default as DataExport } from "./DataExport/DataExport";
 export { default as DataUpload } from "./DataUpload/DataUpload";
+export { default as DataMapping } from "./DataMapping/DataMapping";
 export { default as DataUploadDialog } from "./DataUploadDialog/DataUploadDialog";
 export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as EntityCard } from "./EntityCard/EntityCard";
