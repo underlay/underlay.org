@@ -97,6 +97,7 @@ export const getCollectionData = async (namespaceSlug: string, collectionSlug: s
 				},
 				include: {
 					exports: true,
+					schemas: { orderBy: { createdAt: "desc" } },
 				},
 			},
 		},

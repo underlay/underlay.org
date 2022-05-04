@@ -77,8 +77,8 @@ model Collection {
   isPublic          Boolean
   readme            String?
   labels            Json?
-  schema            Json?
-  schemaMapping     Json?
+  schema            Json? // To remove
+  schemaMapping     Json? // To remove
   version           String?
   publishedAt       DateTime?
   publishedDataSize BigInt?
@@ -88,6 +88,7 @@ model Collection {
   collaborators Collaborator[]
   exports       Export[]
   schemas       Schema[]
+  versions      Version[]
   @@map(name: "collections")
 }
 
@@ -124,10 +125,24 @@ model Export {
 model Schema {
   id           String     @id @default(uuid())
   version      String
+  content      Json
   collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId String     @map(name: "collection_id")
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
+  @@unique([collectionId, version], name: "collectionid_version")
   @@map(name: "schemas")
+}
+
+model Version {
+  id           String     @id @default(uuid())
+  number       String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @map(name: "collection_id")
+  createdAt    DateTime   @default(now()) @map(name: "created_at")
+  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@unique([collectionId, number], name: "collectionid_number")
+  @@map(name: "versions")
 }

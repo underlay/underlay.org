@@ -7,15 +7,23 @@ import { ThreeColumnFrame } from "components";
 import SchemaClass from "./SchemaClass";
 import styles from "./SchemaEditor.module.scss";
 import type { Attribute, Schema } from "utils/shared/types";
+import { CollectionProps } from "utils/server/collections";
 
 type Props = {
-	collectionId: string;
-	schema: Schema | null;
-	version: string | null;
+	collection: CollectionProps;
+	setCollection: any;
+	setIsEditing: any;
+	// collectionId: string;
+	// schema: Schema | null;
+	// version: string | null;
 };
 
-const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSchema, version }) {
-	const [schema, setSchema] = useState(initSchema || []);
+const SchemaEditor: React.FC<Props> = function ({
+	collection,
+	setCollection /* collectionId, schema: initSchema, version */,
+	setIsEditing,
+}) {
+	const [schema, setSchema] = useState(collection.schemas[0] || []);
 	const [canSave, setCanSave] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const addNode = (addAtEnd: boolean) => {
@@ -96,19 +104,24 @@ const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSche
 	};
 	const handleSave = async () => {
 		setIsSaving(true);
-		await fetch("/api/schema", {
+		const response = await fetch("/api/schema", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				collectionId: collectionId,
+				collectionId: collection.id,
 				schema: schema,
 			}),
+		});
+		const json = await response.json();
+		setCollection({
+			...collection,
+			schemas: [json.data, ...collection.schemas],
 		});
 		setIsSaving(false);
 		setCanSave(false);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
-		if (version) {
+		if (collection.version) {
 			return null;
 		}
 		const nodeFunc = () => {
@@ -143,6 +156,13 @@ const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSche
 						text={canSave ? "Save Schema" : "Schema Saved"}
 						loading={isSaving}
 						onClick={handleSave}
+					/>
+					<Button
+						className={styles.sticky}
+						text={"Cancel"}
+						onClick={() => {
+							setIsEditing(false);
+						}}
 					/>
 					{buttonRow(false)}
 
