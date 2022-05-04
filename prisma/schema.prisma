@@ -87,7 +87,7 @@ model Collection {
 
   collaborators Collaborator[]
   exports       Export[]
-
+  schemas       Schema[]
   @@map(name: "collections")
 }
 
@@ -119,4 +119,15 @@ model Export {
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
   @@map(name: "exports")
+}
+
+model Schema {
+  id           String     @id @default(uuid())
+  version      String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @map(name: "collection_id")
+  createdAt    DateTime   @default(now()) @map(name: "created_at")
+  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@map(name: "schemas")
 }

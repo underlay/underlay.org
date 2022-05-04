@@ -51,7 +51,7 @@ const SchemaAttribute: React.FC<Props> = function ({
 			{isFixed && (
 				<HTMLSelect
 					className={styles.select}
-					value={undefined}
+					value={attribute.type}
 					onChange={handleTypeSelectUpdate}
 				>
 					<option value={""}>Select a Node...</option>
