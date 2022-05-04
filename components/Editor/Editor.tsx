@@ -9,7 +9,7 @@ import type { Entity, Node } from "utils/shared/types";
 import { mockEntities } from "utils/client/mockData";
 import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
-import { EntityCard, EntityRelationships, RelationshipCard, SchemaEditor2 } from "components";
+import { EntityCard, EntityRelationships, RelationshipCard } from "components";
 import { NodeOrRelationshipBlock } from "./NodeOrRelationshipBlock";
 import { pushToArrayIfUnseen, updateArrayWithNewElement } from "utils/shared/arrays";
 
@@ -193,7 +193,7 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 				</div>
 
 				<div className={styles.columns}>
-					{mode === "schema" && (
+					{/* {mode === "schema" && (
 						<SchemaEditor2
 							node={nodes[activeNodeIndexes[0]]}
 							onCancel={() => {
@@ -205,7 +205,7 @@ const Editor: React.FC<CollectionProps> = function ({ collection }) {
 								);
 							}}
 						/>
-					)}
+					)} */}
 
 					{mode === "entities" &&
 						getActiveEntities().map((args) => {
