@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
-import { CollectionHeader, SchemaEditor } from "components";
+import { CollectionHeader, SchemaEditor, SchemaViewer } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
-// import { Schema } from "utils/shared/types";
 
 const CollectionSchema: React.FC<CollectionProps> = function ({ collection: initCollection }) {
-	const [collection, setCollection] = useState(initCollection);
-	const [isEditing, setIsEditing] = useState(!!collection.version);
+	const [collection, setCollection] = useState<CollectionProps["collection"]>(initCollection);
+	const [isEditing, setIsEditing] = useState<boolean>(!collection.version);
+
 	return (
 		<div>
 			<CollectionHeader mode="schema" collection={collection} />
@@ -17,15 +17,7 @@ const CollectionSchema: React.FC<CollectionProps> = function ({ collection: init
 					setCollection={setCollection}
 				/>
 			)}
-			{!isEditing && (
-				<button
-					onClick={() => {
-						setIsEditing(true);
-					}}
-				>
-					Edit
-				</button>
-			)}
+			{!isEditing && <SchemaViewer setIsEditing={setIsEditing} collection={collection} />}
 		</div>
 	);
 };

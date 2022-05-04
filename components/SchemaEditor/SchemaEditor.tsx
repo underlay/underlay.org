@@ -1,31 +1,24 @@
-import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import React, { useState } from "react";
+import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import { v4 as uuidv4 } from "uuid";
 
 import { ThreeColumnFrame } from "components";
-
-import SchemaClass from "./SchemaClass";
-import styles from "./SchemaEditor.module.scss";
 import type { Attribute, Schema } from "utils/shared/types";
 import { CollectionProps } from "utils/server/collections";
 
+import SchemaClassEditor from "./SchemaClassEditor";
+import styles from "./SchemaEditor.module.scss";
+
 type Props = {
-	collection: CollectionProps;
+	collection: CollectionProps["collection"];
 	setCollection: any;
 	setIsEditing: any;
-	// collectionId: string;
-	// schema: Schema | null;
-	// version: string | null;
 };
 
-const SchemaEditor: React.FC<Props> = function ({
-	collection,
-	setCollection /* collectionId, schema: initSchema, version */,
-	setIsEditing,
-}) {
-	const [schema, setSchema] = useState(collection.schemas[0] || []);
-	const [canSave, setCanSave] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
+const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, setIsEditing }) {
+	const [schema, setSchema] = useState<Schema>(collection.schemas[0]?.content as Schema);
+	const [canSave, setCanSave] = useState<boolean>(false);
+	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const addNode = (addAtEnd: boolean) => {
 		setCanSave(true);
 		const defaultNode = {
@@ -115,15 +108,14 @@ const SchemaEditor: React.FC<Props> = function ({
 		const json = await response.json();
 		setCollection({
 			...collection,
-			schemas: [json.data, ...collection.schemas],
+			schemas: [json, ...collection.schemas],
 		});
+		console.log(json);
 		setIsSaving(false);
 		setCanSave(false);
+		setIsEditing(false);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
-		if (collection.version) {
-			return null;
-		}
 		const nodeFunc = () => {
 			addNode(addAtEnd);
 		};
@@ -169,7 +161,7 @@ const SchemaEditor: React.FC<Props> = function ({
 					{schema.map((schemaClass) => {
 						return (
 							<div key={schemaClass.id} className={styles.classWrapper}>
-								<SchemaClass
+								<SchemaClassEditor
 									schemaClass={schemaClass}
 									schemaNodes={schemaNodes}
 									updateClass={updateClass}

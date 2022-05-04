@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@blueprintjs/core": "^4.0.0-beta.10",
 		"@blueprintjs/icons": "^4.0.0-beta.6",
+		"@blueprintjs/popover2": "^1.1.4",
 		"@blueprintjs/select": "^4.0.0-beta.10",
 		"@hapi/iron": "^6.0.0",
 		"@next/bundle-analyzer": "^12.0.7",

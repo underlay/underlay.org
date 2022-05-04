@@ -8,8 +8,9 @@ export { default as CollectionOverviewSide } from "./CollectionOverview/Collecti
 export { default as CollectionPreview } from "./CollectionPreview/CollectionPreview";
 export { default as CommunityList } from "./CommunityList/CommunityList";
 export { default as CommunityOverview } from "./CommunityOverview/CommunityOverview";
-export { default as DataUpload } from "./DataUpload/DataUpload";
+export { default as DataHeader } from "./DataHeader/DataHeader";
 export { default as DataMapping } from "./DataMapping/DataMapping";
+export { default as DataUpload } from "./DataUpload/DataUpload";
 export { default as DataUploadDialog } from "./DataUploadDialog/DataUploadDialog";
 export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as EntityCard } from "./EntityCard/EntityCard";
@@ -23,7 +24,7 @@ export { default as Landing } from "./Landing/Landing";
 export { default as ProfileHeader } from "./ProfileHeader/ProfileHeader";
 export { default as RelationshipCard } from "./RelationshipCard/RelationshipCard";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";
-export { default as SchemaEditor2 } from "./SchemaEditor2/SchemaEditor2";
+export { default as SchemaViewer } from "./SchemaViewer/SchemaViewer";
 export { default as ScopeNav } from "./ScopeNav/ScopeNav";
 export { default as Section } from "./Section/Section";
 export { default as SideNav } from "./SideNav/SideNav";
@@ -31,4 +32,3 @@ export { default as ThreeColumnFrame } from "./ThreeColumnFrame/ThreeColumnFrame
 export { default as UserList } from "./UserList/UserList";
 export { default as UserOverview } from "./UserOverview/UserOverview";
 export { default as UserPreview } from "./UserPreview/UserPreview";
-export { default as DataHeader } from "./DataHeader/DataHeader";
