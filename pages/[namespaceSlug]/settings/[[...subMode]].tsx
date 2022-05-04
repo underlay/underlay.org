@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { GetServerSideProps } from "next";
+import { Button, FormGroup, InputGroup } from "@blueprintjs/core";
 
-import { ProfileHeader, ThreeColumnFrame, Section, SideNav } from "components";
+import {
+	ProfileHeader,
+	ThreeColumnFrame,
+	Section,
+	SideNav,
+	AvatarUpload,
+	Avatar,
+} from "components";
 import { useLocationContext } from "utils/client/hooks";
 import { ProfilePageParams } from "utils/shared/types";
 import { getLoginId } from "utils/server/auth/user";
@@ -15,6 +23,8 @@ type Props = {
 };
 
 const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
+	const [name, setName] = useState(user.name);
+	const [avatar, setAvatar] = useState<string | undefined>(user.avatar);
 	const { namespaceSlug = "", subMode } = useLocationContext().query;
 	const activeSubMode = subMode && subMode[0];
 	return (
@@ -56,11 +66,43 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 				content={
 					<React.Fragment>
 						{!activeSubMode && (
-							<React.Fragment>
-								<Section title="Public Profile">Details here</Section>
-							</React.Fragment>
+							<Section title="Public Profile">
+								<FormGroup label="Name" labelFor="name-input">
+									<InputGroup
+										id="name-input"
+										required={true}
+										value={name}
+										onChange={(evt) => setName(evt.target.value)}
+									/>
+								</FormGroup>
+								<FormGroup label="Avatar" labelFor="avatar-input">
+									<div style={{ display: "flex", alignItems: "center" }}>
+										<div style={{ marginRight: "10px" }}>
+											<Avatar src={avatar} name={name} size={50} />
+										</div>
+										<AvatarUpload
+											onComplete={(val: string) => {
+												setAvatar(val);
+											}}
+										/>
+										{avatar && (
+											<Button
+												icon="trash"
+												minimal
+												onClick={() => {
+													setAvatar(undefined);
+												}}
+											/>
+										)}
+									</div>
+								</FormGroup>
+							</Section>
 						)}
-						{activeSubMode === "account" && "Account"}
+						{activeSubMode === "account" && (
+							<Section title="User Account">
+								<div>Delete Account</div>
+							</Section>
+						)}
 					</React.Fragment>
 				}
 			/>
