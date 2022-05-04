@@ -61,14 +61,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 		https://arunoda.me/blog/ssr-and-server-only-modules
 	*/
 	if (typeof window === "undefined") {
-		// const { getLoginId, findUserById } = require("../utils/server/auth/user.ts");
+		const { getLoginId, findUserById } = require("../utils/server/auth/user.ts");
 		const appProps = await App.getInitialProps(appContext);
 
-		// const loginId = await getLoginId(appContext.ctx.req);
-		// const loginData = await findUserById(loginId);
+		const loginId = await getLoginId(appContext.ctx.req);
+		const loginData = await findUserById(loginId);
 		return {
 			...appProps,
-			loginData: null,
+			loginData: loginData,
 			vercelEnv: process.env.VERCEL_ENV,
 			supabaseUrl: process.env.SUPABASE_URL,
 			supabaseKey: process.env.SUPABASE_PUBLIC_KEY,
