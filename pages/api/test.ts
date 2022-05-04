@@ -7,18 +7,18 @@ import crypto from "crypto";
 export default nextConnect()
 	// .use(auth)
 	.get(async (req, res) => {
-		const namespace = await prisma.namespace.create({
-			data: {
-				slug: "test",
-			},
-		});
-		const user = await prisma.user.create({
-			data: {
-				namespaceId: namespace.id,
-				email: "test@test.com",
-				name: "Alex Test",
-			},
-		});
+		// const namespace = await prisma.namespace.create({
+		// 	data: {
+		// 		slug: "test",
+		// 	},
+		// });
+		// const user = await prisma.user.create({
+		// 	data: {
+		// 		namespaceId: namespace.id,
+		// 		email: "test@test.com",
+		// 		name: "Alex Test",
+		// 	},
+		// });
 
 		// const salt = crypto.randomBytes(16).toString("hex");
 		// const hash = crypto.pbkdf2Sync("password", salt, 1000, 64, "sha512").toString("hex");
@@ -525,5 +525,5 @@ export default nextConnect()
 		// );
 
 		//@ts-ignore
-		return res.status(200).json({ ok: user });
+		return res.status(200).json({ ok: true });
 	});
