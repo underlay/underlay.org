@@ -30,12 +30,13 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 		}
 
 		// TODO: Make sure loginId has permissions for associated namespaceId
-		const { namespaceId, name, description, isPublic } = req.body;
+		const { namespaceId, name, description, isPublic, readme } = req.body;
 		const newSlug = slugifyString(name);
 		const newCollection = await prisma.collection.create({
 			data: {
 				slug: newSlug,
 				description,
+				readme,
 				isPublic,
 				namespaceId,
 			},

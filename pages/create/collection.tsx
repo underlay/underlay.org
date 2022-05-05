@@ -43,7 +43,7 @@ const CreateCollection: React.FC<Props> = ({ validNamespaces }) => {
 		const response = await fetch("/api/collection", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ namespaceId, name, description, isPublic }),
+			body: JSON.stringify({ namespaceId, name, description, isPublic, readme: description }),
 		});
 		const newCollection = await response.json();
 		if (newCollection) {
