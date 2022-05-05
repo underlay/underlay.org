@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Intent, ProgressBar } from "@blueprintjs/core";
+import { Button, Icon, Intent, ProgressBar } from "@blueprintjs/core";
 import classNames from "classnames";
 
 import styles from "./DataUploadDialog.module.scss";
@@ -50,10 +50,11 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 	return (
 		<div className={styles.create}>
 			<div className={styles.sectionHeader}>
-				<div className={`${styles.number} ${currentStep === 1 ? styles.currentStep : ""}`}>
+				<div className={`${styles.number} ${currentStep > 1 ? styles.completedStep : ""}`}>
 					1
 				</div>
 				<div className={styles.title}>Select File to Upload</div>
+				{currentStep > 1 && <Icon className={styles.icon} icon="tick" />}
 			</div>
 			<div className={classNames(styles.sectionContent, styles.sectionOne)}>
 				<DataUpload
@@ -78,10 +79,11 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 				/>
 			</div>
 			<div className={styles.sectionHeader}>
-				<div className={`${styles.number} ${currentStep === 2 ? styles.currentStep : ""}`}>
+				<div className={`${styles.number} ${currentStep > 2 ? styles.completedStep : ""}`}>
 					2
 				</div>
 				<div className={styles.title}>Align Data to Schema</div>
+				{currentStep > 2 && <Icon className={styles.icon} icon="tick" />}
 			</div>
 			<div className={classNames(styles.sectionContent)}>
 				<DataMapping
@@ -105,10 +107,11 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 				/>
 			</div>
 			<div className={styles.sectionHeader}>
-				<div className={`${styles.number} ${currentStep === 3 ? styles.currentStep : ""}`}>
+				<div className={`${styles.number} ${currentStep > 3 ? styles.completedStep : ""}`}>
 					3
 				</div>
 				<div className={styles.title}>Publish New Version</div>
+				{currentStep > 3 && <Icon className={styles.icon} icon="tick" />}
 			</div>
 			<div className={classNames(styles.sectionContent)}>
 				<p>Publish the next version of the dataset.</p>
@@ -119,6 +122,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 					intent={Intent.SUCCESS}
 					text={"Publishing version " + getNextVersion(collection.version!)}
 					onClick={() => {
+						setCurrentStep(4);
 						uploadData().then(() => {
 							setUploadProgress(1);
 						});
