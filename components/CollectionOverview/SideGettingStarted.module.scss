@@ -1,3 +1,5 @@
+@import "pages/variables.scss";
+
 .gettingStarted {
 	.small {
 		font-weight: 600;
@@ -11,9 +13,9 @@
 	&.completed {
 		cursor: default !important;
 		.number {
-			background-color: #adcead;
-			border: 1px solid #6c9574;
-			color: #6c9574;
+			background-color: $completed-step-background-color;
+			border: $completed-step-border;
+			color: $completed-step-color;
 		}
 	}
 	& > span {
