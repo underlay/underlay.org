@@ -1,10 +1,9 @@
 import nextConnect from "next-connect";
 import prisma from "prisma/db";
-import { getLoginId } from "utils/server/auth/user";
-
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import { getLoginId } from "utils/server/auth/user";
 import { getNextSchemaVersion } from "utils/server/schemas";
-import collection from "./collection";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
 	const loginId = await getLoginId(req);
@@ -13,15 +12,6 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	}
 	const { collectionId, schema } = req.body;
 
-	/*
-	We should keep schemas at 0.0.0 until there is some data.
-	We don't want a collection 0.x.0 if there's no data attached to it.
-	A collection is a schema + data pairing, it doesn't make sense for 0.5.0 to not have any data.
-	A collection stays at 0.0.0 until it's first data.
-	Version = null -> No schema or data
-	Version = 0.0.0 -> Schema, no data
-	Version = x.y.z (any one of those non-zero) -> schema, data.
-	*/
 	const newVersionNumber = await getNextSchemaVersion(collectionId);
 	if (!newVersionNumber) {
 		return res.status(500).json({ ok: false });
@@ -42,14 +32,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 			content: schema,
 		},
 	});
-	await prisma.collection.update({
-		where: {
-			id: collectionId,
-		},
-		data: {
-			version: newVersionNumber,
-		},
-	});
+
 	/* TODO: Implementation */
 	/* This is the space where we will migrate data forward to the new schema */
 	/* The result of updating the schema, if there is data, will always be a new */

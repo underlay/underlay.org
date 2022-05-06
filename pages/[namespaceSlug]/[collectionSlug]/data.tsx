@@ -71,132 +71,139 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 		}
 	};
 
-	const schema = collection.schemas[0].content as Class[];
-	const [activeNodes, setActiveNodes] = useState<Class[]>([schema[0]]);
+	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
+	const [activeNodes, setActiveNodes] = useState<Class[]>(schema ? [schema[0]] : []);
 
 	return (
 		<div>
 			<CollectionHeader mode="data" collection={collection} />
-			<ThreeColumnFrame
-				className={styles.frame}
-				navContent={
-					<div className={styles.schema}>
-						<Section title="Nodes">
-							{schema
-								.filter((classElement) => {
-									return !classElement.isRelationship;
-								})
-								.map((classElement) => {
-									return (
-										<Button
-											key={classElement.id}
-											className={styles.classRow}
-											onClick={() => {
-												setActiveNodes([classElement]);
-											}}
-											minimal
-											fill
-											icon={"circle"}
-										>
-											{classElement.key}
-										</Button>
-									);
-								})}
-						</Section>
-						<Section title="Relationships">
-							{schema
-								.filter((classElement) => {
-									return classElement.isRelationship;
-								})
-								.map((classElement) => {
-									return (
-										<Button
-											key={classElement.id}
-											className={styles.classRow}
-											onClick={() => {
-												setActiveNodes([classElement]);
-											}}
-											minimal
-											fill
-											icon={"arrow-top-right"}
-										>
-											{classElement.key}
-										</Button>
-									);
-								})}
-						</Section>
-					</div>
-				}
-				content={
-					<div>
-						<div className={styles.dataHeader}>
-							{collection.version && !collection.publishedAt && (
-								<div>Version {collection.version}</div>
-							)}
-							{collection.version && collection.publishedAt && (
-								<div>
-									Version {collection.version} · Published{" "}
-									{convertToLocaleDateString(collection.publishedAt)}
-								</div>
-							)}
-
-							{!collection.version && <div />}
-							<div>
-								<Button
-									style={{ marginRight: "10px" }}
-									outlined
-									text={newButtonText}
-									onClick={() => {
-										setNewUploadOpen(true);
-									}}
-									intent={newUploadInProgress ? Intent.WARNING : undefined}
-								/>
-								<AnchorButton
-									outlined
-									text={"Export Data"}
-									href={`/${namespaceSlug}/${collectionSlug}/exports`}
-								/>
+			{!schema && <div>No schema yet</div>}
+			{schema && (
+				<React.Fragment>
+					<ThreeColumnFrame
+						className={styles.frame}
+						navContent={
+							<div className={styles.schema}>
+								<Section title="Nodes">
+									{schema
+										.filter((classElement) => {
+											return !classElement.isRelationship;
+										})
+										.map((classElement) => {
+											return (
+												<Button
+													key={classElement.id}
+													className={styles.classRow}
+													onClick={() => {
+														setActiveNodes([classElement]);
+													}}
+													minimal
+													fill
+													icon={"circle"}
+												>
+													{classElement.key}
+												</Button>
+											);
+										})}
+								</Section>
+								<Section title="Relationships">
+									{schema
+										.filter((classElement) => {
+											return classElement.isRelationship;
+										})
+										.map((classElement) => {
+											return (
+												<Button
+													key={classElement.id}
+													className={styles.classRow}
+													onClick={() => {
+														setActiveNodes([classElement]);
+													}}
+													minimal
+													fill
+													icon={"arrow-top-right"}
+												>
+													{classElement.key}
+												</Button>
+											);
+										})}
+								</Section>
 							</div>
-						</div>
-						<div className={styles.dataFrame}>
-							<DataViewer collection={collection} activeNodes={activeNodes} />
+						}
+						content={
+							<div>
+								<div className={styles.dataHeader}>
+									{collection.version && !collection.publishedAt && (
+										<div>Version {collection.version}</div>
+									)}
+									{collection.version && collection.publishedAt && (
+										<div>
+											Version {collection.version} · Published{" "}
+											{convertToLocaleDateString(collection.publishedAt)}
+										</div>
+									)}
 
-							{!collection.version && (
-								<NonIdealState
-									className={styles.emptyState}
-									title="No Data Yet"
-									icon="widget"
-									action={
+									{!collection.version && <div />}
+									<div>
 										<Button
+											style={{ marginRight: "10px" }}
+											outlined
+											text={newButtonText}
 											onClick={() => {
 												setNewUploadOpen(true);
 											}}
-										>
-											Upload Data from File
-										</Button>
-									}
-								/>
-							)}
-						</div>
-					</div>
-				}
-			/>
-			<Dialog
-				style={{ width: "80vw" }}
-				isOpen={newUploadOpen}
-				onClose={() => {
-					setNewUploadOpen(false);
-				}}
-			>
-				<DataUploadDialog
-					newUpload={newUpload}
-					setNewUpload={wrappedSetNewUpload}
-					schema={collection.schemas[0].content as Schema}
-					uploadData={uploadData}
-					isUploading={isUploading}
-					collection={collection}
-				/>
-			</Dialog>
+											intent={
+												newUploadInProgress ? Intent.WARNING : undefined
+											}
+										/>
+										<AnchorButton
+											outlined
+											text={"Export Data"}
+											href={`/${namespaceSlug}/${collectionSlug}/exports`}
+										/>
+									</div>
+								</div>
+								<div className={styles.dataFrame}>
+									<DataViewer collection={collection} activeNodes={activeNodes} />
+
+									{!collection.version && (
+										<NonIdealState
+											className={styles.emptyState}
+											title="No Data Yet"
+											icon="widget"
+											action={
+												<Button
+													onClick={() => {
+														setNewUploadOpen(true);
+													}}
+												>
+													Upload Data from File
+												</Button>
+											}
+										/>
+									)}
+								</div>
+							</div>
+						}
+					/>
+					<Dialog
+						style={{ width: "80vw" }}
+						isOpen={newUploadOpen}
+						onClose={() => {
+							setNewUploadOpen(false);
+						}}
+					>
+						<DataUploadDialog
+							newUpload={newUpload}
+							setNewUpload={wrappedSetNewUpload}
+							schema={collection.schemas[0].content as Schema}
+							uploadData={uploadData}
+							isUploading={isUploading}
+							collection={collection}
+						/>
+					</Dialog>
+				</React.Fragment>
+			)}
 		</div>
 	);
 };
