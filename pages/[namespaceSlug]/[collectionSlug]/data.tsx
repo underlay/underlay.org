@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 
+import { supabase } from "utils/client/supabase";
 import { CollectionHeader, DataUploadDialog, Section, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
 import { AnchorButton, Button, Dialog, Intent, NonIdealState } from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
-import { uploadData as uploadDataToSupabase } from "utils/client/data";
+// import { uploadData as uploadDataToSupabase } from "utils/client/data";
 
 import styles from "./data.module.scss";
 import DataViewer from "components/DataViewer/DataViewer";
-import { getNextVersion } from "utils/shared/version";
+// import { getNextVersion } from "utils/shared/version";
 import { convertToLocaleDateString } from "utils/shared/dates";
+import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -19,7 +21,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	);
 	const [newUploadInProgress, setNewUploadInProgress] = useState(false);
 	const [newUploadOpen, setNewUploadOpen] = useState(false);
-	const [isUploading, _setIsUploading] = useState(false);
+	const [isUploading, setIsUploading] = useState(false);
 
 	let newButtonText = "Upload Data";
 	if (newUploadInProgress) {
@@ -42,31 +44,50 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	const uploadData = async () => {
 		if (newUpload) {
 			// setNewUploadOpen(true);
-			_setIsUploading(true);
+			setIsUploading(true);
 			setNewUploadInProgress(true);
 
-			const nextVer = getNextVersion(collection.version || "");
+			// const nextVer = getNextVersion(collection.version || "");
 
-			await uploadDataToSupabase(
-				newUpload.file,
-				`${namespaceSlug}/${collectionSlug}` + ".csv",
-				nextVer
-			);
+			const fileName = `${generateRandomString(10)}.csv`;
+			const filepath = `${getSlugSuffix(collectionSlug)}/uploads/${fileName}`;
+			const { error } = await supabase.storage.from("data").upload(filepath, newUpload.file);
+			const { publicURL } = await supabase.storage.from("data").getPublicUrl(filepath);
+			if (error) {
+				setIsUploading(false);
+				console.error(error);
+			}
 
-			await fetch("/api/collection", {
-				method: "PATCH",
+			await fetch("/api/input/csv", {
+				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					...collection,
-					version: nextVer,
-					publishedAt: new Date(),
-					publishedDataSize: newUpload.file.size,
-					schemaMapping: newUpload.mapping,
+					collectionId: collection.id,
+					fileUri: publicURL,
+					mapping: newUpload.mapping,
 				}),
 			});
 
+			// await uploadDataToSupabase(
+			// 	newUpload.file,
+			// 	`${namespaceSlug}/${collectionSlug}` + ".csv",
+			// 	nextVer
+			// );
+
+			// await fetch("/api/collection", {
+			// 	method: "PATCH",
+			// 	headers: { "Content-Type": "application/json" },
+			// 	body: JSON.stringify({
+			// 		...collection,
+			// 		version: nextVer,
+			// 		publishedAt: new Date(),
+			// 		publishedDataSize: newUpload.file.size,
+			// 		schemaMapping: newUpload.mapping,
+			// 	}),
+			// });
+
 			setNewUploadInProgress(false);
-			_setIsUploading(false);
+			setIsUploading(false);
 			setNewUploadOpen(false);
 		}
 	};

@@ -85,6 +85,7 @@ model Collection {
   exports       Export[]
   schemas       Schema[]
   versions      Version[]
+  inputs        Input[]
   @@map(name: "collections")
 }
 
@@ -127,6 +128,7 @@ model Schema {
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
+  inputs Input[]
   @@unique([collectionId, version], name: "collectionid_version")
   @@map(name: "schemas")
 }
@@ -141,4 +143,50 @@ model Version {
 
   @@unique([collectionId, number], name: "collectionid_number")
   @@map(name: "versions")
+}
+
+// Every Input has one Input[Source] value
+// The Input[Source] will contain the specific values needed to produce
+// outputData, which is a processed (i.e. with applied ids, etc)
+// schema-compatible json of the data.
+// We reduce the set of pending outputData values to produce the
+// finalized data for the version.
+
+model Input {
+  id            String     @id @default(uuid())
+  reductionType String
+  outputData    Json
+  schema        Schema     @relation(fields: [schemaId], references: [id])
+  schemaId      String     @map(name: "schema_id")
+  collection    Collection @relation(fields: [collectionId], references: [id])
+  collectionId  String     @map(name: "collection_id")
+  sourceCsv     SourceCsv? @relation(fields: [sourceCsvId], references: [id])
+  sourceCsvId   String?    @map(name: "source_csv_id")
+  sourceApi     SourceApi? @relation(fields: [sourceApiId], references: [id])
+  sourceApiId   String?    @map(name: "source_api_id")
+  createdAt     DateTime   @default(now()) @map(name: "created_at")
+  updatedAt     DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@map(name: "inputs")
+}
+
+model SourceCsv {
+  id        String   @id @default(uuid())
+  mapping   Json
+  fileUri   String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+
+  input Input[]
+  @@map(name: "sources_csv")
+}
+
+model SourceApi {
+  id        String   @id @default(uuid())
+  payload   Json
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+
+  input Input[]
+  @@map(name: "sources_api")
 }

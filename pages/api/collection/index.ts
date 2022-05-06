@@ -48,24 +48,24 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 			include: { namespace: true },
 		});
 		return res.status(200).json(populatedCollection);
-	})
-	.patch(async (req, res) => {
-		const loginId = await getLoginId(req);
-		if (!loginId) {
-			return res.status(403).json({ ok: false });
-		}
-
-		await prisma.collection.update({
-			where: {
-				id: req.body.id,
-			},
-			data: {
-				version: req.body.version,
-				publishedAt: req.body.publishedAt,
-				publishedDataSize: req.body.publishedDataSize,
-				schemaMapping: req.body.schemaMapping,
-			},
-		});
-
-		return res.status(200).json({ ok: true });
 	});
+// .patch(async (req, res) => {
+// 	const loginId = await getLoginId(req);
+// 	if (!loginId) {
+// 		return res.status(403).json({ ok: false });
+// 	}
+
+// 	await prisma.collection.update({
+// 		where: {
+// 			id: req.body.id,
+// 		},
+// 		data: {
+// 			version: req.body.version,
+// 			publishedAt: req.body.publishedAt,
+// 			publishedDataSize: req.body.publishedDataSize,
+// 			schemaMapping: req.body.schemaMapping,
+// 		},
+// 	});
+
+// 	return res.status(200).json({ ok: true });
+// });
