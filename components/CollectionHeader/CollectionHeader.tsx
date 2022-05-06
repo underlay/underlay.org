@@ -9,7 +9,7 @@ import { collectionNavItems } from "utils/shared/navs";
 
 import styles from "./CollectionHeader.module.scss";
 import Head from "next/head";
-import { capitalize } from "utils/shared/strings";
+import { capitalize, getSlugPrefix } from "utils/shared/strings";
 
 import { CollectionProps } from "utils/server/collections";
 
@@ -25,7 +25,7 @@ const CollectionHeader: React.FC<Props> = function ({ mode, collection }) {
 				<title>
 					{capitalize(mode)}
 					{mode ? " · " : ""}
-					{namespaceSlug}/{collectionSlug} · Underlay
+					{namespaceSlug}/{getSlugPrefix(collectionSlug)} · Underlay
 				</title>
 			</Head>
 			<div className={styles.scopeHeader}>
@@ -35,7 +35,9 @@ const CollectionHeader: React.FC<Props> = function ({ mode, collection }) {
 							{namespaceSlug}
 						</a>
 						<span>/</span>
-						<a href={buildUrl({ namespaceSlug, collectionSlug })}>{collectionSlug}</a>
+						<a href={buildUrl({ namespaceSlug, collectionSlug })}>
+							{getSlugPrefix(collectionSlug)}
+						</a>
 
 						{!isPublic && (
 							<Tag className={styles.privateTag} minimal large>
