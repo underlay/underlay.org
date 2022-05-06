@@ -16,7 +16,7 @@ type Props = {
 };
 
 const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, setIsEditing }) {
-	const [schema, setSchema] = useState<Schema>(collection.schemas[0]?.content as Schema);
+	const [schema, setSchema] = useState<Schema>((collection.schemas[0]?.content as Schema) || []);
 	const [canSave, setCanSave] = useState<boolean>(false);
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const addNode = (addAtEnd: boolean) => {
@@ -108,7 +108,7 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 		const json = await response.json();
 		setCollection({
 			...collection,
-			schemas: [json, ...collection.schemas],
+			schemas: json.version === "0.0.0" ? [json] : [json, ...collection.schemas],
 		});
 		console.log(json);
 		setIsSaving(false);

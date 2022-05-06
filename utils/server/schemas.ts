@@ -16,6 +16,9 @@ export const getNextSchemaVersion = async (collectionId: string) => {
 	if (!collection.version) {
 		return "0.0.0";
 	}
+	if (collection.version === "0.0.0") {
+		return "0.0.0";
+	}
 	const [major, minor] = collection.version.split(".");
 	return `${major}.${Number(minor) + 1}.0`;
 };
