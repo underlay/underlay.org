@@ -41,7 +41,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
-	const allNodes: Class[] = collection.schema as any;
+	const allNodes: Class[] = collection.schemas[0].content;
 	const initNodes = allNodes.filter((n) => !n.isRelationship);
 	const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
 

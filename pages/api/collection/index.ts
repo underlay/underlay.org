@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import prisma from "prisma/db";
 
-import { slugifyString } from "utils/shared/strings";
+import { generateRandomString, slugifyString } from "utils/shared/strings";
 import { getLoginId } from "utils/server/auth/user";
 
 export default nextConnect<NextApiRequest, NextApiResponse>()
@@ -31,10 +31,12 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 
 		// TODO: Make sure loginId has permissions for associated namespaceId
 		const { namespaceId, name, description, isPublic } = req.body;
-		const newSlug = slugifyString(name);
+		const newSlugPrefix = slugifyString(name);
+		const newSlugSuffix = generateRandomString(10);
 		const newCollection = await prisma.collection.create({
 			data: {
-				slug: newSlug,
+				slugPrefix: newSlugPrefix,
+				slugSuffix: newSlugSuffix,
 				description,
 				isPublic,
 				namespaceId,

@@ -1,4 +1,5 @@
 import prisma from "prisma/db";
+import { getSlugSuffix } from "utils/shared/strings";
 
 export const getNamespaceData = async (namespaceSlug: string) => {
 	const namespaceData = await prisma.namespace.findUnique({
@@ -87,21 +88,17 @@ export const getUserData = async ({ slug, includeCollections }: UserDataRequest)
 	});
 };
 
-export const getCollectionData = async (namespaceSlug: string, collectionSlug: string) => {
-	const profileData = await prisma.namespace.findUnique({
-		where: { slug: namespaceSlug },
+export const getCollectionData = async (collectionSlug: string) => {
+	const collectionData = await prisma.collection.findUnique({
+		where: {
+			slugSuffix: getSlugSuffix(collectionSlug),
+		},
 		include: {
-			collections: {
-				where: {
-					slug: collectionSlug,
-				},
-				include: {
-					exports: true,
-					schemas: { orderBy: { createdAt: "desc" } },
-					versions: { orderBy: { createdAt: "desc" } },
-				},
-			},
+			namespace: true,
+			exports: true,
+			schemas: { orderBy: { createdAt: "desc" } },
+			versions: { orderBy: { createdAt: "desc" } },
 		},
 	});
-	return profileData?.collections[0];
+	return collectionData;
 };

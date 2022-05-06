@@ -69,21 +69,17 @@ model Member {
 }
 
 model Collection {
-  id                String    @id @default(uuid())
-  namespace         Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId       String    @map(name: "namespace_id")
-  slug              String
-  description       String
-  isPublic          Boolean
-  readme            String?
-  labels            Json?
-  schema            Json? // To remove
-  schemaMapping     Json? // To remove
-  version           String?
-  publishedAt       DateTime?
-  publishedDataSize BigInt?
-  createdAt         DateTime  @default(now()) @map(name: "created_at")
-  updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  id          String    @id @default(uuid())
+  namespace   Namespace @relation(fields: [namespaceId], references: [id])
+  namespaceId String    @map(name: "namespace_id")
+  slugSuffix  String    @unique @map(name: "slug_suffix")
+  slugPrefix  String?   @map(name: "slug_prefix")
+  description String?
+  isPublic    Boolean   @default(false) @map(name: "is_public")
+  readme      String?
+  labels      Json?
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
   collaborators Collaborator[]
   exports       Export[]
@@ -110,7 +106,7 @@ model Export {
   name         String
   format       String
   size         String
-  isPublic     Boolean    @default(false)
+  isPublic     Boolean    @default(false) @map(name: "is_public")
   mapping      Json
   collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId String     @map(name: "collection_id")

@@ -13,9 +13,9 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	}
 	const { collectionId, schema } = req.body;
 
-	/* TODO: Decide
-	Perhaps we should keep schemas at 0.0.0 until there is some data.
-	Do you really want 0.x.0 if there's no data attached to it?
+	/*
+	We should keep schemas at 0.0.0 until there is some data.
+	We don't want a collection 0.x.0 if there's no data attached to it.
 	A collection is a schema + data pairing, it doesn't make sense for 0.5.0 to not have any data.
 	A collection stays at 0.0.0 until it's first data.
 	Version = null -> No schema or data

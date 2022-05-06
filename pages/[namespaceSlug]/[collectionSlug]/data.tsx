@@ -41,7 +41,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 	 */
 	const uploadData = async () => {
 		if (newUpload) {
-			setNewUploadOpen(true);
+			// setNewUploadOpen(true);
 			_setIsUploading(true);
 			setNewUploadInProgress(true);
 
@@ -71,8 +71,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 		}
 	};
 
-	const schema = collection.schema as Class[];
-
+	const schema = collection.schemas[0].content as Class[];
 	const [activeNodes, setActiveNodes] = useState<Class[]>([schema[0]]);
 
 	return (
@@ -179,25 +178,25 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 								/>
 							)}
 						</div>
-						<Dialog
-							style={{ width: "80vw" }}
-							isOpen={newUploadOpen}
-							onClose={() => {
-								setNewUploadOpen(false);
-							}}
-						>
-							<DataUploadDialog
-								newUpload={newUpload}
-								setNewUpload={wrappedSetNewUpload}
-								schema={collection.schema as Schema}
-								uploadData={uploadData}
-								isUploading={isUploading}
-								collection={collection}
-							/>
-						</Dialog>
 					</div>
 				}
 			/>
+			<Dialog
+				style={{ width: "80vw" }}
+				isOpen={newUploadOpen}
+				onClose={() => {
+					setNewUploadOpen(false);
+				}}
+			>
+				<DataUploadDialog
+					newUpload={newUpload}
+					setNewUpload={wrappedSetNewUpload}
+					schema={collection.schemas[0].content as Schema}
+					uploadData={uploadData}
+					isUploading={isUploading}
+					collection={collection}
+				/>
+			</Dialog>
 		</div>
 	);
 };

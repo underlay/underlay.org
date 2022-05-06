@@ -34,6 +34,8 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 
 	const [currentStep, setCurrentStep] = useState(1);
 
+	/* TODO: Refactor */
+	/* Refactor in filter, map */
 	const schemaAttributesArr: { class: string; attr: string }[] = [];
 	schema.forEach((c) => {
 		c.attributes.forEach((a) => {
@@ -120,7 +122,8 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 					disabled={currentStep < 3}
 					style={{ marginTop: "10px" }}
 					intent={Intent.SUCCESS}
-					text={"Publishing version " + getNextVersion(collection.version!)}
+					// text={"Publishing version " + getNextVersion(collection.version!)}
+					text={"Complete Upload"}
 					onClick={() => {
 						setCurrentStep(4);
 						uploadData().then(() => {

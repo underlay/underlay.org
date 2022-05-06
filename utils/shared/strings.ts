@@ -43,3 +43,31 @@ export const btoaUniversal = (input: string) => {
 		return Buffer.from(input).toString("base64");
 	}
 };
+
+export const generateRandomString = (length: number) => {
+	const letters = "abcdefghjkmnpqrstuvwxyz";
+	const numbers = "23456789";
+	const characters = letters + numbers;
+	let result = "";
+	for (let i = 0; i < length; i++) {
+		/* Ensure first character in output is a letter, not a number */
+		const lengthToUse = i === 0 ? letters.length : characters.length;
+		result += characters.charAt(Math.floor(Math.random() * lengthToUse));
+	}
+	return result;
+};
+
+export const getSlugPrefix = (slug: string) => {
+	return slug.split("-").slice(0, -1).join("-");
+};
+
+export const getSlugSuffix = (slug: string) => {
+	return slug.split("-").pop();
+};
+
+export const makeSlug = (prefix: string | null, suffix: string) => {
+	if (!prefix) {
+		return suffix;
+	}
+	return `${prefix}-${suffix}`;
+};
