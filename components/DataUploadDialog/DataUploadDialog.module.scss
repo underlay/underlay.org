@@ -1,3 +1,5 @@
+@import "pages/variables.scss";
+
 .create {
 	padding: 25px;
 	.sectionHeader {
@@ -17,6 +19,12 @@
 		align-items: center;
 		justify-content: center;
 		margin-right: 15px;
+
+		&.completedStep {
+			background-color: $completed-step-background-color;
+			border: $completed-step-border;
+			color: $completed-step-color;
+		}
 	}
 	.title {
 		font-weight: 600;
@@ -37,6 +45,6 @@
 	}
 }
 
-.currentStep {
-	background-color: #a0c8ff;
+.icon {
+	margin-left: 10px !important;
 }
