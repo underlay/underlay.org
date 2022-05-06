@@ -1,9 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import prisma from "prisma/db";
+import { v4 as uuidv4 } from "uuid";
 
 import { getLoginId } from "utils/server/auth/user";
 import { processCsv } from "utils/server/csv";
+import { Schema } from "utils/shared/types";
+import { updateDraftVersion } from "utils/server/versions";
+// import { Schema } from "utils/shared/types";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
 	const loginId = await getLoginId(req);
@@ -34,11 +38,14 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 			fileUri,
 		},
 	});
+	const inputObjectId = uuidv4();
 	const schema = collection.schemas[0];
+	const schemaContent = schema.content as Schema;
 	/* source + schema -> outputData */
-	const outputData = await processCsv(schema, fileUri, mapping);
+	const outputData = await processCsv(schemaContent, fileUri, mapping, inputObjectId);
 	const inputObject = await prisma.input.create({
 		data: {
+			id: inputObjectId,
 			reductionType: "merge",
 			outputData: outputData,
 			schemaId: schema.id,
@@ -46,7 +53,8 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 			collectionId: collectionId,
 		},
 	});
-	// await updateDraftVersion(inputObject);
+
+	await updateDraftVersion(inputObject, collection.slugSuffix);
 
 	return res.status(200).json(inputObject);
 });
