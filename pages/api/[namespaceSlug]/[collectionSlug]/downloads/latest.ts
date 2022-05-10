@@ -42,7 +42,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 		}
 		const text = await data.text();
 
-		const records: any = await new Promise((resolve, reject) => {
+		const rows: any = await new Promise((resolve, reject) => {
 			parse(text, (err, records, _info) => {
 				if (err) reject(err);
 
@@ -50,7 +50,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 			});
 		});
 
-		return res.status(200).json({ data: records });
+		return res.status(200).json({ data: rows });
 	}
 	return res.status(404);
 });
