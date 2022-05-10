@@ -3,7 +3,7 @@ import nextConnect from "next-connect";
 import prisma from "prisma/db";
 import { parse } from "csv-parse";
 
-import { getServerSupabase } from "utils/client/supabase";
+import { getServerSupabase } from "utils/server/supabase";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, res) => {
 	// allow unauthenticated requests for now
