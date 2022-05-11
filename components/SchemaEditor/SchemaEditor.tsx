@@ -110,7 +110,6 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 			...collection,
 			schemas: json.version === "0.0" ? [json] : [json, ...collection.schemas],
 		});
-		console.log(json);
 		setIsSaving(false);
 		setCanSave(false);
 		setIsEditing(false);

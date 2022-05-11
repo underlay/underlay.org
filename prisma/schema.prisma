@@ -74,7 +74,7 @@ model Collection {
   namespace   Namespace @relation(fields: [namespaceId], references: [id])
   namespaceId String    @map(name: "namespace_id")
   slugSuffix  String    @unique @map(name: "slug_suffix")
-  slugPrefix  String?   @map(name: "slug_prefix")
+  slugPrefix  String    @map(name: "slug_prefix")
   description String?
   isPublic    Boolean   @default(false) @map(name: "is_public")
   readme      String?
@@ -87,6 +87,7 @@ model Collection {
   schemas       Schema[]
   versions      Version[]
   inputs        Input[]
+  @@unique([slugPrefix, namespaceId], name: "slugprefix_namespaceid")
   @@map(name: "collections")
 }
 

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { buildUrl } from "utils/shared/urls";
+import { makeSlug } from "utils/shared/strings";
 import { useLocationContext } from "utils/client/hooks";
 
 import styles from "./CollectionPreview.module.scss";
@@ -8,7 +9,8 @@ import { Collection } from "components/Icons";
 import { convertToLocaleDateString } from "utils/shared/dates";
 
 type Props = {
-	slug: string;
+	slugPrefix: string;
+	slugSuffix: string;
 	description?: string;
 	isPublic: boolean;
 	version: string;
@@ -16,13 +18,15 @@ type Props = {
 };
 
 const CollectionPreview: React.FC<Props> = function ({
-	slug,
+	slugPrefix,
+	slugSuffix,
 	description,
 	isPublic,
 	version,
 	publishedAt,
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
+	const slug = makeSlug(slugPrefix, slugSuffix);
 	return (
 		<a
 			href={buildUrl({
@@ -33,7 +37,7 @@ const CollectionPreview: React.FC<Props> = function ({
 		>
 			<div className={styles.title}>
 				<Collection size={20} className={styles.icon} />
-				{slug}
+				{slugPrefix}
 			</div>
 			{description && <div className={styles.description}>{description}</div>}
 			<div className={styles.details}>
