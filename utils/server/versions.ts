@@ -1,7 +1,12 @@
-import { Input, prisma } from "@prisma/client";
+import { Input } from "@prisma/client";
+import { Class, Schema } from "utils/shared/types";
 import { getServerSupabase } from "./supabase";
 
-export const updateDraftVersion = async (inputObject: Input, slugSuffix: string) => {
+export const updateDraftVersion = async (
+	inputObject: Input,
+	slugSuffix: string,
+	schema: Schema
+) => {
 	/* Merge it with past values */
 	/* TODO here! */
 	// Load/check current draft.json
@@ -30,6 +35,7 @@ export const updateDraftVersion = async (inputObject: Input, slugSuffix: string)
 	// new unique field on one of the relationships
 
 	/* 
+		If Merge:
 		Iterate over jsons in outputData per Class
 		For each, iterate over all existing Classes of same,
 		Match based on unique fields (or relationship values)
@@ -40,18 +46,158 @@ export const updateDraftVersion = async (inputObject: Input, slugSuffix: string)
 		then merge newer over older
 		append result
 	*/
-
-	/* Or - Naive thing to do is just overwrite draft */
+	/* 
+	
+	/* But wait, we can do this O(2n) rather than O(n^2)
+	Just need to answer how to handle entities that have multiple unique values
+	Do they all have to match?Only one? Only don't merge if none?
+	Maybe it's the difference between 'Unique' and 'identifier'
+	Wait - ya, we're not saying 'unqiue' like in psql where only one value can have it
+	We're using it as in 'unique idenitifer' - more like primary key, which there's only one of
+	We're conflating @unique with @id. None of this code is about enforcing @unqiue, so really,
+	we're just working with @id in these processes.
+	And then relationships we're just merging on source+target unless specified, in which case 
+	we merge on source+target+@id.
+	*/
+	// TODO: Refactor
+	// Simplify by looking for a single @id value, rather than checking all unique fields
 	const supabase = getServerSupabase();
+	const reductionType = inputObject.reductionType as "concat" | "merge" | "overwrite";
+	const reductionFunctions = {
+		merge: mergeJsons,
+		concat: concatJsons,
+		overwrite: overwriteJsons,
+	};
+	const reductionFunc = reductionFunctions[reductionType];
+
+	const { data, error: err } = await supabase.storage
+		.from("data")
+		.download(`${slugSuffix}/versions/draft.json`);
+	const dataString = await data?.text();
+	const oldData = err ? {} : JSON.parse(dataString);
+	const nextData = reductionFunc(schema, oldData, inputObject.outputData);
+
+	/* Connect to supabase and set filepath */
 	const fileName = `draft.json`;
 	const filepath = `${slugSuffix}/versions/${fileName}`;
+
 	/* Overwrite the file on supabase */
 	const { error } = await supabase.storage
 		.from("data")
-		.upload(filepath, JSON.stringify(inputObject.outputData));
+		.upload(filepath, JSON.stringify(nextData), {
+			cacheControl: "0",
+			upsert: true,
+		});
 	if (error) {
 		throw error;
 	}
 	/* return success */
 	return true;
+};
+
+const getAllClassKeys = (oldJson: {}, newJson: {}): string[] => {
+	return [...new Set([...Object.keys(oldJson), ...Object.keys(newJson)])];
+};
+
+export const overwriteJsons = (_schema: Schema, _oldJson: {}, newJson: {}) => {
+	return newJson;
+};
+
+export const concatJsons = (_schema: Schema, oldJson: {}, newJson: {}) => {
+	const nextData = {};
+	const allClassKeys = getAllClassKeys(oldJson, newJson);
+
+	allClassKeys.forEach((outputDataClassKey) => {
+		const newEntities = newJson[outputDataClassKey] || [];
+		const previousEntities = oldJson[outputDataClassKey] || [];
+		nextData[outputDataClassKey] = [...previousEntities, ...newEntities];
+	});
+	return nextData;
+};
+
+export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
+	const nextData = {};
+	const allClassKeys = getAllClassKeys(oldJson, newJson);
+
+	allClassKeys.forEach((outputDataClassKey) => {
+		const newEntities = newJson[outputDataClassKey] || [];
+		const previousEntities = oldJson[outputDataClassKey] || [];
+		const activeSchemaClass = schema.find((schemaClass) => {
+			return schemaClass.key === outputDataClassKey;
+		}) as Class;
+		const uniqueAttrs = activeSchemaClass.attributes
+			.filter((attr) => {
+				return attr.isUnique;
+			})
+			.map((attr) => attr.key);
+		const newProcessed = [];
+		newEntities.forEach((newEntity) => {
+			const newUniques = uniqueAttrs?.map((attr) => {
+				return newEntity[attr];
+			});
+
+			const matchingPrevious = previousEntities.find((oldEntity, index) => {
+				const oldUniques = uniqueAttrs.map((attr) => {
+					return oldEntity[attr];
+				});
+				const uniquesMatch = newUniques.some((val, index) => {
+					return val === oldUniques[index];
+				});
+				const relationshipMatch =
+					activeSchemaClass.isRelationship &&
+					newEntity.source === oldEntity.source &&
+					newEntity.target == oldEntity.target &&
+					(!uniqueAttrs.length || uniquesMatch);
+				/* 3 cases
+				A. No unique attrs, in which case uniquesMatch will equal false
+				B. Unique attrs, but they don't match, in which case uniquesMatch equals false
+				C. Unique attrs, and they match, uniquesMatch equals true
+
+				And what we do:
+				A. merge
+				B. Don't merge
+				C. Merge
+				*/
+				// TODO: fix
+				// To avoid duplicate relationships, they're initially made to ulid's that
+				// get wiped out on merge. So we either need a map of ulid aliases, and to
+				// process relationships after all nodes have been. Or, we need to go through and remove
+				// relationships that don't have a valid source or target ulid. This would solve the
+				// empty relationship value problem as well.
+
+				if (uniquesMatch || relationshipMatch) {
+					previousEntities.splice(index, 1);
+					return true;
+				}
+				return false;
+			});
+
+			if (!matchingPrevious) {
+				newProcessed.push(newEntity);
+			} else {
+				// TODO: Fix
+				// Don't append prov in the value is unchanged...
+				newProcessed.push({
+					...matchingPrevious,
+					...newEntity,
+					_ulid: matchingPrevious._ulid,
+					_ulprov: `${matchingPrevious._ulprov},${newEntity._ulprov}`,
+				});
+			}
+			// Look up with attributes if the entity are unique, put into array
+			// For each existingDataEntity, put unique attributes into array
+			// Compare if any of the values match that in newEntityArray
+			// If so, that's the existingData object we're looking for!
+			// If there's an existing data object, merge
+			// {
+			// 	...oldEntity,
+			// 	...newEntity,
+			// 	_ulid: oldEntity._ulid,
+			// 	_ulprov: `${oldEntity._ulprov},${newEntity._ulprov}`
+			// }
+			// Else, just add newEntity
+		});
+		nextData[outputDataClassKey] = [...previousEntities, ...newProcessed];
+	});
+	return nextData;
 };

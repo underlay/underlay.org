@@ -10,10 +10,7 @@ export const processCsv = async (
 	mapping: [],
 	inputObjectId: string
 ) => {
-	// const schema = source.input[0].schema.content as [];
-	// const mapping = source.mapping as [];
-	// const csvUri = source.fileUri;
-
+	/* Setup object with Class keys for us to populate on csv iteration */
 	const records = mapping.reduce((prev: any, curr: { class: string }) => {
 		return { ...prev, [curr.class]: [] };
 	}, {});
@@ -31,7 +28,7 @@ export const processCsv = async (
 				/*
 					Each record (i.e. csv row) has at most one of each entity type
 					We pre-set the entities we know will be created by reducing
-					the mapping and generating stub objects with ids
+					the mapping and generating stub objects with ids & prov
 				*/
 				const entities = mapping.reduce((prev: any, curr: { class: string }) => {
 					return { ...prev, [curr.class]: { _ulid: uuidv4(), _ulprov: inputObjectId } };
@@ -71,18 +68,9 @@ export const processCsv = async (
 					Make sure you clear unconnected relationship nodes that are made.
 				*/
 
-				/* 
-				On each row, we can 1) generate entities, 2) generate relationships
-				We need to:
-					- Know which entities to generate
-					- Create those
-					- Know which entities have a relationship in a row
-						- Check which nodes have mappings and have a relationship type that specifies them	
-				*/
 				entityKeys.forEach((entityKey: string) => {
 					records[entityKey].push(entities[entityKey]);
 				});
-				// records.push(entities);
 			}
 
 			resolve(records);

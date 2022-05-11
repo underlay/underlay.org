@@ -7,7 +7,6 @@ import { getLoginId } from "utils/server/auth/user";
 import { processCsv } from "utils/server/csv";
 import { Schema } from "utils/shared/types";
 import { updateDraftVersion } from "utils/server/versions";
-// import { Schema } from "utils/shared/types";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, res) => {
 	const loginId = await getLoginId(req);
@@ -25,13 +24,12 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		return res.status(500).json({ ok: false });
 	}
 	/* 
-			- create sourceCsv object
-			- get file from its public path
-			- put it through whatever process we need to generate outputData (eventually we need to queue this over to a worker)
-			- create input object
-			- Generate the draft json
-			- Save draft json
-		*/
+		Create sourceCsv object
+		Get file from its public path
+		Put it through whatever process we need to generate outputData (eventually we need to queue this over to a worker)
+		Create input object
+		Generate and save the draft json
+	*/
 	const sourceCsv = await prisma.sourceCsv.create({
 		data: {
 			mapping,
@@ -46,7 +44,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	const inputObject = await prisma.input.create({
 		data: {
 			id: inputObjectId,
-			reductionType: "merge",
+			reductionType: "merge", // merge, overwrite, concat
 			outputData: outputData,
 			schemaId: schema.id,
 			sourceCsvId: sourceCsv.id,
@@ -54,7 +52,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		},
 	});
 
-	await updateDraftVersion(inputObject, collection.slugSuffix);
+	await updateDraftVersion(inputObject, collection.slugSuffix, schemaContent);
 
 	return res.status(200).json(inputObject);
 });
