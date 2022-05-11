@@ -76,6 +76,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			setNewUploadInProgress(false);
 			setIsUploading(false);
 			setNewUploadOpen(false);
+			setActiveVersion(undefined);
 		}
 	};
 
@@ -94,19 +95,18 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			versions: [data, ...collection.versions],
 		});
 		setIsPublishing(false);
+		setActiveVersion(data);
 	};
 
 	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
-	// const [activeNodes, setActiveNodes] = useState<Class[]>(schema ? [schema[0]] : []);
 	const [selectedClassKey, setSelectedClassKey] = useState(schema ? schema[0].key : "");
-	// const activeVersion = collection.versions[0];
 	const lastVersion = collection.versions[0];
 	const [activeVersion, setActiveVersion] = useState(lastVersion);
 	const inputsSinceVersion = collection.inputs.filter((input) => {
 		if (!lastVersion) {
 			return true;
 		}
-		if (input.createdAt > lastVersion.createdAt) {
+		if (new Date(input.createdAt) > new Date(lastVersion.createdAt)) {
 			return true;
 		}
 		return false;
