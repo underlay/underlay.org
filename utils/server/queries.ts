@@ -98,6 +98,13 @@ export const getCollectionData = async (collectionSlug: string) => {
 			exports: true,
 			schemas: { orderBy: { createdAt: "desc" } },
 			versions: { orderBy: { createdAt: "desc" } },
+			inputs: {
+				orderBy: { createdAt: "desc" },
+				include: {
+					sourceCsv: { include: { user: { include: { namespace: true } } } },
+					sourceApi: true,
+				},
+			},
 		},
 	});
 	return collectionData;

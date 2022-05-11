@@ -1,6 +1,6 @@
 import { Input } from "@prisma/client";
 import { splitClasses } from "utils/shared/schema";
-import { Class, Schema } from "utils/shared/types";
+import { Schema } from "utils/shared/types";
 import { getServerSupabase } from "./supabase";
 
 export const updateDraftVersion = async (

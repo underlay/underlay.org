@@ -34,6 +34,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		data: {
 			mapping,
 			fileUri,
+			userId: loginId,
 		},
 	});
 	const inputObjectId = uuidv4();
@@ -54,5 +55,12 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 
 	await updateDraftVersion(inputObject, collection.slugSuffix, schemaContent);
 
-	return res.status(200).json(inputObject);
+	const populatedInputObject = await prisma.input.findUnique({
+		where: { id: inputObject.id },
+		include: {
+			sourceCsv: { include: { user: { include: { namespace: true } } } },
+			sourceApi: true,
+		},
+	});
+	return res.status(200).json(populatedInputObject);
 });

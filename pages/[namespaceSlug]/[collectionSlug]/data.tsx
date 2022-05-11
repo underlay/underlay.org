@@ -14,13 +14,15 @@ import DataViewer from "components/DataViewer/DataViewer";
 import { convertToLocaleDateString } from "utils/shared/dates";
 import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
 
-const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
+const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	const [newUpload, setNewUpload] = useState<undefined | { file: File; mapping: Mapping }>(
 		undefined
 	);
+	const [collection, setCollection] = useState(initCollection);
 	const [newUploadInProgress, setNewUploadInProgress] = useState(false);
 	const [newUploadOpen, setNewUploadOpen] = useState(false);
+	const [isPublishing, setIsPublishing] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 
 	let newButtonText = "Upload Data";
@@ -47,8 +49,6 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 			setIsUploading(true);
 			setNewUploadInProgress(true);
 
-			// const nextVer = getNextVersion(collection.version || "");
-
 			const fileName = `${generateRandomString(10)}.csv`;
 			const filepath = `${getSlugSuffix(collectionSlug)}/uploads/${fileName}`;
 			const { error } = await supabase.storage.from("data").upload(filepath, newUpload.file);
@@ -58,7 +58,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 				console.error(error);
 			}
 
-			await fetch("/api/input/csv", {
+			const response = await fetch("/api/input/csv", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -67,24 +67,11 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 					mapping: newUpload.mapping,
 				}),
 			});
-
-			// await uploadDataToSupabase(
-			// 	newUpload.file,
-			// 	`${namespaceSlug}/${collectionSlug}` + ".csv",
-			// 	nextVer
-			// );
-
-			// await fetch("/api/collection", {
-			// 	method: "PATCH",
-			// 	headers: { "Content-Type": "application/json" },
-			// 	body: JSON.stringify({
-			// 		...collection,
-			// 		version: nextVer,
-			// 		publishedAt: new Date(),
-			// 		publishedDataSize: newUpload.file.size,
-			// 		schemaMapping: newUpload.mapping,
-			// 	}),
-			// });
+			const data = await response.json();
+			setCollection({
+				...collection,
+				inputs: [data, ...collection.inputs],
+			});
 
 			setNewUploadInProgress(false);
 			setIsUploading(false);
@@ -92,9 +79,38 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 		}
 	};
 
-	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
-	const [activeNodes, setActiveNodes] = useState<Class[]>(schema ? [schema[0]] : []);
+	const publishVersion = async () => {
+		setIsPublishing(true);
+		const response = await fetch("/api/version", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				collectionId: collection.id,
+			}),
+		});
+		const data = await response.json();
+		setCollection({
+			...collection,
+			versions: [data, ...collection.versions],
+		});
+		setIsPublishing(false);
+	};
 
+	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
+	// const [activeNodes, setActiveNodes] = useState<Class[]>(schema ? [schema[0]] : []);
+	const [selectedClassKey, setSelectedClassKey] = useState(schema ? schema[0].key : "");
+	// const activeVersion = collection.versions[0];
+	const lastVersion = collection.versions[0];
+	const [activeVersion, setActiveVersion] = useState(lastVersion);
+	const inputsSinceVersion = collection.inputs.filter((input) => {
+		if (!lastVersion) {
+			return true;
+		}
+		if (input.createdAt > lastVersion.createdAt) {
+			return true;
+		}
+		return false;
+	});
 	return (
 		<div>
 			<CollectionHeader mode="data" collection={collection} />
@@ -116,7 +132,8 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 													key={classElement.id}
 													className={styles.classRow}
 													onClick={() => {
-														setActiveNodes([classElement]);
+														setSelectedClassKey(classElement.key);
+														// setActiveNodes([classElement]);
 													}}
 													minimal
 													fill
@@ -138,7 +155,8 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 													key={classElement.id}
 													className={styles.classRow}
 													onClick={() => {
-														setActiveNodes([classElement]);
+														// setActiveNodes([classElement]);
+														setSelectedClassKey(classElement.key);
 													}}
 													minimal
 													fill
@@ -154,17 +172,28 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 						content={
 							<div>
 								<div className={styles.dataHeader}>
-									{collection.version && !collection.publishedAt && (
-										<div>Version {collection.version}</div>
-									)}
-									{collection.version && collection.publishedAt && (
+									{activeVersion && (
 										<div>
-											Version {collection.version} · Published{" "}
-											{convertToLocaleDateString(collection.publishedAt)}
+											Version {activeVersion.number} · Published{" "}
+											{convertToLocaleDateString(activeVersion.createdAt)}
 										</div>
 									)}
+									{!activeVersion && (
+										<React.Fragment>
+											<div>Draft · {inputsSinceVersion.length} Updates</div>
+											{!!inputsSinceVersion.length && (
+												<div>
+													<Button
+														text={"Publish new version"}
+														onClick={publishVersion}
+														loading={isPublishing}
+													/>
+												</div>
+											)}
+										</React.Fragment>
+									)}
 
-									{!collection.version && <div />}
+									{/* {!activeVersion && <div />} */}
 									<div>
 										<Button
 											style={{ marginRight: "10px" }}
@@ -185,9 +214,13 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection }) {
 									</div>
 								</div>
 								<div className={styles.dataFrame}>
-									<DataViewer collection={collection} activeNodes={activeNodes} />
+									<DataViewer
+										activeVersionNumber={activeVersion?.number || "draft"}
+										collection={collection}
+										selectedClassKey={selectedClassKey}
+									/>
 
-									{!collection.version && (
+									{!activeVersion && (
 										<NonIdealState
 											className={styles.emptyState}
 											title="No Data Yet"

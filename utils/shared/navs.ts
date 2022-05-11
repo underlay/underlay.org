@@ -42,10 +42,6 @@ export const collectionNavItems = [
 		title: "Data",
 	},
 	{
-		slug: "versions",
-		title: "Versions",
-	},
-	{
 		slug: "discussions",
 		title: "Discussions",
 	},
