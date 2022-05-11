@@ -4,7 +4,7 @@ import { supabase } from "utils/client/supabase";
 import { CollectionHeader, DataUploadDialog, Section, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
-import { AnchorButton, Button, Dialog, Intent, NonIdealState } from "@blueprintjs/core";
+import { AnchorButton, Button, Dialog, Intent, MenuItem, NonIdealState } from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
 // import { uploadData as uploadDataToSupabase } from "utils/client/data";
 
@@ -13,6 +13,8 @@ import DataViewer from "components/DataViewer/DataViewer";
 // import { getNextVersion } from "utils/shared/version";
 import { convertToLocaleDateString } from "utils/shared/dates";
 import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
+import { Select } from "@blueprintjs/select";
+import { Version } from "@prisma/client";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -111,6 +113,10 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		}
 		return false;
 	});
+	const availableVersionsToSelect = inputsSinceVersion.length
+		? [{ number: "Draft" }, ...collection.versions]
+		: collection.versions;
+	console.log(availableVersionsToSelect, collection.inputs);
 	return (
 		<div>
 			<CollectionHeader mode="data" collection={collection} />
@@ -172,25 +178,80 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 						content={
 							<div>
 								<div className={styles.dataHeader}>
-									{activeVersion && (
+									<Select
+										items={availableVersionsToSelect}
+										itemRenderer={(
+											item: Version,
+											{ handleClick, modifiers }
+										) => {
+											if (!modifiers.matchesPredicate) {
+												return null;
+											}
+											const isSelected =
+												activeVersion?.number === item.number;
+											return (
+												<MenuItem
+													className={isSelected ? "" : styles.menuItem}
+													active={modifiers.active}
+													key={item.id}
+													onClick={handleClick}
+													text={item.number}
+													icon={isSelected ? "tick" : undefined}
+												/>
+											);
+										}}
+										onItemSelect={(item) => {
+											const newValue =
+												item.number === "Draft" ? undefined : item;
+											setActiveVersion(newValue);
+										}}
+										filterable={false}
+										popoverProps={{
+											minimal: true,
+											modifiers: {
+												preventOverflow: { enabled: false },
+												flip: { enabled: false },
+											},
+										}}
+									>
+										<Button outlined rightIcon="caret-down">
+											{activeVersion && (
+												<React.Fragment>
+													Version {activeVersion.number} · Published{" "}
+													{convertToLocaleDateString(
+														activeVersion.createdAt
+													)}
+												</React.Fragment>
+											)}
+											{!activeVersion && (
+												<React.Fragment>
+													<div>
+														Draft · {inputsSinceVersion.length} Updates
+													</div>
+												</React.Fragment>
+											)}
+										</Button>
+									</Select>
+									{!activeVersion && !!inputsSinceVersion.length && (
 										<div>
-											Version {activeVersion.number} · Published{" "}
-											{convertToLocaleDateString(activeVersion.createdAt)}
+											<Button
+												text={"Publish new version"}
+												onClick={publishVersion}
+												loading={isPublishing}
+											/>
 										</div>
 									)}
-									{!activeVersion && (
-										<React.Fragment>
-											<div>Draft · {inputsSinceVersion.length} Updates</div>
-											{!!inputsSinceVersion.length && (
-												<div>
-													<Button
-														text={"Publish new version"}
-														onClick={publishVersion}
-														loading={isPublishing}
-													/>
-												</div>
-											)}
-										</React.Fragment>
+									{activeVersion && !!inputsSinceVersion.length && (
+										<div>
+											<Button
+												text={`${inputsSinceVersion.length} Updates on Draft`}
+												outlined
+												intent={Intent.WARNING}
+												onClick={() => {
+													setActiveVersion(undefined);
+												}}
+											/>
+										</div>
 									)}
 
 									{/* {!activeVersion && <div />} */}
@@ -220,7 +281,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 										selectedClassKey={selectedClassKey}
 									/>
 
-									{!activeVersion && (
+									{!collection.inputs && (
 										<NonIdealState
 											className={styles.emptyState}
 											title="No Data Yet"

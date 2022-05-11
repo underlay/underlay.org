@@ -8,7 +8,7 @@ import { mockEntities } from "utils/client/mockData";
 import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
 import { EntityCard } from "components";
-import { Button } from "@blueprintjs/core";
+import { Button, NonIdealState, Spinner } from "@blueprintjs/core";
 import { splitClasses } from "utils/shared/schema";
 import { supabase } from "utils/client/supabase";
 
@@ -51,10 +51,11 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	const { nodes, relationships } = splitClasses(allNodes);
 	// const initNodes = allNodes.filter((n) => !n.isRelationship);
 	// const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
-
+	const [gettingData, setGettingData] = useState(true);
 	const [versionData, setVersionData] = useState({});
 
 	useEffect(() => {
+		setGettingData(true);
 		const getAndSetData = async () => {
 			const { data, error } = await supabase.storage
 				.from("data")
@@ -62,6 +63,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 			const text = await data?.text();
 			const versionData = error ? {} : JSON.parse(text);
 			setVersionData(versionData);
+			setGettingData(false);
 		};
 		const checkForSupabaseReadyInterval = setInterval(() => {
 			if (supabase) {
@@ -79,31 +81,38 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 
 	return (
 		<div className={styles.dataViewer}>
-			<div className={styles.entities}>
-				{activeClass && (
-					<div className={styles.contentHeader}>
-						<Button
-							key={activeClass.id}
-							className={styles.classRow}
-							minimal
-							icon={activeClass.isRelationship ? "arrow-top-right" : "circle"}
-						>
-							{activeClass.key}
-						</Button>
-					</div>
-				)}
-				{activeEntities.map((entity) => {
-					const relationshipRendering = <div></div>;
-					return (
-						<EntityCard
-							id={entity._ulid}
-							node={activeClass}
-							entity={entity}
-							relationshipRendering={relationshipRendering}
-						/>
-					);
-				})}
-			</div>
+			{gettingData && (
+				<NonIdealState>
+					<Spinner />
+				</NonIdealState>
+			)}
+			{!gettingData && (
+				<div className={styles.entities}>
+					{activeClass && (
+						<div className={styles.contentHeader}>
+							<Button
+								key={activeClass.id}
+								className={styles.classRow}
+								minimal
+								icon={activeClass.isRelationship ? "arrow-top-right" : "circle"}
+							>
+								{activeClass.key}
+							</Button>
+						</div>
+					)}
+					{activeEntities.map((entity) => {
+						const relationshipRendering = <div></div>;
+						return (
+							<EntityCard
+								id={entity._ulid}
+								node={activeClass}
+								entity={entity}
+								relationshipRendering={relationshipRendering}
+							/>
+						);
+					})}
+				</div>
+			)}
 		</div>
 	);
 };
