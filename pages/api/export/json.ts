@@ -21,11 +21,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	if (!collection) {
 		return res.status(500).json({ ok: false });
 	}
-	/* 
-		On every published version, we need to update all exports
 
-		Create export object with url and 
-	*/
 	const exportSlug = generateRandomString(8);
 	const exportObject = await prisma.export.create({
 		data: {

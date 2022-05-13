@@ -113,6 +113,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		}
 		return false;
 	});
+	console.log(collection);
 	const availableVersionsToSelect = inputsSinceVersion.length
 		? [{ number: "Draft" }, ...collection.versions]
 		: collection.versions;

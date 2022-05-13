@@ -95,7 +95,12 @@ export const getCollectionData = async (collectionSlug: string) => {
 		},
 		include: {
 			namespace: true,
-			exports: true,
+			exports: {
+				include: {
+					exportVersions: { include: { version: true } },
+					exportUses: { include: { user: true } },
+				},
+			},
 			schemas: { orderBy: { createdAt: "desc" } },
 			versions: { orderBy: { createdAt: "desc" } },
 			inputs: {

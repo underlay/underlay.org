@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, Checkbox, HTMLSelect, InputGroup, Intent } from "@blueprintjs/core";
+import {
+	Button,
+	ButtonGroup,
+	Checkbox,
+	HTMLSelect,
+	InputGroup,
+	Intent,
+	MenuItem,
+} from "@blueprintjs/core";
 
 import { Section } from "components";
 import { Schema } from "utils/shared/types";
 
 import styles from "./ExportCreate.module.scss";
+import { Version } from "@prisma/client";
+import { Select } from "@blueprintjs/select";
 
 type Props = {
 	newExport: any;
@@ -47,7 +57,6 @@ const ExportCreate: React.FC<Props> = function ({
 			mapping: mapping,
 		});
 	}, []);
-	console.log(newExport.mapping);
 	return (
 		<div className={styles.create}>
 			<div className={styles.sectionHeader}>
@@ -77,9 +86,45 @@ const ExportCreate: React.FC<Props> = function ({
 					/>
 				</Section>
 				<Section className={styles.option} title="Base Version">
-					Put select here
+					<Select
+						items={collection.versions}
+						itemRenderer={(item: Version, { handleClick, modifiers }) => {
+							if (!modifiers.matchesPredicate) {
+								return null;
+							}
+							const isSelected = activeVersion?.number === item.number;
+							return (
+								<MenuItem
+									className={isSelected ? "" : styles.menuItem}
+									active={modifiers.active}
+									key={item.id}
+									onClick={handleClick}
+									text={item.number}
+									icon={isSelected ? "tick" : undefined}
+								/>
+							);
+						}}
+						onItemSelect={(item) => {
+							/* TODO: Implementation */
+							/* When we choose a version on a different schema */
+							/* we need to update the mapping */
+							setActiveVersion(item);
+						}}
+						filterable={false}
+						popoverProps={{
+							minimal: true,
+							modifiers: {
+								preventOverflow: { enabled: false },
+								flip: { enabled: false },
+							},
+						}}
+					>
+						<Button outlined rightIcon="caret-down">
+							Version {activeVersion.number}
+						</Button>
+					</Select>
 				</Section>
-				<Section className={styles.option} title="Privacy">
+				{/* <Section className={styles.option} title="Privacy">
 					<ButtonGroup>
 						<Button
 							text="Public"
@@ -96,7 +141,7 @@ const ExportCreate: React.FC<Props> = function ({
 							}}
 						/>
 					</ButtonGroup>
-				</Section>
+				</Section> */}
 			</div>
 			<div className={styles.sectionHeader}>
 				<div className={styles.number}>2</div>
@@ -105,8 +150,8 @@ const ExportCreate: React.FC<Props> = function ({
 			<div className={classNames(styles.sectionContent)}>
 				{schema.map((schemaClass) => {
 					return (
-						<div key={schemaClass.id}>
-							<div>
+						<div key={schemaClass.id} className={styles.mappingClass}>
+							<div className={styles.classRow}>
 								{schemaClass.key} ·
 								<Checkbox
 									checked={newExport.mapping[schemaClass.key]?.include}
@@ -121,6 +166,8 @@ const ExportCreate: React.FC<Props> = function ({
 									}}
 								/>
 								<InputGroup
+									className="narrow-line-input"
+									placeholder={`Rename...`}
 									type="text"
 									value={newExport.mapping[schemaClass.key]?.rename}
 									onChange={(evt) => {
@@ -135,7 +182,7 @@ const ExportCreate: React.FC<Props> = function ({
 							</div>
 							{schemaClass?.attributes.map((attr) => {
 								return (
-									<div key={attr.id}>
+									<div key={attr.id} className={styles.attrRow}>
 										{attr.key} ·{" "}
 										<Checkbox
 											checked={
@@ -156,6 +203,8 @@ const ExportCreate: React.FC<Props> = function ({
 											}}
 										/>
 										<InputGroup
+											className="narrow-line-input"
+											placeholder={`Rename...`}
 											type="text"
 											value={
 												newExport.mapping[schemaClass.key]?.attributes[

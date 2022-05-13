@@ -8,7 +8,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const [collection, setCollection] = useState(initCollection);
 	const defaultNewExportState = {
 		name: "",
-		isPublic: false,
+		isPublic: true,
 		format: "JSON",
 		mapping: {},
 		versionId: "",

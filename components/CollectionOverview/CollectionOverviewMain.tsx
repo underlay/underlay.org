@@ -13,13 +13,7 @@ const CollectionOverviewMain: React.FC<Props> = function ({ collection, setColle
 		<React.Fragment>
 			<ReadmeSection collection={collection} setCollection={setCollection} />
 
-			<Section title="Schema">
-				<img
-					width="100%"
-					style={{ border: "1px solid #bbb", borderRadius: "3px" }}
-					src="https://s3.amazonaws.com/assets.underlay.org/dev-user-uploads/92b8884c2630d78f2de609f0b3324e04.png"
-				/>
-			</Section>
+			<Section title="Activity"></Section>
 			{/* <Section title="Data"> */}
 			{/* <img
 					width="100%"

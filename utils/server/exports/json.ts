@@ -7,6 +7,7 @@ export const generateExportVersionJson = async (
 	exportSlug: string,
 	mapping: {}
 ) => {
+	console.log(versionId, collectionSlugSuffix, mapping);
 	// generateExportVersionJson(inputDataUrl, mapping)
 	// - get input file as json
 	// - go through each and create a new object that uses mapping (either includes name or skips value)
