@@ -4,7 +4,7 @@ import prisma from "prisma/db";
 import { v4 as uuidv4 } from "uuid";
 
 import { getLoginId } from "utils/server/auth/user";
-import { processCsv } from "utils/server/csv";
+import { processCsv } from "utils/server/inputs/csv";
 import { Schema } from "utils/shared/types";
 import { updateDraftVersion } from "utils/server/versions";
 
@@ -59,7 +59,6 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		where: { id: inputObject.id },
 		include: {
 			sourceCsv: { include: { user: { include: { namespace: true } } } },
-			sourceApi: true,
 		},
 	});
 	return res.status(200).json(populatedInputObject);

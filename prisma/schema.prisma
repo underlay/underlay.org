@@ -19,6 +19,7 @@ model Namespace {
   user        User?
   community   Community?
   collections Collection[]
+
   @@map(name: "namespaces")
 }
 
@@ -36,6 +37,7 @@ model User {
   collaborations Collaborator[]
   exports        Export[]
   sourcesCsv     SourceCsv[]
+  exportUses     ExportUse[]
 
   @@map(name: "users")
 }
@@ -53,6 +55,7 @@ model Community {
   updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
   members Member[]
+
   @@map(name: "communities")
 }
 
@@ -87,6 +90,7 @@ model Collection {
   schemas       Schema[]
   versions      Version[]
   inputs        Input[]
+
   @@unique([slugPrefix, namespaceId], name: "slugprefix_namespaceid")
   @@map(name: "collections")
 }
@@ -107,10 +111,12 @@ model Collaborator {
 model Export {
   id           String     @id @default(uuid())
   name         String
+  slug         String
   format       String
-  size         String
   isPublic     Boolean    @default(false) @map(name: "is_public")
   mapping      Json
+  schema       Schema     @relation(fields: [schemaId], references: [id])
+  schemaId     String     @map(name: "schema_id")
   collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId String     @map(name: "collection_id")
   user         User       @relation(fields: [userId], references: [id])
@@ -118,7 +124,38 @@ model Export {
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
+  exportVersion ExportVersion[]
+  exportUses    ExportUse[]
+
+  @@unique([slug, collectionId], name: "slug_collectionid")
   @@map(name: "exports")
+}
+
+model ExportVersion {
+  id        String   @id @default(uuid())
+  fileUri   String
+  version   Version  @relation(fields: [versionId], references: [id])
+  versionId String   @map(name: "version_id")
+  export    Export   @relation(fields: [exportId], references: [id])
+  exportId  String   @map(name: "export_id")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@map(name: "export_versions")
+}
+
+model ExportUse {
+  id          String   @id @default(uuid())
+  url         String
+  description String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @map(name: "user_id")
+  export      Export   @relation(fields: [exportId], references: [id])
+  exportId    String   @map(name: "export_id")
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@map(name: "export_uses")
 }
 
 model Schema {
@@ -130,7 +167,9 @@ model Schema {
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
-  inputs Input[]
+  inputs  Input[]
+  exports Export[]
+
   @@unique([collectionId, version], name: "collectionid_version")
   @@map(name: "schemas")
 }
@@ -142,6 +181,8 @@ model Version {
   collectionId String     @map(name: "collection_id")
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+  exportVersions ExportVersion[]
 
   @@unique([collectionId, number], name: "collectionid_number")
   @@map(name: "versions")
@@ -182,6 +223,7 @@ model SourceCsv {
   updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
   input Input[]
+
   @@map(name: "sources_csv")
 }
 
@@ -192,5 +234,6 @@ model SourceApi {
   updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
 
   input Input[]
+
   @@map(name: "sources_api")
 }
