@@ -1,14 +1,16 @@
-import React from "react";
-import styles from "./ExportCreate.module.scss";
-
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, HTMLSelect, InputGroup, Intent } from "@blueprintjs/core";
+import { Button, ButtonGroup, Checkbox, HTMLSelect, InputGroup, Intent } from "@blueprintjs/core";
+
 import { Section } from "components";
+import { Schema } from "utils/shared/types";
+
+import styles from "./ExportCreate.module.scss";
 
 type Props = {
 	newExport: any;
 	setNewExport: any;
-	schema: any;
+	collection: any;
 	generateExport: any;
 	isGenerating: boolean;
 };
@@ -16,10 +18,36 @@ type Props = {
 const ExportCreate: React.FC<Props> = function ({
 	newExport,
 	setNewExport,
-	// schema,
+	collection,
 	generateExport,
 	isGenerating,
 }) {
+	const lastVersion = collection.versions[0];
+	const [activeVersion, setActiveVersion] = useState(lastVersion);
+	const schema = collection.schemas[0].content as Schema;
+	useEffect(() => {
+		const mapping = {};
+		schema.forEach((schemaClass) => {
+			const classMap = {
+				include: true,
+				rename: "",
+				attributes: {},
+			};
+			schemaClass.attributes.forEach((attr) => {
+				classMap.attributes[attr.key] = {
+					include: true,
+					rename: "",
+				};
+			});
+			mapping[schemaClass.key] = classMap;
+		});
+		setNewExport({
+			...newExport,
+			versionId: activeVersion.id,
+			mapping: mapping,
+		});
+	}, []);
+	console.log(newExport.mapping);
 	return (
 		<div className={styles.create}>
 			<div className={styles.sectionHeader}>
@@ -48,6 +76,9 @@ const ExportCreate: React.FC<Props> = function ({
 						options={["JSON", "CSV", "SQL"]}
 					/>
 				</Section>
+				<Section className={styles.option} title="Base Version">
+					Put select here
+				</Section>
 				<Section className={styles.option} title="Privacy">
 					<ButtonGroup>
 						<Button
@@ -72,7 +103,82 @@ const ExportCreate: React.FC<Props> = function ({
 				<div className={styles.title}>Align Export Data</div>
 			</div>
 			<div className={classNames(styles.sectionContent)}>
-				We'll do some alignment UI here.
+				{schema.map((schemaClass) => {
+					return (
+						<div key={schemaClass.id}>
+							<div>
+								{schemaClass.key} ·
+								<Checkbox
+									checked={newExport.mapping[schemaClass.key]?.include}
+									label="Include"
+									onChange={(evt) => {
+										const nextMapping = { ...newExport.mapping };
+										nextMapping[schemaClass.key].include = evt.target.checked;
+										setNewExport({
+											...newExport,
+											mapping: nextMapping,
+										});
+									}}
+								/>
+								<InputGroup
+									type="text"
+									value={newExport.mapping[schemaClass.key]?.rename}
+									onChange={(evt) => {
+										const nextMapping = { ...newExport.mapping };
+										nextMapping[schemaClass.key].rename = evt.target.value;
+										setNewExport({
+											...newExport,
+											mapping: nextMapping,
+										});
+									}}
+								/>
+							</div>
+							{schemaClass?.attributes.map((attr) => {
+								return (
+									<div key={attr.id}>
+										{attr.key} ·{" "}
+										<Checkbox
+											checked={
+												newExport.mapping[schemaClass.key]?.attributes[
+													attr.key
+												].include
+											}
+											label="Include"
+											onChange={(evt) => {
+												const nextMapping = { ...newExport.mapping };
+												nextMapping[schemaClass.key].attributes[
+													attr.key
+												].include = evt.target.checked;
+												setNewExport({
+													...newExport,
+													mapping: nextMapping,
+												});
+											}}
+										/>
+										<InputGroup
+											type="text"
+											value={
+												newExport.mapping[schemaClass.key]?.attributes[
+													attr.key
+												].rename
+											}
+											onChange={(evt) => {
+												const nextMapping = { ...newExport.mapping };
+												nextMapping[schemaClass.key].attributes[
+													attr.key
+												].rename = evt.target.value;
+												setNewExport({
+													...newExport,
+													mapping: nextMapping,
+												});
+											}}
+										/>
+									</div>
+								);
+							})}
+						</div>
+					);
+				})}
 			</div>
 
 			<div className={styles.sectionHeader}>

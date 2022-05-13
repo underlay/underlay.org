@@ -124,8 +124,8 @@ model Export {
   createdAt    DateTime   @default(now()) @map(name: "created_at")
   updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
 
-  exportVersion ExportVersion[]
-  exportUses    ExportUse[]
+  exportVersions ExportVersion[]
+  exportUses     ExportUse[]
 
   @@unique([slug, collectionId], name: "slug_collectionid")
   @@map(name: "exports")
@@ -134,6 +134,7 @@ model Export {
 model ExportVersion {
   id        String   @id @default(uuid())
   fileUri   String
+  size      String // In bytes
   version   Version  @relation(fields: [versionId], references: [id])
   versionId String   @map(name: "version_id")
   export    Export   @relation(fields: [exportId], references: [id])
