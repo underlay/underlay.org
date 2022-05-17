@@ -181,10 +181,7 @@ export const getData = async (
 						nodeEntity[a] = r[ai];
 					});
 
-					// TODO: Use unique keys to determine uniqueness later
-					if (entities[name].findIndex((n) => n.name === nodeEntity.name) === -1) {
-						entities[name].push(nodeEntity);
-					}
+					entities[name].push(nodeEntity);
 					nameToNewNodeMapping[name] = nodeEntity;
 				});
 
