@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import prisma from "prisma/db";
-import { parse } from "csv-parse";
 
 import { getServerSupabase } from "utils/server/supabase";
+import { mapData } from "utils/shared/mapping";
+import { Class, Mapping } from "utils/shared/types";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, res) => {
 	// allow unauthenticated requests for now
@@ -34,6 +35,10 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 			},
 		});
 
+		if (!collection) {
+			return res.status(400);
+		}
+
 		const fileName = `${namespaceSlug}/${collectionSlug}${collection?.version}.csv`;
 
 		const { data, error } = await supabase.storage.from("data").download(fileName);
@@ -42,15 +47,18 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 		}
 		const text = await data.text();
 
-		const rows: any = await new Promise((resolve, reject) => {
-			parse(text, (err, records, _info) => {
-				if (err) reject(err);
+		const allNodes: Class[] = collection.schema as any;
+		const nodes = allNodes.filter((n) => !n.isRelationship);
+		const relationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
 
-				resolve(records);
-			});
-		});
+		const resData = await mapData(
+			text,
+			nodes,
+			relationships,
+			collection.schemaMapping as Mapping
+		);
 
-		return res.status(200).json({ data: rows });
+		return res.status(200).json({ data: resData });
 	}
 	return res.status(404);
 });
