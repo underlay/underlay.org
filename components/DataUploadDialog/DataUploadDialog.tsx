@@ -104,7 +104,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 					>
 						<option value={"merge"}>Merge</option>
 						<option value={"overwrite"}>Overwrite</option>
-						<option value={"concat"}>Concatenate</option>
+						<option value={"concatenate"}>Concatenate</option>
 					</HTMLSelect>
 				</div>
 				<p>

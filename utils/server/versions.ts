@@ -13,10 +13,10 @@ export const updateDraftVersion = async (
 	// OutputData has the same shape as version files, and a version file is just a reduction
 	// of all outputData blobs up to the point of a version publication.
 	const supabase = getServerSupabase();
-	const reductionType = inputObject.reductionType as "concat" | "merge" | "overwrite";
+	const reductionType = inputObject.reductionType as "concatenate" | "merge" | "overwrite";
 	const reductionFunctions = {
 		merge: mergeJsons,
-		concat: concatJsons,
+		concatenate: concatJsons,
 		overwrite: overwriteJsons,
 	};
 	const reductionFunc = reductionFunctions[reductionType];

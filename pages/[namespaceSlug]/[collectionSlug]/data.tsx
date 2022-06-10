@@ -4,7 +4,15 @@ import { supabase } from "utils/client/supabase";
 import { CollectionHeader, DataUploadDialog, Section, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
-import { AnchorButton, Button, Dialog, Intent, MenuItem, NonIdealState } from "@blueprintjs/core";
+import {
+	AnchorButton,
+	Button,
+	Dialog,
+	Intent,
+	Menu,
+	MenuItem,
+	NonIdealState,
+} from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
 // import { uploadData as uploadDataToSupabase } from "utils/client/data";
 
@@ -15,6 +23,7 @@ import { convertToLocaleDateString } from "utils/shared/dates";
 import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
 import { Select } from "@blueprintjs/select";
 import { Version } from "@prisma/client";
+import { Popover2 } from "@blueprintjs/popover2";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
@@ -230,23 +239,80 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 												)}
 												{!activeVersion && (
 													<React.Fragment>
-														<div>
-															Draft · {inputsSinceVersion.length}{" "}
-															Update
-															{inputsSinceVersion.length !== 1 && "s"}
-														</div>
+														<div>Draft</div>
 													</React.Fragment>
 												)}
 											</Button>
 										</Select>
 										{!activeVersion && !!inputsSinceVersion.length && (
-											<div>
+											<React.Fragment>
+												<Popover2
+													content={
+														<Menu>
+															{inputsSinceVersion.map((input) => {
+																console.log(input);
+																return (
+																	<MenuItem
+																		text={
+																			<div>
+																				<div
+																					className={
+																						styles.inputDate
+																					}
+																				>
+																					{convertToLocaleDateString(
+																						input.createdAt
+																					)}
+																				</div>
+																				<div>
+																					{
+																						input
+																							.sourceCsv
+																							?.user
+																							.name
+																					}{" "}
+																					uploaded a{" "}
+																					<a
+																						href={
+																							input
+																								.sourceCsv
+																								?.fileUri
+																						}
+																					>
+																						CSV file
+																					</a>{" "}
+																					to{" "}
+																					{
+																						input.reductionType
+																					}
+																					.
+																				</div>
+																			</div>
+																		}
+																	/>
+																);
+															})}
+														</Menu>
+													}
+													minimal
+													placement="bottom-start"
+												>
+													<Button
+														outlined
+														text={`${inputsSinceVersion.length} Update${
+															inputsSinceVersion.length !== 1
+																? "s"
+																: ""
+														}`}
+														rightIcon="caret-down"
+													/>
+												</Popover2>
 												<Button
 													text={"Publish new version"}
 													onClick={publishVersion}
 													loading={isPublishing}
 												/>
-											</div>
+											</React.Fragment>
 										)}
 										{activeVersion && !!inputsSinceVersion.length && (
 											<div>
