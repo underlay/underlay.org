@@ -11,6 +11,8 @@
 		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
 		"prebuild": "prisma generate",
 		"start": "NODE_ENV=production node server.js",
+		"type-check": "tsc",
+		"type-check-watch": "tsc --watch",
 		"test": "jest"
 	},
 	"engines": {
