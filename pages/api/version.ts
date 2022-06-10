@@ -55,12 +55,14 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 				newVersion.id,
 				collection.slugSuffix,
 				exportObj.slug,
+				// @ts-ignore
 				exportObj.mapping
 			);
 		})
 	);
 
 	await Promise.all(
+		// @ts-ignore
 		newFileOutputs.map(({ fileUri, size }, index) => {
 			return prisma.exportVersion.create({
 				data: {

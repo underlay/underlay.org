@@ -9,7 +9,7 @@ type Props = {
 	onFileChange: (file: File) => any;
 	fullSlug: string;
 	buttonText?: string;
-	version: string;
+	// version: string;
 };
 
 const DataUpload: React.FC<Props> = function ({

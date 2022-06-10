@@ -36,6 +36,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		},
 	});
 
+	// @ts-ignore
 	const { fileUri, size } = await generateExportVersionJson(
 		versionId,
 		collection.slugSuffix,

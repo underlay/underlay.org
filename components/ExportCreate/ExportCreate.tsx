@@ -29,12 +29,12 @@ const ExportCreate: React.FC<Props> = function ({
 	const schema = collection.schemas[0].content as Schema;
 	useEffect(() => {
 		if (!newExport.mapping) {
-			const mapping = {};
+			const mapping: { [key: string]: any } = {};
 			schema.forEach((schemaClass) => {
 				const classMap = {
 					include: true,
 					rename: "",
-					attributes: {},
+					attributes: {} as { [key: string]: any },
 				};
 				schemaClass.attributes.forEach((attr) => {
 					classMap.attributes[attr.key] = {
@@ -155,6 +155,7 @@ const ExportCreate: React.FC<Props> = function ({
 										onChange={(evt) => {
 											const nextMapping = { ...newExport.mapping };
 											nextMapping[schemaClass.key].include =
+												// @ts-ignore
 												evt.target.checked;
 											setNewExport({
 												...newExport,
@@ -193,9 +194,12 @@ const ExportCreate: React.FC<Props> = function ({
 												disabled={!classIncluded}
 												label="Include"
 												onChange={(evt) => {
+													// @ts-ignore
 													const nextMapping = { ...newExport.mapping };
+
 													nextMapping[schemaClass.key].attributes[
 														attr.key
+														// @ts-ignore
 													].include = evt.target.checked;
 													setNewExport({
 														...newExport,

@@ -23,7 +23,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 	schema,
 	uploadData,
 	isUploading,
-	collection,
+	// collection,
 }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
@@ -65,7 +65,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 						setHeaders(file);
 					}}
 					fullSlug={`${namespaceSlug}/${collectionSlug}`}
-					version={collection.version || ""}
+					// version={collection.version || ""}
 				/>
 			</div>
 			<div className={styles.sectionHeader}>

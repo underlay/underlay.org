@@ -24,9 +24,9 @@ export const updateDraftVersion = async (
 	const { data, error: err } = await supabase.storage
 		.from("data")
 		.download(`${slugSuffix}/versions/draft.json`);
-	const dataString = await data?.text();
+	const dataString = (await data?.text()) as string;
 	const oldData = err ? {} : JSON.parse(dataString);
-	const nextData = reductionFunc(schema, oldData, inputObject.outputData);
+	const nextData = reductionFunc(schema, oldData, inputObject.outputData as {});
 
 	/* Connect to supabase and set filepath */
 	const fileName = `draft.json`;
@@ -51,8 +51,8 @@ const getAllClassKeys = (oldJson: {}, newJson: {}): string[] => {
 };
 
 const entityHasUpdated = (
-	oldObject: {},
-	newObject: {},
+	oldObject: { [key: string]: any },
+	newObject: { [key: string]: any },
 	isRelationship: boolean = false
 ): boolean => {
 	return Object.keys(newObject).some((newObjectKey) => {
@@ -73,8 +73,12 @@ export const overwriteJsons = (_schema: Schema, _oldJson: {}, newJson: {}) => {
 	return newJson;
 };
 
-export const concatJsons = (_schema: Schema, oldJson: {}, newJson: {}) => {
-	const nextData = {};
+export const concatJsons = (
+	_schema: Schema,
+	oldJson: { [key: string]: any },
+	newJson: { [key: string]: any }
+) => {
+	const nextData: { [key: string]: any } = {};
 	const allClassKeys = getAllClassKeys(oldJson, newJson);
 
 	allClassKeys.forEach((outputDataClassKey) => {
@@ -103,12 +107,12 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 		- if yes, {..old, ...new, ulId: oldid, prov: `${oldEntity._ulprov},${newEntity._ulprov}`, source: properSource, target: properTarget }
 		
 	*/
-	const nextData = {};
+	const nextData: { [key: string]: any } = {};
 	const concattedData = concatJsons(schema, oldJson, newJson);
 	const { nodes: nodeClasses, relationships: relationshipClasses } = splitClasses(schema);
-	const idMap = {};
+	const idMap: { [key: string]: any } = {};
 	nodeClasses.forEach((nodeClass) => {
-		const entityByUniqueValue = {};
+		const entityByUniqueValue: { [key: string]: any } = {};
 		const classKey = nodeClass.key;
 		const classData = concattedData[classKey];
 		if (!classData) {
@@ -118,8 +122,8 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 			return attr.isUID;
 		});
 		const uniqueAttrKey = uniqueAttr?.key;
-		classData.forEach((entity) => {
-			const uniqueValue = uniqueAttrKey ? entity[uniqueAttrKey] : entity._ulid;
+		classData.forEach((entity: { [key: string]: any }) => {
+			const uniqueValue: string = uniqueAttrKey ? entity[uniqueAttrKey] : entity._ulid;
 			const existingEntity = entityByUniqueValue[uniqueValue];
 			if (existingEntity) {
 				idMap[entity._ulid] = existingEntity._ulid;
@@ -140,7 +144,7 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 	});
 
 	relationshipClasses.forEach((relationshipClass) => {
-		const entityByUniqueValue = {};
+		const entityByUniqueValue: { [key: string]: any } = {};
 		const classKey = relationshipClass.key;
 		const classData = concattedData[classKey];
 		if (!classData) {
@@ -150,7 +154,7 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 			return attr.isUID;
 		});
 		const uniqueAttrKey = uniqueAttr?.key;
-		classData.forEach((entity) => {
+		classData.forEach((entity: { [key: string]: any }) => {
 			const hasValidForeignKeys = idMap[entity.source] && idMap[entity.target];
 			if (!hasValidForeignKeys) {
 				return;

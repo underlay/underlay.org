@@ -1,21 +1,22 @@
-import { Button, ButtonGroup } from "@blueprintjs/core";
+// import { Button, ButtonGroup } from "@blueprintjs/core";
 import React from "react";
 
-import { Section } from "components";
+// import { Section } from "components";
 import { CollectionProps } from "utils/server/collections";
 
 import styles from "./CollectionOverviewSide.module.scss";
 import SideGettingStarted from "./SideGettingStarted";
-import { humanFileSize } from "utils/shared/filesize";
-import { convertToLocaleDateString } from "utils/shared/dates";
+// import { humanFileSize } from "utils/shared/filesize";
+// import { convertToLocaleDateString } from "utils/shared/dates";
 
 const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection }) {
-	if (!collection.version) {
+	if (!collection.versions.length) {
 		return <SideGettingStarted collection={collection} />;
 	}
 	return (
 		<div className={styles.side}>
-			<Section title="Version" className={styles.small}>
+			{/* TODO: make this section real */}
+			{/* <Section title="Version" className={styles.small}>
 				{collection.version}
 			</Section>
 			<Section title="Last Published" className={styles.small}>
@@ -32,6 +33,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 					<Button disabled outlined small text=".schema" />
 				</ButtonGroup>
 			</Section>
+			 */}
 		</div>
 	);
 };

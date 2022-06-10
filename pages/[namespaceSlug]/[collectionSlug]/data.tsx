@@ -114,7 +114,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
 	const [selectedClassKey, setSelectedClassKey] = useState(schema ? schema[0].key : "");
 	const lastVersion = collection.versions[0];
-	const [activeVersion, setActiveVersion] = useState(lastVersion);
+	const [activeVersion, setActiveVersion] = useState<undefined | Version>(lastVersion);
 	const inputsSinceVersion = collection.inputs.filter((input) => {
 		if (!lastVersion) {
 			return true;
@@ -191,6 +191,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 									<div className={styles.buttonGroup}>
 										<Select
 											items={availableVersionsToSelect}
+											// @ts-ignore
 											itemRenderer={(
 												item: Version,
 												{ handleClick, modifiers }
@@ -217,7 +218,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 											onItemSelect={(item) => {
 												const newValue =
 													item.number === "Draft" ? undefined : item;
-												setActiveVersion(newValue);
+												setActiveVersion(newValue as Version);
 											}}
 											filterable={false}
 											popoverProps={{

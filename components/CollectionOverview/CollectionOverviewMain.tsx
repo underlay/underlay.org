@@ -13,7 +13,7 @@ const CollectionOverviewMain: React.FC<Props> = function ({ collection, setColle
 		<React.Fragment>
 			<ReadmeSection collection={collection} setCollection={setCollection} />
 
-			<Section title="Activity"></Section>
+			<Section title="Activity">-- Add Inputs, versions, comments in a timeline here</Section>
 			{/* <Section title="Data"> */}
 			{/* <img
 					width="100%"

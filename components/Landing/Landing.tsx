@@ -1,4 +1,4 @@
-import { FormGroup, InputGroup } from "@blueprintjs/core";
+import { InputGroup } from "@blueprintjs/core";
 import classNames from "classnames";
 import Form from "components/Form/Form";
 import React, { useState } from "react";

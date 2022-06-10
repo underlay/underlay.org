@@ -51,7 +51,12 @@ export const processCsv = async (
 					.forEach((schemaClass) => {
 						const sourceKey = getClassKeyById(schemaClass.attributes[0].type, schema);
 						const targetKey = getClassKeyById(schemaClass.attributes[1].type, schema);
-						if (entityKeys.includes(sourceKey) && entityKeys.includes(targetKey)) {
+						if (
+							sourceKey &&
+							targetKey &&
+							entityKeys.includes(sourceKey) &&
+							entityKeys.includes(targetKey)
+						) {
 							/* If both types of entities are in the csv row, then we can create a relationship! */
 							const sourceId = entities[sourceKey]._ulid;
 							const targetId = entities[targetKey]._ulid;

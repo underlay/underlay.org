@@ -22,11 +22,11 @@ const DataMapping: React.FC<Props> = function ({ schema, csvHeaders, mapping = [
 					<div key={schemaClass.id} className={styles.classBlock}>
 						<div className={styles.classKey}>{schemaClass.key}</div>
 						{schemaClass.attributes
-							.filter((attr, index) => {
+							.filter((_attr, index) => {
 								return !schemaClass.isRelationship || index >= 2;
 							})
 							.map((attr) => {
-								const existingMappedEntry = mapping.find((mapEntry) => {
+								const existingMappedEntry = mapping.find((mapEntry: any) => {
 									return (
 										mapEntry.class === schemaClass.key &&
 										mapEntry.attr === attr.key
@@ -46,12 +46,14 @@ const DataMapping: React.FC<Props> = function ({ schema, csvHeaders, mapping = [
 											// minimal
 											onChange={(evt) => {
 												const newValue = evt.target.value;
-												const newMapping = mapping.filter((mapEntry) => {
-													return (
-														mapEntry.class !== schemaClass.key ||
-														mapEntry.attr !== attr.key
-													);
-												});
+												const newMapping = mapping.filter(
+													(mapEntry: any) => {
+														return (
+															mapEntry.class !== schemaClass.key ||
+															mapEntry.attr !== attr.key
+														);
+													}
+												);
 												if (newValue) {
 													newMapping.push({
 														class: schemaClass.key,

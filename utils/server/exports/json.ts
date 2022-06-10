@@ -5,7 +5,7 @@ export const generateExportVersionJson = async (
 	versionId: string,
 	collectionSlugSuffix: string,
 	exportSlug: string,
-	mapping: {}
+	mapping: { [key: string]: any }
 ) => {
 	console.log(versionId, collectionSlugSuffix, mapping);
 	// generateExportVersionJson(inputDataUrl, mapping)
@@ -42,18 +42,18 @@ export const generateExportVersionJson = async (
 	const { data, error } = await supabase.storage
 		.from("data")
 		.download(`${collectionSlugSuffix}/versions/${version.number}.json`);
-	const text = await data?.text();
+	const text = (await data?.text()) as string;
 	const versionData = error ? {} : JSON.parse(text);
 
-	const nextData = {};
+	const nextData: { [key: string]: any } = {};
 	Object.keys(versionData).forEach((versionDataKey) => {
 		const mappingClass = mapping[versionDataKey];
 		if (!mappingClass.include) {
 			return;
 		}
-		const nextEntities = [];
-		versionData[versionDataKey].map((entity) => {
-			const nextEntity = {};
+		const nextEntities: any[] = [];
+		versionData[versionDataKey].map((entity: any) => {
+			const nextEntity: { [key: string]: any } = {};
 			Object.keys(entity).forEach((attr) => {
 				const autoIncludeKeys = ["_ulid", "_ulprov"];
 				if (autoIncludeKeys.includes(attr)) {
@@ -81,5 +81,6 @@ export const generateExportVersionJson = async (
 		.from("data")
 		.list(filePathPrefix, { search: version.number });
 
+	// @ts-ignore
 	return { fileUri, size: String(listData[0].metadata.size) };
 };

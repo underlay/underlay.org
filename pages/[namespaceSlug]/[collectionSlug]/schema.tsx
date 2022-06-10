@@ -5,7 +5,7 @@ import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
 const CollectionSchema: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const [collection, setCollection] = useState<CollectionProps["collection"]>(initCollection);
-	const [isEditing, setIsEditing] = useState<boolean>(!collection.version);
+	const [isEditing, setIsEditing] = useState<boolean>(!collection.inputs.length);
 
 	return (
 		<div>

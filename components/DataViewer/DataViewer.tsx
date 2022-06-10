@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useLocationContext } from "utils/client/hooks";
+// import { useLocationContext } from "utils/client/hooks";
 import classNames from "classnames";
 
 import styles from "./DataViewer.module.scss";
-import type { Class, Mapping, Schema } from "utils/shared/types";
-import { mockEntities } from "utils/client/mockData";
-import { getData } from "utils/client/data";
+import type { Class, Schema } from "utils/shared/types";
+// import { mockEntities } from "utils/client/mockData";
+// import { getData } from "utils/client/data";
 import { CollectionProps } from "utils/server/collections";
 import { EntityCard } from "components";
 import { Button, NonIdealState, Spinner } from "@blueprintjs/core";
-import { splitClasses } from "utils/shared/schema";
+// import { splitClasses } from "utils/shared/schema";
 import { supabase } from "utils/client/supabase";
 
 interface Props {
@@ -36,7 +36,7 @@ export const NodeOrRelationshipBlock: React.FC<Props> = function ({ node, onClic
 type DataViewerProps = {
 	// activeNodes: Class[];
 	activeVersionNumber: string;
-	collection: CollectionProps;
+	collection: CollectionProps["collection"];
 	selectedClassKey: string;
 };
 
@@ -48,7 +48,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	// const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
 	const allNodes: Class[] = collection.schemas[0].content as Schema;
-	const { nodes, relationships } = splitClasses(allNodes);
+	// const { nodes, relationships } = splitClasses(allNodes);
 	// const initNodes = allNodes.filter((n) => !n.isRelationship);
 	// const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
 	const [gettingData, setGettingData] = useState(true);
@@ -60,7 +60,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 			const { data, error } = await supabase.storage
 				.from("data")
 				.download(`${collection.slugSuffix}/versions/${activeVersionNumber}.json`);
-			const text = await data?.text();
+			const text = (await data?.text()) as string;
 			const versionData = error ? {} : JSON.parse(text);
 			setVersionData(versionData);
 			setGettingData(false);
@@ -76,7 +76,11 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	const activeClass = allNodes.find((schemaClass) => {
 		return schemaClass.key === selectedClassKey;
 	});
+	if (!activeClass) {
+		return null;
+	}
 
+	// @ts-ignore
 	const activeEntities = versionData[selectedClassKey] || [];
 
 	return (
@@ -100,12 +104,11 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 							</Button>
 						</div>
 					)}
-					{activeEntities.map((entity) => {
+					{activeEntities.map((entity: any) => {
 						const relationshipRendering = <div></div>;
 						return (
 							<EntityCard
 								key={entity._ulid}
-								id={entity._ulid}
 								node={activeClass}
 								entity={entity}
 								relationshipRendering={relationshipRendering}
