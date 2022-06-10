@@ -79,6 +79,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			setIsUploading(false);
 			setNewUploadOpen(false);
 			setActiveVersion(undefined);
+			setNewUpload(undefined);
 		}
 	};
 
@@ -113,9 +114,8 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		}
 		return false;
 	});
-	console.log(collection);
 	const availableVersionsToSelect = inputsSinceVersion.length
-		? [{ number: "Draft" }, ...collection.versions]
+		? [{ number: "Draft", id: "draft" }, ...collection.versions]
 		: collection.versions;
 	return (
 		<div>
@@ -178,86 +178,93 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 						content={
 							<div>
 								<div className={styles.dataHeader}>
-									<Select
-										items={availableVersionsToSelect}
-										itemRenderer={(
-											item: Version,
-											{ handleClick, modifiers }
-										) => {
-											if (!modifiers.matchesPredicate) {
-												return null;
-											}
-											const isSelected =
-												activeVersion?.number === item.number;
-											return (
-												<MenuItem
-													className={isSelected ? "" : styles.menuItem}
-													active={modifiers.active}
-													key={item.id}
-													onClick={handleClick}
-													text={item.number}
-													icon={isSelected ? "tick" : undefined}
+									<div className={styles.buttonGroup}>
+										<Select
+											items={availableVersionsToSelect}
+											itemRenderer={(
+												item: Version,
+												{ handleClick, modifiers }
+											) => {
+												if (!modifiers.matchesPredicate) {
+													return null;
+												}
+												const isSelected =
+													activeVersion?.number === item.number ||
+													(!activeVersion && item.number === "Draft");
+												return (
+													<MenuItem
+														className={
+															isSelected ? "" : styles.menuItem
+														}
+														active={modifiers.active}
+														key={item.id}
+														onClick={handleClick}
+														text={item.number}
+														icon={isSelected ? "tick" : undefined}
+													/>
+												);
+											}}
+											onItemSelect={(item) => {
+												const newValue =
+													item.number === "Draft" ? undefined : item;
+												setActiveVersion(newValue);
+											}}
+											filterable={false}
+											popoverProps={{
+												minimal: true,
+												modifiers: {
+													preventOverflow: { enabled: false },
+													flip: { enabled: false },
+												},
+											}}
+										>
+											<Button outlined rightIcon="caret-down">
+												{activeVersion && (
+													<React.Fragment>
+														Version {activeVersion.number} · Published{" "}
+														{convertToLocaleDateString(
+															activeVersion.createdAt
+														)}
+													</React.Fragment>
+												)}
+												{!activeVersion && (
+													<React.Fragment>
+														<div>
+															Draft · {inputsSinceVersion.length}{" "}
+															Update
+															{inputsSinceVersion.length !== 1 && "s"}
+														</div>
+													</React.Fragment>
+												)}
+											</Button>
+										</Select>
+										{!activeVersion && !!inputsSinceVersion.length && (
+											<div>
+												<Button
+													text={"Publish new version"}
+													onClick={publishVersion}
+													loading={isPublishing}
 												/>
-											);
-										}}
-										onItemSelect={(item) => {
-											const newValue =
-												item.number === "Draft" ? undefined : item;
-											setActiveVersion(newValue);
-										}}
-										filterable={false}
-										popoverProps={{
-											minimal: true,
-											modifiers: {
-												preventOverflow: { enabled: false },
-												flip: { enabled: false },
-											},
-										}}
-									>
-										<Button outlined rightIcon="caret-down">
-											{activeVersion && (
-												<React.Fragment>
-													Version {activeVersion.number} · Published{" "}
-													{convertToLocaleDateString(
-														activeVersion.createdAt
-													)}
-												</React.Fragment>
-											)}
-											{!activeVersion && (
-												<React.Fragment>
-													<div>
-														Draft · {inputsSinceVersion.length} Updates
-													</div>
-												</React.Fragment>
-											)}
-										</Button>
-									</Select>
-									{!activeVersion && !!inputsSinceVersion.length && (
-										<div>
-											<Button
-												text={"Publish new version"}
-												onClick={publishVersion}
-												loading={isPublishing}
-											/>
-										</div>
-									)}
-									{activeVersion && !!inputsSinceVersion.length && (
-										<div>
-											<Button
-												text={`${inputsSinceVersion.length} Updates on Draft`}
-												outlined
-												intent={Intent.WARNING}
-												onClick={() => {
-													setActiveVersion(undefined);
-												}}
-											/>
-										</div>
-									)}
+											</div>
+										)}
+										{activeVersion && !!inputsSinceVersion.length && (
+											<div>
+												<Button
+													text={`${inputsSinceVersion.length} Update${
+														inputsSinceVersion.length !== 1 ? "s" : ""
+													} on Draft`}
+													outlined
+													intent={Intent.WARNING}
+													onClick={() => {
+														setActiveVersion(undefined);
+													}}
+												/>
+											</div>
+										)}
+									</div>
 
-									{/* {!activeVersion && <div />} */}
-									<div>
+									<div className={styles.buttonGroup}>
 										<Button
-											style={{ marginRight: "10px" }}
 											outlined
 											text={newButtonText}
 											onClick={() => {

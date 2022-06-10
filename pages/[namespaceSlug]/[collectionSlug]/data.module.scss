@@ -20,6 +20,12 @@
 		font-size: 14px;
 		align-items: center;
 		margin-bottom: 15px;
+		.buttonGroup {
+			display: flex;
+			& > *:not(:first-child) {
+				margin-left: 10px;
+			}
+		}
 	}
 	.dataFrame {
 		border: 1px solid #ccc;

@@ -36,26 +36,28 @@ const ExportCreate: React.FC<Props> = function ({
 	const [activeVersion, setActiveVersion] = useState(lastVersion);
 	const schema = collection.schemas[0].content as Schema;
 	useEffect(() => {
-		const mapping = {};
-		schema.forEach((schemaClass) => {
-			const classMap = {
-				include: true,
-				rename: "",
-				attributes: {},
-			};
-			schemaClass.attributes.forEach((attr) => {
-				classMap.attributes[attr.key] = {
+		if (!newExport.mapping) {
+			const mapping = {};
+			schema.forEach((schemaClass) => {
+				const classMap = {
 					include: true,
 					rename: "",
+					attributes: {},
 				};
+				schemaClass.attributes.forEach((attr) => {
+					classMap.attributes[attr.key] = {
+						include: true,
+						rename: "",
+					};
+				});
+				mapping[schemaClass.key] = classMap;
 			});
-			mapping[schemaClass.key] = classMap;
-		});
-		setNewExport({
-			...newExport,
-			versionId: activeVersion.id,
-			mapping: mapping,
-		});
+			setNewExport({
+				...newExport,
+				versionId: activeVersion.id,
+				mapping: mapping,
+			});
+		}
 	}, []);
 	return (
 		<div className={styles.create}>
@@ -149,79 +151,89 @@ const ExportCreate: React.FC<Props> = function ({
 			</div>
 			<div className={classNames(styles.sectionContent)}>
 				{schema.map((schemaClass) => {
+					const classIncluded = newExport.mapping[schemaClass.key]?.include;
 					return (
 						<div key={schemaClass.id} className={styles.mappingClass}>
 							<div className={styles.classRow}>
-								{schemaClass.key} ·
-								<Checkbox
-									checked={newExport.mapping[schemaClass.key]?.include}
-									label="Include"
-									onChange={(evt) => {
-										const nextMapping = { ...newExport.mapping };
-										nextMapping[schemaClass.key].include = evt.target.checked;
-										setNewExport({
-											...newExport,
-											mapping: nextMapping,
-										});
-									}}
-								/>
-								<InputGroup
-									className="narrow-line-input"
-									placeholder={`Rename...`}
-									type="text"
-									value={newExport.mapping[schemaClass.key]?.rename}
-									onChange={(evt) => {
-										const nextMapping = { ...newExport.mapping };
-										nextMapping[schemaClass.key].rename = evt.target.value;
-										setNewExport({
-											...newExport,
-											mapping: nextMapping,
-										});
-									}}
-								/>
+								<div className={styles.schemaKey}>{schemaClass.key}</div>
+								<div className={styles.checkbox}>
+									<Checkbox
+										checked={classIncluded}
+										label="Include"
+										onChange={(evt) => {
+											const nextMapping = { ...newExport.mapping };
+											nextMapping[schemaClass.key].include =
+												evt.target.checked;
+											setNewExport({
+												...newExport,
+												mapping: nextMapping,
+											});
+										}}
+									/>
+								</div>
+								{classIncluded && (
+									<InputGroup
+										className="narrow-line-input"
+										placeholder={`Rename...`}
+										type="text"
+										value={newExport.mapping[schemaClass.key]?.rename}
+										onChange={(evt) => {
+											const nextMapping = { ...newExport.mapping };
+											nextMapping[schemaClass.key].rename = evt.target.value;
+											setNewExport({
+												...newExport,
+												mapping: nextMapping,
+											});
+										}}
+									/>
+								)}
 							</div>
 							{schemaClass?.attributes.map((attr) => {
+								const attrIncluded =
+									newExport.mapping[schemaClass.key]?.attributes[attr.key]
+										.include;
 								return (
 									<div key={attr.id} className={styles.attrRow}>
-										{attr.key} ·{" "}
-										<Checkbox
-											checked={
-												newExport.mapping[schemaClass.key]?.attributes[
-													attr.key
-												].include
-											}
-											label="Include"
-											onChange={(evt) => {
-												const nextMapping = { ...newExport.mapping };
-												nextMapping[schemaClass.key].attributes[
-													attr.key
-												].include = evt.target.checked;
-												setNewExport({
-													...newExport,
-													mapping: nextMapping,
-												});
-											}}
-										/>
-										<InputGroup
-											className="narrow-line-input"
-											placeholder={`Rename...`}
-											type="text"
-											value={
-												newExport.mapping[schemaClass.key]?.attributes[
-													attr.key
-												].rename
-											}
-											onChange={(evt) => {
-												const nextMapping = { ...newExport.mapping };
-												nextMapping[schemaClass.key].attributes[
-													attr.key
-												].rename = evt.target.value;
-												setNewExport({
-													...newExport,
-													mapping: nextMapping,
-												});
-											}}
-										/>
+										<div className={styles.attrKey}>{attr.key}</div>
+										<div className={styles.checkbox}>
+											<Checkbox
+												checked={attrIncluded}
+												disabled={!classIncluded}
+												label="Include"
+												onChange={(evt) => {
+													const nextMapping = { ...newExport.mapping };
+													nextMapping[schemaClass.key].attributes[
+														attr.key
+													].include = evt.target.checked;
+													setNewExport({
+														...newExport,
+														mapping: nextMapping,
+													});
+												}}
+											/>
+										</div>
+										{attrIncluded && classIncluded && (
+											<InputGroup
+												className="narrow-line-input"
+												placeholder={`Rename...`}
+												type="text"
+												value={
+													newExport.mapping[schemaClass.key]?.attributes[
+														attr.key
+													].rename
+												}
+												onChange={(evt) => {
+													const nextMapping = { ...newExport.mapping };
+													nextMapping[schemaClass.key].attributes[
+														attr.key
+													].rename = evt.target.value;
+													setNewExport({
+														...newExport,
+														mapping: nextMapping,
+													});
+												}}
+											/>
+										)}
 									</div>
 								);
 							})}
@@ -245,6 +257,7 @@ const ExportCreate: React.FC<Props> = function ({
 					text="Generate Export"
 					onClick={generateExport}
 					loading={isGenerating}
+					disabled={!newExport?.name}
 				/>
 			</div>
 		</div>

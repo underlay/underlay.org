@@ -61,6 +61,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 					<div>
 						<div style={{ display: "flex", justifyContent: "flex-end" }}>
 							<Button
+								disabled={!collection.versions.length}
 								outlined
 								text={newButtonText}
 								onClick={() => {
