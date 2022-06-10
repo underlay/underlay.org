@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Icon, Intent } from "@blueprintjs/core";
+import { Button, HTMLSelect, Icon, Intent } from "@blueprintjs/core";
 import classNames from "classnames";
 
 import styles from "./DataUploadDialog.module.scss";
@@ -28,7 +28,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
 	const [csvHeaders, setCSVHeaders] = useState<string[]>([]);
-	const hasSomeAlignment = !!newUpload?.mapping.length;
+	const hasSomeAlignment = newUpload?.mapping ? newUpload.mapping.length : false;
 	const file = newUpload?.file;
 
 	const setHeaders = (file: File) => {
@@ -91,10 +91,27 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 				<div className={styles.title}>Complete Upload</div>
 			</div>
 			<div className={classNames(styles.sectionContent)}>
+				<div className={styles.behaviorRow}>
+					Upload Behavior:
+					<HTMLSelect
+						value={newUpload?.reductionType || "merge"}
+						onChange={(evt) => {
+							const nextNewUpload = newUpload
+								? { ...newUpload, reductionType: evt.target.value }
+								: { reductionType: evt.target.value };
+							setNewUpload(nextNewUpload);
+						}}
+					>
+						<option value={"merge"}>Merge</option>
+						<option value={"overwrite"}>Overwrite</option>
+						<option value={"concat"}>Concatenate</option>
+					</HTMLSelect>
+				</div>
 				<p>
 					Completing the upload adds data to the collection's draft version. You will be
 					able to review this data, upload more data, and publish a new version as needed.
 				</p>
+
 				<Button
 					disabled={!hasSomeAlignment}
 					style={{ marginTop: "10px" }}

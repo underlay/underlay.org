@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
 import classNames from "classnames";
-import {
-	Button,
-	ButtonGroup,
-	Checkbox,
-	HTMLSelect,
-	InputGroup,
-	Intent,
-	MenuItem,
-} from "@blueprintjs/core";
+import { Button, Checkbox, HTMLSelect, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
 
 import { Section } from "components";
 import { Schema } from "utils/shared/types";

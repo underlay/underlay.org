@@ -15,7 +15,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	}
 
 	// TODO: Make sure loginId has permissions for associated namespaceId
-	const { collectionId, fileUri, mapping } = req.body;
+	const { collectionId, fileUri, mapping, reductionType } = req.body;
 	const collection = await prisma.collection.findUnique({
 		where: { id: collectionId },
 		include: { schemas: { orderBy: { createdAt: "desc" } } },
@@ -45,7 +45,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	const inputObject = await prisma.input.create({
 		data: {
 			id: inputObjectId,
-			reductionType: "merge", // merge, overwrite, concat
+			reductionType: reductionType, // merge, overwrite, concat
 			outputData: outputData,
 			schemaId: schema.id,
 			sourceCsvId: sourceCsv.id,

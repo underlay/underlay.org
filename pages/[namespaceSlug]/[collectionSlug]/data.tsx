@@ -18,9 +18,9 @@ import { Version } from "@prisma/client";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
-	const [newUpload, setNewUpload] = useState<undefined | { file: File; mapping: Mapping }>(
-		undefined
-	);
+	const [newUpload, setNewUpload] = useState<
+		undefined | { file: File; mapping: Mapping; reductionType?: string }
+	>(undefined);
 	const [collection, setCollection] = useState(initCollection);
 	const [newUploadInProgress, setNewUploadInProgress] = useState(false);
 	const [newUploadOpen, setNewUploadOpen] = useState(false);
@@ -67,6 +67,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 					collectionId: collection.id,
 					fileUri: publicURL,
 					mapping: newUpload.mapping,
+					reductionType: newUpload.reductionType || "merge",
 				}),
 			});
 			const data = await response.json();

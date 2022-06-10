@@ -48,3 +48,11 @@
 .icon {
 	margin-left: 10px !important;
 }
+.behaviorRow {
+	display: flex;
+	align-items: center;
+	margin-bottom: 15px;
+	& > *:first-child {
+		margin-left: 5px;
+	}
+}
