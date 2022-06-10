@@ -42,9 +42,12 @@ const DataMapping: React.FC<Props> = function ({
 		setMappedHeaders(newArr);
 		onMappingChange(newArr);
 
-		if (newArr.filter((o) => o === DEFAULT_HEADER).length === 0) {
-			onMappingCompleted();
-		}
+		// TODO: We should not require all fields to be completed.
+		// But not exactly sure where in the flow to fix.
+		// Commenting out for now...
+		// if (newArr.filter((o) => o === DEFAULT_HEADER).length === 0) {
+		onMappingCompleted();
+		// }
 	};
 
 	return (

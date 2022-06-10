@@ -115,7 +115,7 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 			return;
 		}
 		const uniqueAttr = nodeClass.attributes.find((attr) => {
-			return attr.isUnique;
+			return attr.isUID;
 		});
 		const uniqueAttrKey = uniqueAttr?.key;
 		classData.forEach((entity) => {
@@ -147,7 +147,7 @@ export const mergeJsons = (schema: Schema, oldJson: {}, newJson: {}) => {
 			return;
 		}
 		const uniqueAttr = relationshipClass.attributes.find((attr) => {
-			return attr.isUnique;
+			return attr.isUID;
 		});
 		const uniqueAttrKey = uniqueAttr?.key;
 		classData.forEach((entity) => {

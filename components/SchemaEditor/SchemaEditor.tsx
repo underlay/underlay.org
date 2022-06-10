@@ -44,14 +44,14 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 					key: "source",
 					type: "reference",
 					isOptional: false,
-					isUnique: false,
+					isUID: false,
 				},
 				{
 					id: uuidv4(),
 					key: "target",
 					type: "reference",
 					isOptional: false,
-					isUnique: false,
+					isUID: false,
 				},
 			],
 		};

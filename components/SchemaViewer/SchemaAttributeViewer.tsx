@@ -26,7 +26,7 @@ const SchemaAttributeViewer: React.FC<Props> = function ({ isFixed, attribute, s
 				<div>{attribute.type}</div>
 			)}
 			{!attribute.isOptional && <div>Required</div>}
-			{attribute.isUnique && <div>Unique</div>}
+			{attribute.isUID && <div>Unique Identifier</div>}
 		</div>
 	);
 };

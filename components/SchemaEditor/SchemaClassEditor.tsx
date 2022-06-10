@@ -28,13 +28,16 @@ const SchemaClassEditor: React.FC<Props> = function ({
 			key: "",
 			type: "Text",
 			isOptional: false,
-			isUnique: false,
+			isUID: false,
 		};
 		updateClass(schemaClass.id, { attributes: [...schemaClass.attributes, defaultAttribute] });
 	};
 	const removeClass = () => {
 		updateClass(schemaClass.id, { id: null });
 	};
+	const uidAttr = schemaClass.attributes.find((attr) => {
+		return attr.isUID;
+	});
 	return (
 		<div className={styles.schemaClass}>
 			<div className={styles.classHeader}>
@@ -61,6 +64,7 @@ const SchemaClassEditor: React.FC<Props> = function ({
 							updateAttribute={(attributeId: string, updates: Attribute) => {
 								updateAttribute(schemaClass.id, attributeId, updates);
 							}}
+							uidAttr={uidAttr}
 						/>
 					</div>
 				);

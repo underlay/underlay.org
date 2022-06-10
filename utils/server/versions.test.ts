@@ -6,15 +6,15 @@ const schema = [
 		id: "s1",
 		key: "Person",
 		attributes: [
-			{ id: "s2", key: "name", type: "Text", isUnique: true, isOptional: false },
-			{ id: "s3", key: "age", type: "Text", isUnique: false, isOptional: false },
+			{ id: "s2", key: "name", type: "Text", isUID: true, isOptional: false },
+			{ id: "s3", key: "age", type: "Text", isUID: false, isOptional: false },
 		],
 	},
 	{
 		id: "s4",
 		key: "Location",
 		attributes: [
-			{ id: "s5", key: "cityName", type: "Text", isUnique: true, isOptional: false },
+			{ id: "s5", key: "cityName", type: "Text", isUID: true, isOptional: false },
 		],
 	},
 	{
@@ -22,9 +22,9 @@ const schema = [
 		key: "BornIn",
 		isRelationship: true,
 		attributes: [
-			{ id: "s7", key: "source", type: "s1", isUnique: false, isOptional: false },
-			{ id: "s8", key: "target", type: "s4", isUnique: false, isOptional: false },
-			{ id: "s9", key: "year", type: "Number", isUnique: false, isOptional: false },
+			{ id: "s7", key: "source", type: "s1", isUID: false, isOptional: false },
+			{ id: "s8", key: "target", type: "s4", isUID: false, isOptional: false },
+			{ id: "s9", key: "year", type: "Number", isUID: false, isOptional: false },
 		],
 		
 	},
@@ -145,7 +145,7 @@ test("merge - relationship with unique", () => {
 	*/
 	const schemaRel = [...schema];
 	// prettier-ignore
-	schemaRel[2].attributes.push({ id: "s10", key: "manualId", type: "Number", isUnique: true, isOptional: false });
+	schemaRel[2].attributes.push({ id: "s10", key: "manualId", type: "Number", isUID: true, isOptional: false });
 
 	const data1Rel = { ...data1 };
 	data1Rel.BornIn[0].manualId = "0";

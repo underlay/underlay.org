@@ -98,6 +98,7 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 								csvHeader: mappedHeaders[i],
 							};
 						});
+						console.log(mapping);
 						setNewUpload({
 							file,
 							mapping,

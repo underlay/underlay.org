@@ -9,6 +9,7 @@ type Props = {
 	attribute: Attribute;
 	schemaNodes: Partial<Class>[];
 	updateAttribute: any;
+	uidAttr?: Attribute;
 };
 
 const SchemaAttributeEditor: React.FC<Props> = function ({
@@ -16,6 +17,7 @@ const SchemaAttributeEditor: React.FC<Props> = function ({
 	attribute,
 	schemaNodes,
 	updateAttribute,
+	uidAttr,
 }) {
 	const handleKeyUpdate = (evt: any) => {
 		updateAttribute(attribute.id, { key: evt.target.value });
@@ -27,7 +29,7 @@ const SchemaAttributeEditor: React.FC<Props> = function ({
 		updateAttribute(attribute.id, { type: evt.target.value });
 	};
 	const handleUniqueUpdate = (evt: any) => {
-		updateAttribute(attribute.id, { isUnique: evt.target.checked });
+		updateAttribute(attribute.id, { isUID: evt.target.checked });
 	};
 	const setOptional = () => {
 		updateAttribute(attribute.id, { isOptional: true });
@@ -89,9 +91,10 @@ const SchemaAttributeEditor: React.FC<Props> = function ({
 							/>
 						</ButtonGroup>
 						<Checkbox
+							disabled={uidAttr && uidAttr.id !== attribute.id}
 							className={styles.checkbox}
-							label={"Unique"}
-							checked={attribute.isUnique}
+							label={"Unique Identifier"}
+							checked={attribute.isUID}
 							onChange={handleUniqueUpdate}
 						/>
 						<Button onClick={removeAttribute} icon="trash" small minimal />
