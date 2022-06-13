@@ -10,7 +10,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 		name: "",
 		isPublic: true,
 		format: "JSON",
-		mapping: {},
+		mapping: undefined,
 		versionId: "",
 	};
 	const [newExport, setNewExport] = useState(defaultNewExportState);
