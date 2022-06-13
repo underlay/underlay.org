@@ -3,28 +3,28 @@ import { parse } from "csv-parse";
 import type { Entity, Class, Mapping } from "utils/shared/types";
 import { mapData } from "utils/shared/mapping";
 
-export const uploadData = async (file: File, fileName: string, version: string) => {
-	fileName = fileName.replace(".csv", version + ".csv");
-	const { publicURL, error: urlError } = supabase.storage.from("data").getPublicUrl(fileName);
-	if (urlError) {
-		throw urlError;
-	}
+// export const uploadData = async (file: File, fileName: string, version: string) => {
+// 	fileName = fileName.replace(".csv", version + ".csv");
+// 	const { publicURL, error: urlError } = supabase.storage.from("data").getPublicUrl(fileName);
+// 	if (urlError) {
+// 		throw urlError;
+// 	}
 
-	let { error: uploadError } = await supabase.storage.from("data").upload(fileName, file);
-	if (uploadError) {
-		// File already exists. Reupload
-		if ((uploadError as any).statusCode === "23505") {
-			let { error: updateError } = await supabase.storage.from("data").update(fileName, file);
-			if (updateError) {
-				throw updateError;
-			}
-		} else {
-			throw uploadError;
-		}
-	}
+// 	let { error: uploadError } = await supabase.storage.from("data").upload(fileName, file);
+// 	if (uploadError) {
+// 		// File already exists. Reupload
+// 		if ((uploadError as any).statusCode === "23505") {
+// 			let { error: updateError } = await supabase.storage.from("data").update(fileName, file);
+// 			if (updateError) {
+// 				throw updateError;
+// 			}
+// 		} else {
+// 			throw uploadError;
+// 		}
+// 	}
 
-	return publicURL;
-};
+// 	return publicURL;
+// };
 
 export const downloadData = async (
 	fileName: string,

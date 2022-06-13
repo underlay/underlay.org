@@ -33,10 +33,10 @@ const AvatarUpload: React.FC<Props> = function ({ onComplete, buttonText = "Set 
 		x: 0,
 		y: 0,
 	});
-	const onCropChange = useCallback((crop) => {
+	const onCropChange = useCallback((crop: any) => {
 		setCrop(crop);
 	}, []);
-	const onCropComplete = useCallback((_croppedArea, croppedAreaPixels) => {
+	const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
 		setCroppedAreaPixels(croppedAreaPixels);
 	}, []);
 	const hiddenFileInput = useRef(null);

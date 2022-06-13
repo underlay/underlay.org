@@ -15,7 +15,7 @@ const Header = () => {
 				<AnchorButton
 					className={styles.title}
 					icon={<img src="/logo.svg" alt="Underlay logo" />}
-					text="Underlay"
+					// text="Underlay"
 					href="/"
 					minimal
 				/>

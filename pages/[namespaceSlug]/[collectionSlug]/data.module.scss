@@ -20,16 +20,26 @@
 		font-size: 14px;
 		align-items: center;
 		margin-bottom: 15px;
+		.buttonGroup {
+			display: flex;
+			& > *:not(:first-child) {
+				margin-left: 10px;
+			}
+		}
 	}
 	.dataFrame {
 		border: 1px solid #ccc;
 		border-radius: 2px;
 		padding: 20px;
 		min-height: 60vh;
-		max-height: 90vh;
+		// max-height: 90vh;
 		overflow-y: scroll;
 	}
 	.emptyState {
 		margin-top: 75px;
 	}
+}
+.inputDate {
+	opacity: 0.8;
+	font-size: 14px;
 }

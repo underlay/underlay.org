@@ -21,6 +21,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 	if (namespaceSlug && collectionSlug) {
 		const collection = await prisma.collection.findFirst({
 			where: {
+				// @ts-ignore
 				slug: {
 					equals: collectionSlug,
 				},
@@ -38,7 +39,6 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 		if (!collection) {
 			return res.status(400);
 		}
-
 		const fileName = `${namespaceSlug}/${collectionSlug}${collection?.version}.csv`;
 
 		const { data, error } = await supabase.storage.from("data").download(fileName);

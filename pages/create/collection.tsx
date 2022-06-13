@@ -15,7 +15,7 @@ import { Select } from "@blueprintjs/select";
 
 import { Avatar, Form } from "components";
 import { getLoginId } from "utils/server/auth/user";
-import { slugifyString } from "utils/shared/strings";
+import { makeSlug, slugifyString } from "utils/shared/strings";
 import prisma from "prisma/db";
 
 import styles from "./collection.module.scss";
@@ -47,7 +47,10 @@ const CreateCollection: React.FC<Props> = ({ validNamespaces }) => {
 		});
 		const newCollection = await response.json();
 		if (newCollection) {
-			window.location.href = `/${newCollection.namespace.slug}/${newCollection.slug}`;
+			window.location.href = `/${newCollection.namespace.slug}/${makeSlug(
+				newCollection.slugPrefix,
+				newCollection.slugSuffix
+			)}`;
 		} else {
 			setIsLoading(false);
 		}

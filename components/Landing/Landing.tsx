@@ -1,186 +1,103 @@
-import React from "react";
+import { InputGroup } from "@blueprintjs/core";
+import classNames from "classnames";
+import Form from "components/Form/Form";
+import React, { useState } from "react";
 
 import styles from "./Landing.module.scss";
 
 type Props = {};
 
 const Landing: React.FC<Props> = function () {
-	const blocks = [
-		{
-			title: "Assertions",
-			icon: "/assertions.svg",
-			text: "The fundamental unit of data in the Underlay. Immutable statements that can specify their provenance and be cryptographically signed to allow for trust- and context-based filtering.",
-			spec: "https://github.com/underlay/arc-protocol/blob/master/assertions.md",
-			specText: "View Assertion Spec",
-		},
-		{
-			title: "Reduction",
-			icon: "/reduction.svg",
-			text: "The process of taking a set of assertions and merging them to create a consistent state. Reduction allows assertions to be used as immutable transactions that change a larger graph.",
-			spec: "https://github.com/underlay/arc-protocol/blob/master/reduction.md",
-			specText: "View Reduction Spec",
-		},
-		{
-			title: "Collections",
-			icon: "/collections.svg",
-			text: "Containers that enable curation of a usefully scoped set of graph data. Collections can be versioned and include a set of assertions, a reduction schema, other sub-collections, and metadata.",
-			spec: "https://github.com/underlay/arc-protocol/blob/master/collections.md",
-			specText: "View Collection Spec",
-		},
-	];
+	const [query, setQuery] = useState("");
 
-	const readings = [
+	const links = [
 		{
-			rfcNumber: "1",
-			title: "A Short Introduction to the Underlay",
-			date: "Aug 2, 2020 · Danny Hillis",
-			link: "https://notes.knowledgefutures.org/pub/underlay-short-intro/release/1",
+			title: "Featured Communities",
+			items: [
+				{ text: "Arcadia Science", href: "/arcadia" },
+				{ text: "CUNY", href: "/cuny" },
+				{ text: "NewsQ", href: "/newsq" },
+			],
 		},
 		{
-			rfcNumber: "0",
-			title: "Underlay RFCs",
-			date: "Aug 2, 2020 · Danny Hillis",
-			link: "https://notes.knowledgefutures.org/pub/urfcs/release/1",
+			title: "Featured Collections",
+			items: [
+				{ text: "arcadia/proteins", href: "/arcadia/proteins" },
+				{ text: "newsq/full-source", href: "/newsq/full-source" },
+				{
+					text: "hh/reliable-vaccine-news-sources",
+					href: "/hh/reliable-vaccine-news-sources",
+				},
+			],
 		},
 		{
-			rfcNumber: "-1",
-			title: "Understander: A Science Annotator",
-			date: "May 14, 2020 · Samuel Klein",
-			link: "https://notes.knowledgefutures.org/pub/annotator/release/2",
+			title: "Resources",
+			items: [
+				{ text: "Github", href: "https://github.com/underlay" },
+				{
+					text: "RFCs",
+					href: "https://github.com/underlay/overview/blob/master/community/RFCs.md",
+				},
+				{ text: "Contact", href: "mailto:team@underlay.org" },
+			],
 		},
-		{
-			rfcNumber: "-2",
-			title: "Open Research Questions (2019)",
-			date: "Nov 26, 2019 · Joel Gustafson",
-			link: "https://notes.knowledgefutures.org/pub/research-questions/release/1",
-		},
-		{
-			rfcNumber: "-3",
-			title: "Content-Addressing Semantic Data",
-			date: "Oct 24, 2019 (updated Aug 31, 2020) · Joel Gustafson",
-			link: "https://notes.knowledgefutures.org/pub/ic0grz58/release/3",
-		},
-		{
-			rfcNumber: "-4",
-			title: "Data and Model Sharing",
-			date: "Sep 17, 2019 (updated Sep 30, 2020) · Samuel Klein",
-			link: "https://notes.knowledgefutures.org/pub/data-sharing-questions/release/18",
-		},
-	];
-
-	const joinButtons = [
-		{ title: "Newsletter", icon: "", link: "https://eepurl.com/gJL39b" },
-		{ title: "Github", icon: "", link: "https://github.com/underlay" },
-		{ title: "Contact", icon: "", link: "mailto:team@underlay.org" },
 	];
 
 	return (
 		<div className={styles.landing}>
-			<section className={styles.intro}>
-				<h1>The world’s distributed knowledge graph</h1>
-				<p>
-					The Underlay's purpose is to make knowledge accessible, connectable, and
-					inspectable in service of the public good. Like the web, it is an emergent
-					system and concept. It is built on a set of open source protocols and tools for
-					structuring, storing, and aggregating distributed graph data.
-				</p>
-			</section>
-			<section className={styles.how}>
-				<h2>How it Works</h2>
-				<p>
-					The Underlay is premised on the idea that a knowledge graph can be constructed
-					from a series of distributed transactions called <b>assertions</b>. Multiple
-					assertions are combined through a process called <b>reduction</b> and can be
-					curated into useful groupings using <b>collections</b>.
-				</p>
-				<div className={styles.blocks}>
-					{blocks.map((item) => {
+			<div className={styles.top}>
+				<h1>Underlay</h1>
+				<p>Publish data that people can use</p>
+				<Form
+					onSubmit={(evt) => {
+						evt.preventDefault();
+					}}
+				>
+					<InputGroup
+						id="email-input"
+						required={true}
+						value={query}
+						large
+						onChange={(evt) => setQuery(evt.target.value)}
+						placeholder="Find collections to use and communities to join..."
+					/>
+				</Form>
+			</div>
+			<div className={styles.bottom}>
+				<div className={styles.details}>
+					<p>
+						Our mission is to build a neutral, open-source space to publish and share
+						data. With features like…you can leverage provenance and rich structures to
+						make your data sustainable, understood, and accessible.
+					</p>
+					<img className={styles.logo} src="/kfgIcon.svg" />
+					<p>
+						Underlay is a project of Knowledge Futures Group, a non-profit dedicated to
+						sustainable, equitable, effective public knowledge infrastructure. Support
+						Knowledge Futures by becoming a member.
+					</p>
+				</div>
+				<div className={styles.links}>
+					{links.map((section) => {
 						return (
-							<div key={item.title} className={styles.block}>
-								<div className={styles.imageWrapper}>
-									<img className={styles.icon} src={item.icon} alt={item.title} />
-								</div>
-								<div className={styles.title}>{item.title}</div>
-								<div className={styles.text}>{item.text}</div>
-								<div className={styles.link}>
-									<a className={styles.button} href={item.spec}>
-										{item.specText}
-									</a>
-								</div>
+							<div key={section.title} className={styles.linkSection}>
+								<div className={styles.sectionTitle}>{section.title}</div>
+								{section.items.map((item) => {
+									return (
+										<a
+											key={item.href}
+											className={classNames("hoverline", styles.item)}
+											href={item.href}
+										>
+											{item.text}
+										</a>
+									);
+								})}
 							</div>
 						);
 					})}
 				</div>
-				<div className={styles.registryBlock}>
-					<img src="/registry.svg" alt="Registry icon" />
-					<div>
-						<div className={styles.title}>Registries</div>
-						<div className={styles.text}>
-							A hosted service that manages collections and implements usage policies.
-							Registries can implement query capabilities, user authentication, or
-							other features that make the content and its creation more accessible.
-						</div>
-						<div className={styles.text}>
-							A first Underlay registry is being developed in parallel to the protocol
-							and specs.
-						</div>
-						<div className={styles.link}>
-							<a className={styles.button} href="https://r1.underlay.org">
-								Visit R1
-							</a>
-						</div>
-					</div>
-				</div>
-			</section>
-			<section className={styles.read}>
-				<h2 id="rfcs" className={styles.rfcs}>
-					RFCs
-				</h2>
-				<p>
-					<span>
-						The Underlay maintains a RFC (Request for Comments) series to document our
-						ideas, proposals, progress, and plans. RFCs represent snapshots of thinking
-						and may contain outdated or deprecated ideas. For a more thorough
-						description, see{" "}
-					</span>
-					<a href="https://notes.knowledgefutures.org/pub/urfcs/release/1">
-						Danny Hillis's RFC 0
-					</a>
-					.
-				</p>
-				<div className={styles.readings}>
-					{readings.map((item) => {
-						return (
-							<a key={item.link} className={styles.reading} href={item.link}>
-								<div>
-									<b>RFC {item.rfcNumber}</b> {item.title}
-								</div>
-								<div className={styles.date}>{item.date}</div>
-							</a>
-						);
-					})}
-				</div>
-				<p>
-					<a
-						className={styles.button}
-						href="https://github.com/underlay/overview/blob/master/community/RFCs.md"
-					>
-						View all RFCs
-					</a>
-				</p>
-			</section>
-			<section className={styles.join}>
-				<h2>Join the Effort</h2>
-				<div className={styles.joinButtons}>
-					{joinButtons.map((item) => {
-						return (
-							<a key={item.title} className={styles.button} href={item.link}>
-								{item.title}
-							</a>
-						);
-					})}
-				</div>
-			</section>
+			</div>
 		</div>
 	);
 };

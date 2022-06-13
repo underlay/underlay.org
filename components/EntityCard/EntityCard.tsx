@@ -12,14 +12,13 @@ const EntityCard: React.FC<Props> = function ({ node, entity, relationshipRender
 	return (
 		<div key={entity.id} className={styles.entityCard}>
 			{Object.keys(entity).map((attribute) => {
-				if (attribute === "id") {
+				if (attribute === "_ulid" || attribute === "_ulprov") {
 					return null;
 				}
 
 				const matchAttr = node.attributes.find((a) => a.key === attribute);
-
 				return (
-					<div key={entity.id + attribute}>
+					<div key={entity._ulid + attribute}>
 						<div className={styles.propertyWrapper}>
 							<div className={styles.propertyHeader}>{attribute}:</div>
 							{matchAttr && matchAttr.type === "URL" ? (

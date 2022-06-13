@@ -1,23 +1,24 @@
-import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import React, { useState } from "react";
+import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import { v4 as uuidv4 } from "uuid";
 
 import { ThreeColumnFrame } from "components";
-
-import SchemaClass from "./SchemaClass";
-import styles from "./SchemaEditor.module.scss";
 import type { Attribute, Schema } from "utils/shared/types";
+import { CollectionProps } from "utils/server/collections";
+
+import SchemaClassEditor from "./SchemaClassEditor";
+import styles from "./SchemaEditor.module.scss";
 
 type Props = {
-	collectionId: string;
-	schema: Schema | null;
-	version: string | null;
+	collection: CollectionProps["collection"];
+	setCollection: any;
+	setIsEditing: any;
 };
 
-const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSchema, version }) {
-	const [schema, setSchema] = useState(initSchema || []);
-	const [canSave, setCanSave] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
+const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, setIsEditing }) {
+	const [schema, setSchema] = useState<Schema>((collection.schemas[0]?.content as Schema) || []);
+	const [canSave, setCanSave] = useState<boolean>(false);
+	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const addNode = (addAtEnd: boolean) => {
 		setCanSave(true);
 		const defaultNode = {
@@ -43,14 +44,14 @@ const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSche
 					key: "source",
 					type: "reference",
 					isOptional: false,
-					isUnique: false,
+					isUID: false,
 				},
 				{
 					id: uuidv4(),
 					key: "target",
 					type: "reference",
 					isOptional: false,
-					isUnique: false,
+					isUID: false,
 				},
 			],
 		};
@@ -96,21 +97,24 @@ const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSche
 	};
 	const handleSave = async () => {
 		setIsSaving(true);
-		await fetch("/api/schema", {
+		const response = await fetch("/api/schema", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				collectionId: collectionId,
+				collectionId: collection.id,
 				schema: schema,
 			}),
 		});
+		const json = await response.json();
+		setCollection({
+			...collection,
+			schemas: json.version === "0.0" ? [json] : [json, ...collection.schemas],
+		});
 		setIsSaving(false);
 		setCanSave(false);
+		setIsEditing(false);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
-		if (version) {
-			return null;
-		}
 		const nodeFunc = () => {
 			addNode(addAtEnd);
 		};
@@ -144,12 +148,19 @@ const SchemaEditor: React.FC<Props> = function ({ collectionId, schema: initSche
 						loading={isSaving}
 						onClick={handleSave}
 					/>
+					<Button
+						className={styles.sticky}
+						text={"Cancel"}
+						onClick={() => {
+							setIsEditing(false);
+						}}
+					/>
 					{buttonRow(false)}
 
 					{schema.map((schemaClass) => {
 						return (
 							<div key={schemaClass.id} className={styles.classWrapper}>
-								<SchemaClass
+								<SchemaClassEditor
 									schemaClass={schemaClass}
 									schemaNodes={schemaNodes}
 									updateClass={updateClass}

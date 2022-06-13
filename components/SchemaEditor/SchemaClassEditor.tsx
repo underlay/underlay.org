@@ -2,8 +2,9 @@ import { Button, Icon, InputGroup } from "@blueprintjs/core";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Attribute, Class } from "utils/shared/types";
-import SchemaAttribute from "./SchemaAttribute";
-import styles from "./SchemaClass.module.scss";
+
+import SchemaAttributeEditor from "./SchemaAttributeEditor";
+import styles from "./SchemaClassEditor.module.scss";
 
 type Props = {
 	schemaClass: Class;
@@ -12,7 +13,7 @@ type Props = {
 	updateAttribute: any;
 };
 
-const SchemaClass: React.FC<Props> = function ({
+const SchemaClassEditor: React.FC<Props> = function ({
 	schemaClass,
 	schemaNodes,
 	updateClass,
@@ -27,17 +28,22 @@ const SchemaClass: React.FC<Props> = function ({
 			key: "",
 			type: "Text",
 			isOptional: false,
-			isUnique: false,
+			isUID: false,
 		};
 		updateClass(schemaClass.id, { attributes: [...schemaClass.attributes, defaultAttribute] });
 	};
 	const removeClass = () => {
 		updateClass(schemaClass.id, { id: null });
 	};
+	const uidAttr = schemaClass.attributes.find((attr) => {
+		return attr.isUID;
+	});
 	return (
 		<div className={styles.schemaClass}>
 			<div className={styles.classHeader}>
 				<Icon icon={schemaClass.isRelationship ? "arrow-top-right" : "circle"} />
+
+				<Button onClick={removeClass} icon="trash" small minimal />
 				<InputGroup
 					id={`${schemaClass.id}-Class-Key`}
 					className="narrow-line-input"
@@ -47,22 +53,23 @@ const SchemaClass: React.FC<Props> = function ({
 						schemaClass.isRelationship ? "Relationship name..." : "Node name..."
 					}
 				/>
-				<Button onClick={removeClass} icon="trash" small minimal />
 			</div>
 			{schemaClass.attributes.map((attribute, index) => {
 				return (
 					<div key={attribute.id} className={styles.attributeWrapper}>
-						<SchemaAttribute
+						<SchemaAttributeEditor
 							isFixed={index < 2 && !!schemaClass.isRelationship}
 							attribute={attribute}
 							schemaNodes={schemaNodes}
 							updateAttribute={(attributeId: string, updates: Attribute) => {
 								updateAttribute(schemaClass.id, attributeId, updates);
 							}}
+							uidAttr={uidAttr}
 						/>
 					</div>
 				);
 			})}
+
 			<Button onClick={addAttribute} outlined small>
 				Add Attribute
 			</Button>
@@ -70,4 +77,4 @@ const SchemaClass: React.FC<Props> = function ({
 	);
 };
 
-export default SchemaClass;
+export default SchemaClassEditor;

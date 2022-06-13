@@ -8,9 +8,10 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const [collection, setCollection] = useState(initCollection);
 	const defaultNewExportState = {
 		name: "",
-		isPublic: false,
+		isPublic: true,
 		format: "JSON",
-		mapping: {},
+		mapping: undefined,
+		versionId: "",
 	};
 	const [newExport, setNewExport] = useState(defaultNewExportState);
 	const [newExportInProgress, setNewExportInProgress] = useState(false);
@@ -18,12 +19,17 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const [isGenerating, setIsGenerating] = useState(false);
 	const generateExport = async () => {
 		setIsGenerating(true);
-		const response = await fetch("/api/collection/export", {
+		const response = await fetch("/api/export/json", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
+				name: newExport.name,
+				format: newExport.format,
+				isPublic: newExport.isPublic,
+				mapping: newExport.mapping,
+				versionId: newExport.versionId,
+				schemaId: collection.schemas[0].id,
 				collectionId: collection.id,
-				newExport,
 			}),
 		});
 		const newExportObject = await response.json();
@@ -55,6 +61,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 					<div>
 						<div style={{ display: "flex", justifyContent: "flex-end" }}>
 							<Button
+								disabled={!collection.versions.length}
 								outlined
 								text={newButtonText}
 								onClick={() => {
@@ -72,9 +79,9 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 							}}
 						>
 							<ExportCreate
+								collection={collection}
 								newExport={newExport}
 								setNewExport={wrappedSetNewExport}
-								schema={collection.schema}
 								generateExport={generateExport}
 								isGenerating={isGenerating}
 							/>

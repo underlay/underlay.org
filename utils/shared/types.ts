@@ -66,7 +66,7 @@ export type Attribute = {
 	key: string;
 	type: string;
 	isOptional: boolean;
-	isUnique: boolean;
+	isUID: boolean;
 };
 export type Schema = Class[];
 
