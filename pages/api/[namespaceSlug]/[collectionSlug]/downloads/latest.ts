@@ -39,6 +39,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 		if (!collection) {
 			return res.status(400);
 		}
+		// @ts-ignore
 		const fileName = `${namespaceSlug}/${collectionSlug}${collection?.version}.csv`;
 
 		const { data, error } = await supabase.storage.from("data").download(fileName);
@@ -47,6 +48,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 		}
 		const text = await data.text();
 
+		// @ts-ignore
 		const allNodes: Class[] = collection.schema as any;
 		const nodes = allNodes.filter((n) => !n.isRelationship);
 		const relationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
@@ -55,6 +57,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 			text,
 			nodes,
 			relationships,
+			// @ts-ignore
 			collection.schemaMapping as Mapping
 		);
 
