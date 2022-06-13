@@ -161,12 +161,10 @@ const ExportCreate: React.FC<Props> = function ({
 														evt.target.checked;
 												} else {
 													nextMapping[schemaClass.key] = {
+														// @ts-ignore
 														include: evt.target.checked,
 													};
 												}
-												// nextMapping[schemaClass.key].include =
-												// 	// @ts-ignore
-												// 	evt.target.checked;
 												setNewExport({
 													...newExport,
 													mapping: nextMapping,
