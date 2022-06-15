@@ -3,6 +3,22 @@ import { parse } from "csv-parse";
 import type { Entity, Class, Mapping } from "utils/shared/types";
 import { mapData } from "utils/shared/mapping";
 
+export const downloadExport = async (fileUri: string, fileName: string) => {
+	const { publicURL, error } = await supabase.storage.from("data").getPublicUrl(fileUri);
+	if (error || !publicURL) {
+		throw error;
+	}
+
+	const link = document.createElement("a");
+	link.download = fileName;
+	link.href = publicURL;
+	link.target = "_blank";
+
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+};
+
 // export const uploadData = async (file: File, fileName: string, version: string) => {
 // 	fileName = fileName.replace(".csv", version + ".csv");
 // 	const { publicURL, error: urlError } = supabase.storage.from("data").getPublicUrl(fileName);
