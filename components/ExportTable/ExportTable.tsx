@@ -1,17 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./ExportTable.module.scss";
-import { Button, Icon } from "@blueprintjs/core";
+import { Button, Icon, Menu, MenuItem } from "@blueprintjs/core";
 import { EmptyState } from "components";
 import { CollectionProps } from "utils/server/collections";
-// import { useLocationContext } from "utils/client/hooks";
-// import { downloadData } from "utils/client/data";
+import { Select } from "@blueprintjs/select";
+import { Version } from "@prisma/client";
+import { downloadExport } from "utils/client/data";
 
 type Props = {
 	setNewExportOpen: any;
 };
 
 const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, setNewExportOpen }) {
-	// const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
+	const [selectedVersions, setSelectedVersions] = useState(
+		collection.exports.map((e) => {
+			return e.exportVersions.length > 0
+				? e.exportVersions[e.exportVersions.length - 1].version.number
+				: "0.0.1";
+		})
+	);
 
 	return (
 		<React.Fragment>
@@ -28,7 +35,9 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, s
 					</tr>
 				</thead>
 				<tbody>
-					{collection.exports.map((exportItem) => {
+					{collection.exports.map((exportItem, exportItemI) => {
+						const selectedVersion = selectedVersions[exportItemI];
+
 						return (
 							<tr key={exportItem.id}>
 								<td>
@@ -44,27 +53,86 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, s
 								<td>Mapping</td>
 								<td>{exportItem.isPublic ? "Public" : "Private"}</td>
 								<td>
+									<Select
+										className={styles.versionSelect}
+										items={exportItem.exportVersions.map((ev) => ev.version)}
+										itemRenderer={(
+											item: Version,
+											{ handleClick, modifiers }
+										) => {
+											const isSelected = item.number === selectedVersion;
+
+											return (
+												<MenuItem
+													className={isSelected ? "" : styles.menuItem}
+													active={modifiers.active}
+													key={item.id}
+													onClick={handleClick}
+													text={item.number}
+													icon={isSelected ? "tick" : undefined}
+												/>
+											);
+										}}
+										onItemSelect={(item: Version) => {
+											setSelectedVersions(
+												selectedVersions.map((v, i) => {
+													if (i === exportItemI) {
+														return item.number;
+													}
+
+													return v;
+												})
+											);
+										}}
+										itemListRenderer={({
+											items,
+											itemsParentRef,
+											renderItem,
+										}) => {
+											const renderedItems = items.reverse().map(renderItem);
+
+											return (
+												<Menu
+													ulRef={itemsParentRef}
+													className={styles.selectMenu}
+												>
+													{renderedItems}
+												</Menu>
+											);
+										}}
+										filterable={false}
+										popoverProps={{
+											minimal: true,
+											modifiers: {
+												preventOverflow: { enabled: false },
+												flip: { enabled: false },
+											},
+										}}
+									>
+										<Button text={selectedVersions[exportItemI]} />
+									</Select>
 									<span>
 										<Icon
 											className={styles.downloadIcon}
 											icon="download"
 											size={14}
 											style={{ position: "relative", top: "-2px" }}
-											// onClick={() => {
-											// 	if (exportItem.format === "JSON") {
-											// 		downloadData(
-											// 			`${namespaceSlug}/${collectionSlug}.csv`,
-											// 			"json",
-											// 			collection.version || "0.0.1"
-											// 		);
-											// 	} else if (exportItem.format === "CSV") {
-											// 		downloadData(
-											// 			`${namespaceSlug}/${collectionSlug}.csv`,
-											// 			"csv",
-											// 			collection.version || "0.0.1"
-											// 		);
-											// 	}
-											// }}
+											onClick={() => {
+												const targetVersion =
+													exportItem.exportVersions.find((v) => {
+														return v.version.number === selectedVersion;
+													});
+												if (targetVersion) {
+													downloadExport(
+														targetVersion.fileUri,
+														`${collection.namespace.slug}/${
+															collection.slugPrefix
+														}-${collection.slugSuffix}-${
+															targetVersion.version.number
+														}.${exportItem.format.toLowerCase()}`
+													);
+												}
+											}}
 										/>
 									</span>
 								</td>
