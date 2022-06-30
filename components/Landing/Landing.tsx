@@ -66,15 +66,17 @@ const Landing: React.FC<Props> = function () {
 			<div className={styles.bottom}>
 				<div className={styles.details}>
 					<p>
-						Our mission is to build a neutral, open-source space to publish and share
-						data. With features like…you can leverage provenance and rich structures to
-						make your data sustainable, understood, and accessible.
+						Underlay is a neutral, open-source space to publish and share data. Core
+						features let you collaboratively maintain your data such that it is
+						granular, composable, and reusable — making it easier for people to actually
+						use.
 					</p>
 					<img className={styles.logo} src="/kfgIcon.svg" />
 					<p>
 						Underlay is a project of Knowledge Futures Group, a non-profit dedicated to
 						sustainable, equitable, effective public knowledge infrastructure. Support
-						Knowledge Futures by becoming a member.
+						KFG by{" "}
+						<a href="https://www.knowledgefutures.org/membership">becoming a member</a>.
 					</p>
 				</div>
 				<div className={styles.links}>

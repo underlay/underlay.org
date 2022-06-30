@@ -103,6 +103,20 @@ export const getCollectionData = async (collectionSlug: string) => {
 			},
 			schemas: { orderBy: { createdAt: "desc" } },
 			versions: { orderBy: { createdAt: "desc" } },
+			discussionThreads: {
+				include: {
+					user: {
+						include: { namespace: true },
+					},
+					discussionItems: {
+						include: {
+							user: {
+								include: { namespace: true },
+							},
+						},
+					},
+				},
+			},
 			inputs: {
 				orderBy: { createdAt: "desc" },
 				include: {

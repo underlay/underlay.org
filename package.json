@@ -57,6 +57,7 @@
 		"react-dom": "^18.1.0",
 		"react-easy-crop": "^4.0.1",
 		"react-markdown": "^8.0.0",
+		"react-timeago": "^7.1.0",
 		"superjson": "^1.7.5",
 		"uuid": "^8.3.1"
 	},

@@ -33,11 +33,13 @@ model User {
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  memberships    Member[]
-  collaborations Collaborator[]
-  exports        Export[]
-  sourcesCsv     SourceCsv[]
-  exportUses     ExportUse[]
+  memberships       Member[]
+  collaborations    Collaborator[]
+  exports           Export[]
+  sourcesCsv        SourceCsv[]
+  exportUses        ExportUse[]
+  discussionThreads DiscussionThread[]
+  discussionItems   DiscussionItem[]
 
   @@map(name: "users")
 }
@@ -85,11 +87,12 @@ model Collection {
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
-  collaborators Collaborator[]
-  exports       Export[]
-  schemas       Schema[]
-  versions      Version[]
-  inputs        Input[]
+  collaborators     Collaborator[]
+  exports           Export[]
+  schemas           Schema[]
+  versions          Version[]
+  inputs            Input[]
+  discussionThreads DiscussionThread[]
 
   @@unique([slugPrefix, namespaceId], name: "slugprefix_namespaceid")
   @@map(name: "collections")
@@ -237,4 +240,35 @@ model SourceApi {
   input Input[]
 
   @@map(name: "sources_api")
+}
+
+model DiscussionThread {
+  id           String     @id @default(uuid())
+  title        String?
+  number       Int
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String     @map(name: "user_id")
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String     @map(name: "collection_id")
+  entityId     String?    @map(name: "entity_id")
+  createdAt    DateTime   @default(now()) @map(name: "created_at")
+  updatedAt    DateTime   @default(now()) @updatedAt @map(name: "updated_at")
+
+  discussionItems DiscussionItem[]
+
+  @@unique([collectionId, number], name: "collectionid_number")
+  @@map(name: "discussion_threads")
+}
+
+model DiscussionItem {
+  id                 String           @id @default(uuid())
+  text               String
+  discussionThread   DiscussionThread @relation(fields: [discussionThreadId], references: [id])
+  discussionThreadId String           @map(name: "discussion_thread_id")
+  user               User             @relation(fields: [userId], references: [id])
+  userId             String           @map(name: "user_id")
+  createdAt          DateTime         @default(now()) @map(name: "created_at")
+  updatedAt          DateTime         @default(now()) @updatedAt @map(name: "updated_at")
+
+  @@map(name: "discussion_items")
 }
