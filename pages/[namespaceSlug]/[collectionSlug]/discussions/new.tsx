@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import { FormGroup, TextArea, InputGroup, Button, Intent } from "@blueprintjs/core";
 
 import { Avatar, CollectionHeader, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
-import { FormGroup, TextArea, InputGroup, Button, Intent } from "@blueprintjs/core";
 import { makeSlug } from "utils/shared/strings";
 import { useLoginContext } from "utils/client/hooks";
 

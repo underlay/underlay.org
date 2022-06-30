@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-
-import { Avatar, CollectionHeader, ThreeColumnFrame } from "components";
-import { getCollectionProps, CollectionProps } from "utils/server/collections";
-import { useLocationContext, useLoginContext } from "utils/client/hooks";
 import ReactMarkdown from "react-markdown";
 import TimeAgo from "react-timeago";
 import { Button, FormGroup, Intent, TextArea } from "@blueprintjs/core";
 
+import { Avatar, CollectionHeader, ThreeColumnFrame } from "components";
+import { getCollectionProps, CollectionProps } from "utils/server/collections";
+import { useLocationContext, useLoginContext } from "utils/client/hooks";
+
 import styles from "./[threadNumber].module.scss";
+
 const CollectionDiscussions: React.FC<CollectionProps> = function ({ collection }) {
 	const loginData = useLoginContext();
 	const { query } = useLocationContext();

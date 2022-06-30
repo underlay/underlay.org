@@ -1,9 +1,9 @@
 import React from "react";
 import TimeAgo from "react-timeago";
+import { AnchorButton } from "@blueprintjs/core";
 
 import { CollectionHeader, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
-import { AnchorButton } from "@blueprintjs/core";
 
 import styles from "./index.module.scss";
 
