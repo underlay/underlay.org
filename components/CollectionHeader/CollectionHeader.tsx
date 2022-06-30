@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon, Tag } from "@blueprintjs/core";
+import { Tag } from "@blueprintjs/core";
 
 import { ScopeNav } from "components";
 import { Collection } from "components/Icons";

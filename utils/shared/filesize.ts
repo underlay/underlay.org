@@ -10,7 +10,11 @@
  *
  * @return Formatted string.
  */
-export function humanFileSize(bytes: number, si = true, dp = 1) {
+export function humanFileSize(bytes: number | string, si = true, dp = 1) {
+	if (typeof bytes === "string") {
+		bytes = parseInt(bytes, 10);
+	}
+
 	const thresh = si ? 1000 : 1024;
 
 	if (Math.abs(bytes) < thresh) {
