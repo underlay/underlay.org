@@ -2,7 +2,6 @@ import React from "react";
 import { Tag } from "@blueprintjs/core";
 
 import { ScopeNav } from "components";
-import { Collection } from "components/Icons";
 import { buildUrl } from "utils/shared/urls";
 import { useLocationContext } from "utils/client/hooks";
 import { collectionNavItems } from "utils/shared/navs";
@@ -46,10 +45,12 @@ const CollectionHeader: React.FC<Props> = function ({ mode, collection }) {
 						)}
 					</div>
 
-					<div className={styles.details}>
-						<div className={styles.icon}>
+					<div>
+						<p className={styles.description}>{collection.description}</p>
+
+						{/* <span className={styles.icon}>
 							<Collection size={20} />
-						</div>
+						</span> */}
 
 						{
 							//@ts-ignore
