@@ -9,6 +9,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	if (!loginId) {
 		return res.status(403).json({ ok: false });
 	}
+	// TODO: Make sure loginId has permissions for associated collection
 	const { discussionThreadId, text } = req.body;
 
 	const newDiscussionItem = await prisma.discussionItem.create({
