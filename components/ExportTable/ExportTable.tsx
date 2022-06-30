@@ -157,5 +157,3 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, s
 };
 
 export default ExportTable;
-
-function getExportSize() {}
