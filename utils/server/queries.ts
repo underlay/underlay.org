@@ -61,7 +61,13 @@ export const getCommunityData = async ({ slug, includeCollections }: CommunityDa
 			members: { include: { user: { include: { namespace: true } } } },
 			namespace: {
 				include: {
-					collections: includeCollections,
+					collections: includeCollections
+						? {
+								include: {
+									versions: true,
+								},
+						  }
+						: false,
 				},
 			},
 		},
@@ -81,9 +87,26 @@ export const getUserData = async ({ slug, includeCollections }: UserDataRequest)
 			memberships: { include: { community: { include: { namespace: true } } } },
 			namespace: {
 				include: {
-					collections: includeCollections,
+					collections: includeCollections
+						? {
+								include: {
+									versions: true,
+								},
+						  }
+						: false,
 				},
 			},
+		},
+	});
+};
+
+export const getCollectionVersionData = async (collectionSlug: string) => {
+	return prisma.collection.findUnique({
+		where: {
+			slugSuffix: getSlugSuffix(collectionSlug),
+		},
+		include: {
+			versions: { orderBy: { createdAt: "desc" } },
 		},
 	});
 };

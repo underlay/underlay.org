@@ -6,6 +6,7 @@ import { CollectionProps } from "utils/server/collections";
 import { Select } from "@blueprintjs/select";
 import { Version } from "@prisma/client";
 import { downloadExport } from "utils/client/data";
+import { humanFileSize } from "utils/shared/filesize";
 
 type Props = {
 	setNewExportOpen: any;
@@ -25,7 +26,6 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, s
 			<table className={styles.table}>
 				<thead>
 					<tr>
-						<th className={styles.header}></th>
 						<th className={styles.header}>Name</th>
 						<th className={styles.header}>Format</th>
 						<th className={styles.header}>Size</th>
@@ -37,19 +37,22 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({ collection, s
 				<tbody>
 					{collection.exports.map((exportItem, exportItemI) => {
 						const selectedVersion = selectedVersions[exportItemI];
+						let exportSize = "N/A";
+						if (exportItem.exportVersions.length > 0) {
+							const lastVersion = exportItem.exportVersions
+								.map((v) => v.version.number)
+								.pop();
+							const targetExport = exportItem.exportVersions.find((v) => {
+								return v.version.number === lastVersion;
+							})!;
+							exportSize = targetExport.size;
+						}
 
 						return (
 							<tr key={exportItem.id}>
-								<td>
-									<Icon
-										icon="star-empty"
-										size={14}
-										style={{ position: "relative", top: "-2px" }}
-									/>
-								</td>
 								<td>{exportItem.name}</td>
 								<td>{exportItem.format}</td>
-								<td>{/* exportItem.size */}</td>
+								<td>{humanFileSize(exportSize)}</td>
 								<td>Mapping</td>
 								<td>{exportItem.isPublic ? "Public" : "Private"}</td>
 								<td>

@@ -3,6 +3,7 @@ import nextConnect from "next-connect";
 import prisma from "prisma/db";
 
 import { getServerSupabase } from "utils/server/supabase";
+import { getSlugSuffix } from "utils/shared/strings";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, res) => {
 	const supabase = getServerSupabase();
@@ -12,7 +13,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 	const exportName = req.query.exportName as string;
 	const exportVersion = req.query.exportVersion as string;
 
-	const colSlugSuffix = collectionSlug.split("-").pop();
+	const colSlugSuffix = getSlugSuffix(collectionSlug);
 
 	if (namespaceSlug && collectionSlug) {
 		const collection = await prisma.collection.findFirst({

@@ -3,30 +3,36 @@ import React from "react";
 import { buildUrl } from "utils/shared/urls";
 import { makeSlug } from "utils/shared/strings";
 import { useLocationContext } from "utils/client/hooks";
+import { CollectionProps } from "utils/server/collections";
 
 import styles from "./CollectionPreview.module.scss";
 import { Collection } from "components/Icons";
 import { convertToLocaleDateString } from "utils/shared/dates";
 
-type Props = {
-	slugPrefix: string;
-	slugSuffix: string;
-	description?: string;
-	isPublic: boolean;
-	version: string;
-	publishedAt: Date;
-};
+type Props = CollectionProps & {};
 
 const CollectionPreview: React.FC<Props> = function ({
-	slugPrefix,
-	slugSuffix,
-	description,
-	isPublic,
-	version,
-	publishedAt,
+	collection: { slugPrefix, slugSuffix, description, isPublic, versions, updatedAt },
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
 	const slug = makeSlug(slugPrefix, slugSuffix);
+
+	let versionText = "";
+	let timestampText = "";
+
+	/**
+	 * No published versions yet
+	 */
+	if (versions.length === 0) {
+		versionText = "No version published";
+		timestampText = `Last updated at ${convertToLocaleDateString(updatedAt)}`;
+	} else {
+		const currVersion = versions.map((v) => v.number).sort()[0];
+
+		versionText = `${currVersion}`;
+		timestampText = `Last published at ${convertToLocaleDateString(updatedAt)}`;
+	}
+
 	return (
 		<a
 			href={buildUrl({
@@ -43,11 +49,9 @@ const CollectionPreview: React.FC<Props> = function ({
 			<div className={styles.details}>
 				<span>{!isPublic ? "Private" : "Public"}</span>
 				<span className={styles.dot}>·</span>
-				<span>{version}</span>
-				{publishedAt && <span className={styles.dot}>·</span>}
-				{publishedAt && (
-					<span>Last Published at {convertToLocaleDateString(publishedAt)}</span>
-				)}
+				<span>{versionText}</span>
+				{<span className={styles.dot}>·</span>}
+				{<span>{timestampText}</span>}
 			</div>
 		</a>
 	);
