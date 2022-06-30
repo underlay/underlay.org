@@ -33,7 +33,9 @@ const CommunityOverview: React.FC<Props> = function ({ community }) {
 				}
 				sideContent={
 					<React.Fragment>
-						<Section title="About">{community.description}</Section>
+						{community.description && (
+							<Section title="About">{community.description}</Section>
+						)}
 						<AvatarList users={community.members.map((x: any) => x.user)} />
 					</React.Fragment>
 				}
