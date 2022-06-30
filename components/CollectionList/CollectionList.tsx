@@ -12,15 +12,25 @@ type Props = {
 const CollectionList: React.FC<Props> = function ({ collections }) {
 	return (
 		<div className={styles.list}>
-			{collections.map((collection) => {
-				return (
-					<CollectionPreview
-						key={collection.slug}
-						className={styles.collection}
-						collection={collection}
-					/>
-				);
-			})}
+			{collections.length === 0 && (
+				<div>
+					No collection found.{" "}
+					<a href="/create/collection" target="_blank">
+						Create a new collection
+					</a>
+					!
+				</div>
+			)}
+			{collections.length > 0 &&
+				collections.map((collection) => {
+					return (
+						<CollectionPreview
+							key={collection.slug}
+							className={styles.collection}
+							collection={collection}
+						/>
+					);
+				})}
 		</div>
 	);
 };
