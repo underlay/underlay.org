@@ -44,7 +44,6 @@ const CollectionHeader: React.FC<Props> = function ({ mode, collection }) {
 								Private
 							</Tag>
 						)}
-						<Icon icon="star-empty" size={22} />
 					</div>
 
 					<div className={styles.details}>
