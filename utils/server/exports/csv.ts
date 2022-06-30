@@ -1,32 +1,13 @@
 import prisma from "prisma/db";
 import { getServerSupabase } from "utils/server/supabase";
+import { stringify } from "csv-stringify/sync";
 
-export const generateExportVersionJson = async (
+export const generateExportVersionCsv = async (
 	versionId: string,
 	collectionSlugSuffix: string,
 	exportSlug: string,
 	mapping: { [key: string]: any }
 ) => {
-	// generateExportVersionJson(inputDataUrl, mapping)
-	// - get input file as json
-	// - go through each and create a new object that uses mapping (either includes name or skips value)
-	// - cache file
-
-	/* Mapping of form
-		{
-			Person: {
-				include: true,
-				rename: '',
-				attributes: {
-					name: {
-						include: true,
-						rename: 'fullName',
-					}
-				}
-			}
-		}
-	*/
-
 	/* TODO: Refactor */
 	/* Split out mapping logic and supabase writing  */
 	/* so that we can unit test the mapping logic */
@@ -73,8 +54,11 @@ export const generateExportVersionJson = async (
 		nextData[nextDataClassKey] = nextEntities;
 	});
 
-	const fileUri = `${filePathPrefix}/${version.number}.json`;
-	await supabase.storage.from("data").upload(fileUri, JSON.stringify(nextData));
+	const csvRecords = convertToCsvRecords(nextData) as any[];
+	const csvOutput = stringify(csvRecords);
+
+	const fileUri = `${filePathPrefix}/${version.number}.csv`;
+	await supabase.storage.from("data").upload(fileUri, csvOutput);
 
 	const { data: listData } = await supabase.storage
 		.from("data")
@@ -83,3 +67,34 @@ export const generateExportVersionJson = async (
 	// @ts-ignore
 	return { fileUri, size: String(listData[0].metadata.size) };
 };
+
+/**
+ * todo: handle relationships
+ */
+function convertToCsvRecords(data: any) {
+	const result: any[] = [];
+
+	const headerRow: string[] = [];
+	for (let nodeName in data) {
+		for (let eKey in data[nodeName][0]) {
+			if (eKey.startsWith("_ul")) {
+				headerRow.push(eKey);
+			} else {
+				headerRow.push(`${nodeName}/${eKey}`);
+			}
+		}
+
+		data[nodeName].map((nodeEntity: any) => {
+			const newEntity: any = [];
+			for (let eKey in nodeEntity) {
+				newEntity.push(nodeEntity[eKey]);
+			}
+
+			result.push(newEntity);
+		});
+	}
+
+	result.unshift(headerRow);
+
+	return result;
+}

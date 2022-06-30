@@ -26,7 +26,6 @@ const schema = [
 			{ id: "s8", key: "target", type: "s4", isUID: false, isOptional: false },
 			{ id: "s9", key: "year", type: "Number", isUID: false, isOptional: false },
 		],
-		
 	},
 ];
 
