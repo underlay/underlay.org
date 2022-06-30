@@ -1,3 +1,5 @@
+@import "pages/variables.scss";
+
 .previewBlock {
 	display: block;
 	color: black;
@@ -21,11 +23,11 @@
 		display: flex;
 		margin-bottom: 20px;
 	}
-	.description {
-	}
 	.details {
-		font-family: Courier, monospaced;
+		font-family: $base-monospace-font;
+		font-size: 14px;
 		opacity: 0.6;
+		margin-top: 4px;
 	}
 	.dot {
 		margin: 0em 1em;

@@ -17,7 +17,7 @@ const CollectionList: React.FC<Props> = function ({ collections }) {
 					<CollectionPreview
 						key={collection.slug}
 						className={styles.collection}
-						{...collection}
+						collection={collection}
 					/>
 				);
 			})}
