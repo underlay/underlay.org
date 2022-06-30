@@ -15,9 +15,10 @@
 		box-shadow: 0px 0px 0px 1px black;
 	}
 	// .title,
-	// .description {
-	// 	margin-bottom: 6px;
-	// }
+	.description {
+		opacity: 0.8;
+		margin-bottom: 6px;
+	}
 	.title {
 		font-weight: 600;
 		display: flex;
