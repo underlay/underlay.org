@@ -3,8 +3,8 @@ import { Icon, Intent, Tag } from "@blueprintjs/core";
 
 import { Avatar, ScopeNav } from "components";
 import { buildUrl } from "utils/shared/urls";
-import { useLocationContext } from "utils/client/hooks";
-import { communityNavItems, userNavItems } from "utils/shared/navs";
+import { useLocationContext, useLoginContext } from "utils/client/hooks";
+import { communityNavItems, loggedInUserNavItems, userNavItems } from "utils/shared/navs";
 import { Community, User } from "components/Icons";
 
 import styles from "./ProfileHeader.module.scss";
@@ -29,6 +29,9 @@ const ProfileHeader: React.FC<Props> = function ({
 	location,
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
+	const loginData = useLoginContext();
+	const isProfileOwner = loginData && loginData.namespace.slug === namespaceSlug;
+
 	return (
 		<div>
 			<div className={styles.scopeHeader}>
@@ -58,7 +61,16 @@ const ProfileHeader: React.FC<Props> = function ({
 					</div>
 				</div>
 			</div>
-			<ScopeNav mode={mode} navItems={type === "user" ? userNavItems : communityNavItems} />
+			<ScopeNav
+				mode={mode}
+				navItems={
+					type === "user"
+						? isProfileOwner
+							? loggedInUserNavItems
+							: userNavItems
+						: communityNavItems
+				}
+			/>
 		</div>
 	);
 };
