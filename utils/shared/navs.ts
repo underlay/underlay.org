@@ -10,7 +10,7 @@ export const userNavItems = [
 ];
 
 export const loggedInUserNavItems = [
-  ...userNavItems,
+	...userNavItems,
 	{
 		slug: "settings",
 		title: "Settings",
@@ -26,6 +26,10 @@ export const communityNavItems = [
 		slug: "members",
 		title: "Members",
 	},
+];
+
+export const communityOwnerNavItems = [
+	...communityNavItems,
 	{
 		slug: "settings",
 		title: "Settings",
