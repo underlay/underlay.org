@@ -122,6 +122,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 
 export default UserSettings;
 
+//@ts-ignore
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug, subMode } = context.params!;
 	const profileData = await getNamespaceData(namespaceSlug);
