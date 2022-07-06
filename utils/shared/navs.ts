@@ -3,10 +3,6 @@ export const userNavItems = [
 		slug: "overview",
 		title: "Overview",
 	},
-	{
-		slug: "communities",
-		title: "Communities",
-	},
 ];
 
 export const loggedInUserNavItems = [
