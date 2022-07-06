@@ -1,12 +1,12 @@
-// @ts-nocheck
 import React from "react";
 
 import { CollectionPreview } from "components";
 
 import styles from "./CollectionList.module.scss";
+import { Collection } from "@prisma/client";
 
 type Props = {
-	collections: any;
+	collections: Collection[];
 };
 
 const CollectionList: React.FC<Props> = function ({ collections }) {
@@ -23,13 +23,7 @@ const CollectionList: React.FC<Props> = function ({ collections }) {
 			)}
 			{collections.length > 0 &&
 				collections.map((collection) => {
-					return (
-						<CollectionPreview
-							key={collection.slug}
-							className={styles.collection}
-							collection={collection}
-						/>
-					);
+					return <CollectionPreview key={collection.id} collection={collection as any} />;
 				})}
 		</div>
 	);

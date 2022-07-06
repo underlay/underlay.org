@@ -3,13 +3,15 @@ import React from "react";
 import { buildUrl } from "utils/shared/urls";
 import { makeSlug } from "utils/shared/strings";
 import { useLocationContext } from "utils/client/hooks";
-import { CollectionProps } from "utils/server/collections";
 
 import styles from "./CollectionPreview.module.scss";
-import { Collection } from "components/Icons";
+import { Collection as CollectionIcon } from "components/Icons";
 import { convertToLocaleDateString } from "utils/shared/dates";
+import { Collection, Version } from "@prisma/client";
 
-type Props = CollectionProps & {};
+type Props = {
+	collection: Collection & { versions: Version[] };
+};
 
 const CollectionPreview: React.FC<Props> = function ({
 	collection: { slugPrefix, slugSuffix, description, isPublic, versions, updatedAt },
@@ -42,7 +44,7 @@ const CollectionPreview: React.FC<Props> = function ({
 			className={styles.previewBlock}
 		>
 			<div className={styles.title}>
-				<Collection size={20} className={styles.icon} />
+				<CollectionIcon size={20} className={styles.icon} />
 				{slugPrefix}
 			</div>
 			{description && <div className={styles.description}>{description}</div>}
