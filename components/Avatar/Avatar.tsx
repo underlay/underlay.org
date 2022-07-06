@@ -10,12 +10,15 @@ type Props = {
 };
 
 const Avatar: React.FC<Props> = function ({ name = "?", src, size = 32, className = "" }) {
-	const inlineStyle = {
+	const inlineStyle: any = {
 		width: `${size}px`,
 		height: `${size}px`,
 		fontSize: Math.floor(size / 2),
-		background: src ? "" : "#D6CFC7",
 	};
+	if (!src) {
+		inlineStyle.background = "#D6CFC7";
+	}
+
 	return (
 		<div className={classNames(styles.avatar, className)} style={inlineStyle}>
 			{!src && name.charAt(0)}
