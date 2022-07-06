@@ -11,7 +11,7 @@ type Props = {
 const CommunityList: React.FC<Props> = function ({ memberships }) {
 	return (
 		<Section title="Communities">
-			{memberships.length === 0 && <div>No Communities joined</div>}
+			{memberships.length === 0 && <div>No communities joined</div>}
 
 			<div className={styles.communities}>
 				{
