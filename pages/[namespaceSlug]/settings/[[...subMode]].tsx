@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import { Button, FormGroup, InputGroup } from "@blueprintjs/core";
+import { ExtendedCommunity } from "pages/[namespaceSlug]";
 
 import {
 	ProfileHeader,
@@ -10,7 +11,7 @@ import {
 	AvatarUpload,
 	Avatar,
 } from "components";
-import { useLocationContext } from "utils/client/hooks";
+import { useLocationContext, useLoginContext } from "utils/client/hooks";
 import { ProfilePageParams } from "utils/shared/types";
 import { getLoginId } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
@@ -18,7 +19,7 @@ import { getNamespaceData } from "utils/server/queries";
 
 type Props = {
 	slug: string;
-	community?: any;
+	community?: NonNullable<ExtendedCommunity>;
 	user?: any;
 };
 
@@ -27,6 +28,14 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 	const [avatar, setAvatar] = useState<string | undefined>(user.avatar);
 	const { namespaceSlug = "", subMode } = useLocationContext().query;
 	const activeSubMode = subMode && subMode[0];
+	const loginData = useLoginContext();
+	const isOwner = community
+		? !!(
+				loginData &&
+				community.members.some((m) => m.permission === "owner" && m.userId === loginData.id)
+		  )
+		: !!(loginData && loginData.namespace.slug === namespaceSlug);
+
 	return (
 		<div>
 			<ProfileHeader
@@ -34,6 +43,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 				mode="settings"
 				name={community?.name || user?.name}
 				slug={slug}
+				isOwner={isOwner}
 				avatar={community?.avatar || user?.avatar}
 				verifiedUrl={community?.verifiedUrl}
 				location={community?.location}
@@ -112,6 +122,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 
 export default UserSettings;
 
+//@ts-ignore
 export const getServerSideProps: GetServerSideProps<Props, ProfilePageParams> = async (context) => {
 	const { namespaceSlug, subMode } = context.params!;
 	const profileData = await getNamespaceData(namespaceSlug);

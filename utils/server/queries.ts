@@ -133,6 +133,7 @@ export const getCollectionData = async (collectionSlug: string) => {
 					sourceApi: true,
 				},
 			},
+      collaborators: true
 		},
 	});
 	return collectionData;

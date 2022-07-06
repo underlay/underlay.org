@@ -20,13 +20,13 @@ const Header = () => {
 					minimal
 				/>
 				<div>
-					<AnchorButton
+					{/* <AnchorButton
 						className={styles.discover}
 						text="Discover"
 						href="/discover"
 						large
 						minimal
-					/>
+					/> */}
 					{!loginData && (
 						<React.Fragment>
 							<AnchorButton text="Login" href="/login" large minimal />
