@@ -27,6 +27,8 @@ const ExportCreate: React.FC<Props> = function ({
 	const lastVersion = collection.versions[0];
 	const [activeVersion, setActiveVersion] = useState(lastVersion);
 	const schema = collection.schemas[0].content as Schema;
+	const schemaNodes = schema.filter((n) => !n.isRelationship);
+
 	useEffect(() => {
 		if (!newExport.mapping) {
 			const mapping: { [key: string]: any } = {};
@@ -142,7 +144,157 @@ const ExportCreate: React.FC<Props> = function ({
 				<div className={styles.title}>Align Export Data</div>
 			</div>
 			<div className={classNames(styles.sectionContent)}>
-				{newExport.mapping &&
+				{newExport.format === "CSV" && (
+					<div>
+						<Section className={styles.option} title="Main node for each CSV row">
+							<HTMLSelect
+								style={{ marginBottom: "12px" }}
+								className={styles.select}
+								value={newExport.csvMainNode}
+								onChange={(evt) => {
+									setNewExport({
+										...newExport,
+										csvMainNode: evt.target.value,
+									});
+								}}
+								options={schemaNodes.map((n) => n.key)}
+							/>
+						</Section>
+						<Section className={styles.option} title="Node mapping">
+							{newExport.mapping &&
+								schema.map((schemaClass) => {
+									const classIncluded =
+										newExport.mapping[schemaClass.key]?.include;
+									return (
+										<div key={schemaClass.id} className={styles.mappingClass}>
+											<div className={styles.classRow}>
+												<div className={styles.schemaKey}>
+													{schemaClass.key}
+												</div>
+												<div className={styles.checkbox}>
+													<Checkbox
+														checked={classIncluded}
+														disabled={
+															schemaClass.key ===
+															newExport.csvMainNode
+														}
+														label="Include"
+														onChange={(evt) => {
+															const nextMapping = {
+																...newExport.mapping,
+															};
+															if (nextMapping[schemaClass.key]) {
+																nextMapping[
+																	schemaClass.key
+																].include =
+																	// @ts-ignore
+																	evt.target.checked;
+															} else {
+																nextMapping[schemaClass.key] = {
+																	// @ts-ignore
+																	include: evt.target.checked,
+																};
+															}
+															setNewExport({
+																...newExport,
+																mapping: nextMapping,
+															});
+														}}
+													/>
+												</div>
+												{classIncluded && (
+													<InputGroup
+														className="narrow-line-input"
+														placeholder={`Rename...`}
+														type="text"
+														value={
+															newExport.mapping[schemaClass.key]
+																?.rename
+														}
+														onChange={(evt) => {
+															const nextMapping = {
+																...newExport.mapping,
+															};
+															nextMapping[schemaClass.key].rename =
+																evt.target.value;
+															setNewExport({
+																...newExport,
+																mapping: nextMapping,
+															});
+														}}
+													/>
+												)}
+											</div>
+											{schemaClass?.attributes.map((attr) => {
+												const attrIncluded =
+													newExport.mapping[schemaClass.key]?.attributes[
+														attr.key
+													]?.include;
+												return (
+													<div key={attr.id} className={styles.attrRow}>
+														<div className={styles.attrKey}>
+															{attr.key}
+														</div>
+														<div className={styles.checkbox}>
+															<Checkbox
+																checked={attrIncluded}
+																disabled={!classIncluded}
+																label="Include"
+																onChange={(evt) => {
+																	// @ts-ignore
+																	const nextMapping = {
+																		...newExport.mapping,
+																	};
+
+																	nextMapping[
+																		schemaClass.key
+																	].attributes[
+																		attr.key
+																		// @ts-ignore
+																	].include = evt.target.checked;
+																	setNewExport({
+																		...newExport,
+																		mapping: nextMapping,
+																	});
+																}}
+															/>
+														</div>
+														{attrIncluded && classIncluded && (
+															<InputGroup
+																className="narrow-line-input"
+																placeholder={`Rename...`}
+																type="text"
+																value={
+																	newExport.mapping[
+																		schemaClass.key
+																	]?.attributes[attr.key].rename
+																}
+																onChange={(evt) => {
+																	const nextMapping = {
+																		...newExport.mapping,
+																	};
+																	nextMapping[
+																		schemaClass.key
+																	].attributes[attr.key].rename =
+																		evt.target.value;
+																	setNewExport({
+																		...newExport,
+																		mapping: nextMapping,
+																	});
+																}}
+															/>
+														)}
+													</div>
+												);
+											})}
+										</div>
+									);
+								})}
+						</Section>
+					</div>
+				)}
+				{newExport.format === "JSON" &&
+					newExport.mapping &&
 					schema.map((schemaClass) => {
 						const classIncluded = newExport.mapping[schemaClass.key]?.include;
 						return (
