@@ -13,7 +13,8 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	}
 
 	// TODO: Make sure loginId has permissions for associated namespaceId
-	const { name, format, isPublic, mapping, schemaId, collectionId, versionId } = req.body;
+	const { name, format, isPublic, mapping, schemaId, collectionId, versionId, csvMainNode } =
+		req.body;
 	const collection = await prisma.collection.findUnique({
 		where: { id: collectionId },
 		include: { schemas: { orderBy: { createdAt: "desc" } } },
@@ -39,9 +40,11 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 	// @ts-ignore
 	const { fileUri, size } = await generateExportVersionCsv(
 		versionId,
+		schemaId,
 		collection.slugSuffix,
 		exportSlug,
-		mapping
+		mapping,
+		csvMainNode
 	);
 
 	await prisma.exportVersion.create({

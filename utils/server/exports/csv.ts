@@ -1,12 +1,15 @@
 import prisma from "prisma/db";
 import { getServerSupabase } from "utils/server/supabase";
 import { stringify } from "csv-stringify/sync";
+import { Schema } from "@prisma/client";
 
 export const generateExportVersionCsv = async (
 	versionId: string,
+	schemaId: string,
 	collectionSlugSuffix: string,
 	exportSlug: string,
-	mapping: { [key: string]: any }
+	mapping: { [key: string]: any },
+	csvMainNode: string
 ) => {
 	/* TODO: Refactor */
 	/* Split out mapping logic and supabase writing  */
@@ -17,6 +20,16 @@ export const generateExportVersionCsv = async (
 	if (!version) {
 		return undefined;
 	}
+
+	const schema = await prisma.schema.findUnique({
+		where: {
+			id: schemaId,
+		},
+	});
+	if (!schema) {
+		return undefined;
+	}
+
 	const filePathPrefix = `${collectionSlugSuffix}/exports/${exportSlug}`;
 	const supabase = getServerSupabase();
 	const { data, error } = await supabase.storage
@@ -54,7 +67,7 @@ export const generateExportVersionCsv = async (
 		nextData[nextDataClassKey] = nextEntities;
 	});
 
-	const csvRecords = convertToCsvRecords(nextData) as any[];
+	const csvRecords = convertToCsvRecords(nextData, schema, csvMainNode) as any[];
 	const csvOutput = stringify(csvRecords);
 
 	const fileUri = `${filePathPrefix}/${version.number}.csv`;
@@ -71,28 +84,91 @@ export const generateExportVersionCsv = async (
 /**
  * todo: handle relationships
  */
-function convertToCsvRecords(data: any) {
-	const result: any[] = [];
+function convertToCsvRecords(data: any, schema: Schema, csvMainNode: string) {
+	const schemaContents = schema.content as any[];
 
-	const headerRow: string[] = [];
-	for (let nodeName in data) {
-		for (let eKey in data[nodeName][0]) {
-			if (eKey.startsWith("_ul")) {
-				headerRow.push(eKey);
-			} else {
-				headerRow.push(`${nodeName}/${eKey}`);
+	const mainNodeId = schemaContents.find((c) => c.key === csvMainNode)?.id;
+
+	// const nodes = schemaContents.filter((x) => !x.isRelationship);
+	const relationships = schemaContents.filter((x) => x.isRelationship);
+	const relevantRelationships = relationships.filter((x) => {
+		const source = x.attributes.find((a: any) => a.key === "source");
+		const target = x.attributes.find((a: any) => a.key === "target");
+
+		if (source.type === mainNodeId || target.type === mainNodeId) {
+			return true;
+		}
+
+		return false;
+	});
+
+	const result: any[] = [];
+	const headerRow: any[] = [];
+
+	for (let eKey in data[csvMainNode][0]) {
+		if (!eKey.startsWith("_ul")) {
+			headerRow.push(`${csvMainNode}/${eKey}`);
+		}
+	}
+
+	for (let nodeKey in data) {
+		if (nodeKey !== csvMainNode) {
+			for (let eKey in data[nodeKey][0]) {
+				if (!eKey.startsWith("_ul") && eKey !== "source" && eKey !== "target") {
+					headerRow.push(`${nodeKey}/${eKey}`);
+				}
+			}
+		}
+	}
+
+	data[csvMainNode].forEach((mainNodeEntity: any) => {
+		const row: any[] = [];
+
+		for (let eKey in mainNodeEntity) {
+			if (!eKey.startsWith("_ul")) {
+				row.push(mainNodeEntity[eKey]);
 			}
 		}
 
-		data[nodeName].map((nodeEntity: any) => {
-			const newEntity: any = [];
-			for (let eKey in nodeEntity) {
-				newEntity.push(nodeEntity[eKey]);
-			}
+		for (let rel of relevantRelationships) {
+			const relEntity = data[rel.key].find((x: any) => {
+				return x.source === mainNodeEntity._ulid || x.target === mainNodeEntity._ulid;
+			});
 
-			result.push(newEntity);
-		});
-	}
+			if (relEntity) {
+				const matchNodeType =
+					relEntity.source === mainNodeEntity._ulid
+						? rel.attributes.find((a: any) => a.key === "target").type
+						: rel.attributes.find((a: any) => a.key === "source").type;
+
+				const matchNodeKey = schemaContents.find((x: any) => x.id === matchNodeType)!.key;
+
+				const matchEntity = data[matchNodeKey].find((e: any) => {
+					if (relEntity.source === mainNodeEntity._ulid) {
+						return e._ulid === relEntity.target;
+					} else {
+						return e._ulid === relEntity.source;
+					}
+				});
+
+				if (matchEntity) {
+					for (let eKey in matchEntity) {
+						if (!eKey.startsWith("_ul")) {
+							row.push(matchEntity[eKey]);
+						}
+					}
+				}
+
+				for (let eKey in relEntity) {
+					if (eKey !== "source" && eKey !== "target" && !eKey.startsWith("_ul")) {
+						row.push(relEntity[eKey]);
+					}
+				}
+			}
+		}
+
+		result.push(row);
+	});
 
 	result.unshift(headerRow);
 

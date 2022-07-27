@@ -6,12 +6,16 @@ import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
 const CollectionExports: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const [collection, setCollection] = useState(initCollection);
+	const nodeKeys = (initCollection.schemas[0].content as any[])
+		.filter((c) => !c.isRelationship)
+		.map((c) => c.key);
 	const defaultNewExportState = {
 		name: "",
 		isPublic: true,
 		format: "JSON",
 		mapping: undefined,
 		versionId: "",
+		csvMainNode: nodeKeys[0] || "",
 	};
 	const [newExport, setNewExport] = useState(defaultNewExportState);
 	const [newExportInProgress, setNewExportInProgress] = useState(false);
@@ -31,6 +35,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 				versionId: newExport.versionId,
 				schemaId: collection.schemas[0].id,
 				collectionId: collection.id,
+        csvMainNode: newExport.csvMainNode
 			}),
 		});
 		const newExportObject = await response.json();
