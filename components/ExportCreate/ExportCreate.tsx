@@ -262,6 +262,7 @@ const ExportCreate: React.FC<Props> = function ({
 																			attr.key
 																			// @ts-ignore
 																		].include =
+																			// @ts-ignore
 																			evt.target.checked;
 																		setNewExport({
 																			...newExport,
