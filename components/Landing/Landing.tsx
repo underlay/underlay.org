@@ -1,6 +1,7 @@
 import { InputGroup } from "@blueprintjs/core";
 import classNames from "classnames";
 import Form from "components/Form/Form";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 import styles from "./Landing.module.scss";
@@ -9,6 +10,7 @@ type Props = {};
 
 const Landing: React.FC<Props> = function () {
 	const [query, setQuery] = useState("");
+	const router = useRouter();
 
 	const links = [
 		{
@@ -54,12 +56,18 @@ const Landing: React.FC<Props> = function () {
 					}}
 				>
 					<InputGroup
-						id="email-input"
+						id="search-input"
 						required={true}
 						value={query}
 						large
 						onChange={(evt) => setQuery(evt.target.value)}
 						placeholder="Find collections to use and communities to join..."
+						onKeyDown={(evt) => {
+							if (evt.code === "Enter") {
+								evt.preventDefault();
+								router.push({ pathname: "/search", query: { q: query } });
+							}
+						}}
 					/>
 				</Form>
 			</div>

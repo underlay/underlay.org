@@ -1,0 +1,43 @@
+@import "pages/variables.scss";
+
+.previewBlock {
+	display: block;
+	color: black;
+	// background: rgba(256,256,256,0.4);
+	box-shadow: 0px 0px 0px 1px #aaa;
+	text-decoration: none;
+	border-radius: 2px;
+	padding: 15px;
+	&:hover {
+		text-decoration: none;
+		color: black;
+		// background: rgba(256,256,256,0.2);
+		box-shadow: 0px 0px 0px 1px black;
+	}
+	// .title,
+	.description {
+		opacity: 0.8;
+		margin-bottom: 6px;
+	}
+	.title {
+		font-weight: 600;
+		display: flex;
+		margin-bottom: 20px;
+	}
+	.details {
+		font-family: $base-monospace-font;
+		font-size: 14px;
+		opacity: 0.6;
+		margin-top: 4px;
+	}
+	.dot {
+		margin: 0em 1em;
+	}
+	.icon {
+		margin-right: 5px;
+	}
+
+	.highlighted {
+		background-color: yellow;
+	}
+}
