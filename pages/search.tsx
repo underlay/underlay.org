@@ -80,12 +80,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
 
 	const results = await getSearchResults(context.query as any);
 
+	const lowercaseQuery = (context.query.q as string).toLowerCase();
 	const namespaceOrCollectionMatches: Collection[] = [];
 	const descriptionMatches: Collection[] = [];
 	results.forEach((c) => {
 		if (
-			c.namespace.slug.includes(context.query.q as string) ||
-			c.slugPrefix.includes(context.query.q as string)
+			c.namespace.slug.toLowerCase().includes(lowercaseQuery) ||
+			c.slugPrefix.toLowerCase().includes(lowercaseQuery)
 		) {
 			namespaceOrCollectionMatches.push(c);
 		} else {

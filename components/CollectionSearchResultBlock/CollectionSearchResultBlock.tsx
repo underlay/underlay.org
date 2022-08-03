@@ -36,9 +36,12 @@ const CollectionSearchResultBlock: React.FC<Props> = function ({
 		timestampText = `Last published at ${convertToLocaleDateString(updatedAt)}`;
 	}
 
-	const namespaceHits = queryString !== "" && namespace.slug.includes(queryString);
-	const collectionHits = queryString !== "" && slug.includes(queryString);
-	const descriptionHits = queryString !== "" && description?.includes(queryString);
+	const namespaceHits =
+		queryString !== "" && namespace.slug.toLowerCase().includes(queryString.toLowerCase());
+	const collectionHits =
+		queryString !== "" && slug.toLowerCase().includes(queryString.toLowerCase());
+	const descriptionHits =
+		queryString !== "" && description?.toLowerCase().includes(queryString.toLowerCase());
 
 	return (
 		<a

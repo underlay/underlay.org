@@ -169,17 +169,20 @@ export const getSearchResults = async ({ q }: SearchRequest) => {
 					namespace: {
 						slug: {
 							contains: q,
+							mode: "insensitive",
 						},
 					},
 				},
 				{
 					slugPrefix: {
 						contains: q,
+						mode: "insensitive",
 					},
 				},
 				{
 					description: {
 						contains: q,
+						mode: "insensitive",
 					},
 				},
 			],
