@@ -32,3 +32,5 @@ export { default as ThreeColumnFrame } from "./ThreeColumnFrame/ThreeColumnFrame
 export { default as UserList } from "./UserList/UserList";
 export { default as UserOverview } from "./UserOverview/UserOverview";
 export { default as UserPreview } from "./UserPreview/UserPreview";
+export { default as SearchResultList } from "./SearchResultList/SearchResultList";
+export { default as CollectionSearchResultBlock } from "./CollectionSearchResultBlock/CollectionSearchResultBlock";

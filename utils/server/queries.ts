@@ -147,8 +147,37 @@ export const getCollectionData = async (collectionSlug: string) => {
 					sourceApi: true,
 				},
 			},
-      collaborators: true
+			collaborators: true,
 		},
 	});
 	return collectionData;
+};
+
+type SearchRequest = {
+	q: string;
+};
+
+export const getSearchResults = async ({ q }: SearchRequest) => {
+	return prisma.collection.findMany({
+		include: {
+			namespace: true,
+			versions: { orderBy: { createdAt: "desc" } },
+		},
+		where: {
+			OR: [
+				{
+					namespace: {
+						slug: {
+							contains: q,
+						},
+					},
+				},
+				{
+					slugPrefix: {
+						contains: q,
+					},
+				},
+			],
+		},
+	});
 };

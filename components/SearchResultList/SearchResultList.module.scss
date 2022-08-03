@@ -1,0 +1,11 @@
+@import "pages/variables.scss";
+
+.list {
+	display: grid;
+	grid-gap: 25px;
+	// grid: auto / 1fr 1fr;
+	grid: auto / 1fr;
+	@include for-mobile {
+		grid: auto / 1fr;
+	}
+}
