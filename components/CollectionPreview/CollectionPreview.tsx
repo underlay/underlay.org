@@ -14,7 +14,7 @@ type Props = {
 };
 
 const CollectionPreview: React.FC<Props> = function ({
-	collection: { slugPrefix, slugSuffix, description, isPublic, versions, updatedAt, namespace },
+	collection: { slugPrefix, slugSuffix, description, isPublic, versions, updatedAt },
 }) {
 	const { namespaceSlug = "" } = useLocationContext().query;
 	const slug = makeSlug(slugPrefix, slugSuffix);
