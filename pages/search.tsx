@@ -79,9 +79,23 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
 	}
 
 	const results = await getSearchResults(context.query as any);
+
+	const namespaceOrCollectionMatches: Collection[] = [];
+	const descriptionMatches: Collection[] = [];
+	results.forEach((c) => {
+		if (
+			c.namespace.slug.includes(context.query.q as string) ||
+			c.slugPrefix.includes(context.query.q as string)
+		) {
+			namespaceOrCollectionMatches.push(c);
+		} else {
+			descriptionMatches.push(c);
+		}
+	});
+
 	return {
 		props: {
-			collections: results,
+			collections: [...namespaceOrCollectionMatches, ...descriptionMatches],
 		},
 	};
 };

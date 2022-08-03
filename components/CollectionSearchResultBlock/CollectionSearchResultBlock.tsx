@@ -38,6 +38,7 @@ const CollectionSearchResultBlock: React.FC<Props> = function ({
 
 	const namespaceHits = queryString !== "" && namespace.slug.includes(queryString);
 	const collectionHits = queryString !== "" && slug.includes(queryString);
+	const descriptionHits = queryString !== "" && description?.includes(queryString);
 
 	return (
 		<a
@@ -56,9 +57,19 @@ const CollectionSearchResultBlock: React.FC<Props> = function ({
 				<span className={classNames({ [styles.highlighted]: collectionHits })}>
 					{slugPrefix}
 				</span>
-				{/* {`${namespace.slug}/${slugPrefix}`} */}
 			</div>
-			{description && <div className={styles.description}>{description}</div>}
+			{description && (
+				<div className={styles.description}>
+					<span
+						className={classNames([
+							styles.description,
+							{ [styles.highlighted]: descriptionHits },
+						])}
+					>
+						{description}
+					</span>
+				</div>
+			)}
 			<div className={styles.details}>
 				<span>{!isPublic ? "Private" : "Public"}</span>
 				<span className={styles.dot}>·</span>

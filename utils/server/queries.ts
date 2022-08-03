@@ -177,6 +177,11 @@ export const getSearchResults = async ({ q }: SearchRequest) => {
 						contains: q,
 					},
 				},
+				{
+					description: {
+						contains: q,
+					},
+				},
 			],
 		},
 	});
