@@ -20,8 +20,9 @@
 .propertyHeader {
 	min-width: 175px;
 }
-.topIcons {
+.topRow {
 	display: flex;
-	align-items: center;
-	justify-content: flex-end;
+	.properties {
+		flex: 1 1 auto;
+	}
 }

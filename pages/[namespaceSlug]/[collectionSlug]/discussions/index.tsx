@@ -45,7 +45,7 @@ const CollectionDiscussions: React.FC<CollectionProps> = function ({ collection 
 										</div>
 										<div>
 											#{thread.number} · Created by {thread.user.name}{" "}
-											<TimeAgo date={thread.createdAt} />
+											<TimeAgo date={thread.createdAt} minPeriod={60} />
 											{numReplies > 0 && (
 												<span className={styles.replyCount}>
 													{numReplies} repl

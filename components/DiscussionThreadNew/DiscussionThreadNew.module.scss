@@ -4,11 +4,11 @@
 .header {
 	display: flex;
 }
-.title {
+div.title {
 	flex: 1 1 auto;
 	margin-left: 10px;
 }
-.input,
+div.input,
 .button {
 	margin-left: 42px;
 }

@@ -10,7 +10,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 		return res.status(403).json({ ok: false });
 	}
 	// TODO: Make sure loginId has permissions for associated collection
-	const { collectionId, title, text } = req.body;
+	const { collectionId, title, text, entityId } = req.body;
 	const existingThreadCount = await prisma.discussionThread.count({
 		where: {
 			collectionId: collectionId,
@@ -21,6 +21,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 			title: title,
 			number: existingThreadCount + 1,
 			collectionId: collectionId,
+			entityId: entityId || null,
 			userId: loginId,
 		},
 	});

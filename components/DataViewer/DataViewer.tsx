@@ -109,6 +109,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 						return (
 							<EntityCard
 								key={entity._ulid}
+								collection={collection}
 								node={activeClass}
 								entity={entity}
 								relationshipRendering={relationshipRendering}
