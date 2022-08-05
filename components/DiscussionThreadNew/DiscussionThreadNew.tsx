@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Dialog, FormGroup, InputGroup, Intent, TextArea } from "@blueprintjs/core";
+import { Button, FormGroup, InputGroup, Intent, TextArea } from "@blueprintjs/core";
 
 import styles from "./DiscussionThreadNew.module.scss";
 import Avatar from "components/Avatar/Avatar";
