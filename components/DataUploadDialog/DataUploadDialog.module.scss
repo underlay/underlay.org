@@ -56,3 +56,22 @@
 		margin-left: 5px;
 	}
 }
+.behaviorSelectButton {
+	text-transform: capitalize;
+}
+.behaviorSelectHeader {
+	text-transform: capitalize;
+	font-weight: 700;
+	opacity: 0.75;
+	padding-bottom: 5px;
+}
+a.behaviorSelectItem {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.behaviorSelectText {
+	// display: block;
+	max-width: 400px;
+	overflow: auto;
+	white-space: normal;
+}

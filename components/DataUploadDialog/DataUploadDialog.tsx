@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Button, HTMLSelect, Icon, Intent } from "@blueprintjs/core";
+import { Button, Icon, Intent, MenuItem } from "@blueprintjs/core";
 import classNames from "classnames";
+import { Select } from "@blueprintjs/select";
 
-import styles from "./DataUploadDialog.module.scss";
 import { DataUpload, DataMapping } from "components";
 import { CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
 import { Schema } from "utils/shared/types";
 import { getCSVHeaders } from "utils/client/data";
+
+import styles from "./DataUploadDialog.module.scss";
 
 type Props = {
 	newUpload: any;
@@ -93,19 +95,64 @@ const DataUploadDialog: React.FC<Props & CollectionProps> = function ({
 			<div className={classNames(styles.sectionContent)}>
 				<div className={styles.behaviorRow}>
 					Upload Behavior:
-					<HTMLSelect
-						value={newUpload?.reductionType || "merge"}
-						onChange={(evt) => {
+					<Select
+						items={["merge", "overwrite", "concatenate"]}
+						activeItem={null}
+						itemRenderer={(item: string, { handleClick, modifiers }) => {
+							if (!modifiers.matchesPredicate) {
+								return null;
+							}
+							// const selectedValue = newUpload?.reductionType || "merge";
+							// const isSelected = selectedValue === item;
+							const descriptions = {
+								merge: "Entities that share a unique identifier will be merged, with uploaded data overwriting existing fields.",
+								overwrite:
+									"Uploaded data will replace all existing entities, removing all previously existing data.",
+								concatenate:
+									"Entities in the uploaded data will be appended to the collection ignoring any duplicate unique identifiers.",
+							};
+							// @ts-ignore
+							const activeDescription = descriptions[item];
+							return (
+								<MenuItem
+									key={item}
+									active={modifiers.active}
+									onClick={handleClick}
+									className={styles.behaviorSelectItem}
+									text={
+										<div>
+											<div className={styles.behaviorSelectHeader}>
+												{item}
+											</div>
+											<div className={styles.behaviorSelectText}>
+												{activeDescription}
+											</div>
+										</div>
+									}
+								/>
+							);
+						}}
+						onItemSelect={(value) => {
 							const nextNewUpload = newUpload
-								? { ...newUpload, reductionType: evt.target.value }
-								: { reductionType: evt.target.value };
+								? { ...newUpload, reductionType: value }
+								: { reductionType: value };
 							setNewUpload(nextNewUpload);
 						}}
+						filterable={false}
+						popoverProps={{
+							minimal: true,
+							modifiers: {
+								preventOverflow: { enabled: false },
+								flip: { enabled: false },
+							},
+						}}
 					>
-						<option value={"merge"}>Merge</option>
-						<option value={"overwrite"}>Overwrite</option>
-						<option value={"concatenate"}>Concatenate</option>
-					</HTMLSelect>
+						<Button
+							rightIcon="double-caret-vertical"
+							className={styles.behaviorSelectButton}
+							text={newUpload?.reductionType || "merge"}
+						/>
+					</Select>
 				</div>
 				<p>
 					Completing the upload adds data to the collection's draft version. You will be
