@@ -38,6 +38,7 @@ const DiscussionThread: React.FC<Props> = function ({ initDiscussionThread, mini
 		setReplyText("");
 		setIsLoading(false);
 	};
+	const discussionItems = discussionThread?.discussionItems || [];
 	return (
 		<div className={minimal ? styles.minimal : ""}>
 			<h2 className={styles.threadTitle}>
@@ -53,7 +54,7 @@ const DiscussionThread: React.FC<Props> = function ({ initDiscussionThread, mini
 					/>
 				)}
 			</h2>
-			{discussionThread?.discussionItems.map((item: any) => {
+			{discussionItems.map((item: any) => {
 				return (
 					<div key={item.id} className={styles.discussionItem}>
 						<div className={styles.itemHeader}>
