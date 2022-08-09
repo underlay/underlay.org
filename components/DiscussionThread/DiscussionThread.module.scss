@@ -1,0 +1,100 @@
+.threadTitle {
+	.number {
+		opacity: 0.5;
+	}
+}
+.discussionItem {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	margin-bottom: 1em;
+}
+.itemHeader {
+	display: flex;
+	align-items: center;
+	.name {
+		margin-left: 10px;
+	}
+	.separator {
+		margin: 0em 2px;
+	}
+	border-bottom: 1px solid #ccc;
+	padding: 3px 10px;
+}
+.textBody {
+	// margin-left: 27px;
+	padding: 20px 10px 10px;
+	h1 {
+		font-size: 20px;
+	}
+	h2 {
+		font-size: 18px;
+	}
+	h3,
+	h4 {
+		font-size: 16px;
+	}
+}
+
+.reply {
+	margin-top: 25px;
+	padding-top: 25px;
+	border-top: 1px dashed #ccc;
+}
+.replyBody {
+	display: flex;
+	flex: 1 1 auto;
+}
+.replyInput {
+	padding-left: 10px;
+	flex: 1 1 auto;
+}
+.replyButton {
+	margin-left: 34px;
+}
+
+.minimal {
+	margin-bottom: 45px;
+	.permalinkButton {
+		margin-left: 10px;
+		opacity: 0.75;
+		margin-top: -2px;
+	}
+	h2 {
+		font-size: 18px;
+	}
+	.discussionItem {
+		border: 0;
+		&:not(:first-of-type) {
+			margin-left: 34px;
+		}
+	}
+	.itemHeader {
+		border: 0px;
+		padding: 0px;
+		.headerText {
+			opacity: 0.7;
+		}
+	}
+	.textBody {
+		padding: 2px 0px 2px 34px;
+	}
+	.reply {
+		border: 0px;
+		margin-left: 34px;
+		margin-top: 0px;
+		padding-top: 0px;
+		display: flex;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+	.replyInput {
+		margin-bottom: 0px;
+	}
+	.textArea {
+		height: 0px;
+		background: rgba(255, 255, 255, 0.3);
+	}
+	.replyButton {
+		margin-left: 12px;
+	}
+}

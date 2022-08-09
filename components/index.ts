@@ -12,6 +12,8 @@ export { default as DataHeader } from "./DataHeader/DataHeader";
 export { default as DataMapping } from "./DataMapping/DataMapping";
 export { default as DataUpload } from "./DataUpload/DataUpload";
 export { default as DataUploadDialog } from "./DataUploadDialog/DataUploadDialog";
+export { default as DiscussionThread } from "./DiscussionThread/DiscussionThread";
+export { default as DiscussionThreadNew } from "./DiscussionThreadNew/DiscussionThreadNew";
 export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as EntityCard } from "./EntityCard/EntityCard";
 export { default as EntityRelationships } from "./EntityCard/EntityRelationships";
