@@ -100,6 +100,7 @@ const DiscussionThread: React.FC<Props> = function ({ initDiscussionThread, mini
 						text={minimal ? "" : "Add reply"}
 						loading={isLoading}
 						onClick={handleSubmit}
+						disabled={replyText === ""}
 					/>
 				</div>
 			</div>

@@ -77,6 +77,7 @@ const DiscussionThreadNew: React.FC<Props> = function ({
 				text={"Create New Discussion"}
 				loading={isLoading}
 				onClick={handleSubmit}
+				disabled={title === "" || text === ""}
 			/>
 		</div>
 	);
