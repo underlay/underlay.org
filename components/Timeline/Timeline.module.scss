@@ -1,0 +1,71 @@
+@import "pages/variables.scss";
+
+$base-color: #888;
+$green-color: #287c3e;
+$light-green-color: #4bb15c;
+$orange-color: #ef7b16;
+
+.timelineItem {
+	list-style: none;
+}
+
+.timelineItem {
+	position: relative;
+	padding-bottom: 20px;
+}
+
+.timelineItemNode {
+	left: -1px;
+	width: 12px;
+	height: 12px;
+
+	position: absolute;
+	background-color: $base-color;
+	border-color: $base-color;
+	border-radius: 50%;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.timelineItemNode.creationNode {
+	background-color: $green-color;
+	border-color: $green-color;
+}
+.timelineItemNode.publishNode {
+	background-color: $light-green-color;
+	border-color: $light-green-color;
+}
+.timelineItemNode.discussionNode {
+	background-color: $orange-color;
+	border-color: $orange-color;
+}
+
+.timelineItemTail {
+	position: absolute;
+	left: 4px;
+	height: 100%;
+	border-left: 2px solid $base-color;
+}
+
+.timelineItem:last-child .timelineItemTail {
+	display: none;
+}
+
+.timelineItemWrapper {
+	position: relative;
+	padding-left: 28px;
+	top: -3px;
+}
+
+.timelineItemContent > span > * {
+	opacity: 0.7;
+}
+.timelineItemContent > span > *:hover {
+	text-decoration: underline;
+}
+
+.timelineItemTimestamp {
+	color: $base-color;
+	font-size: 13px;
+}

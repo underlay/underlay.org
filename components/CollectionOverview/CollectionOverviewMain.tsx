@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Section } from "components";
+import { Section, CollectionOverviewTimeline } from "components";
 import { CollectionProps } from "utils/server/collections";
 import ReadmeSection from "./ReadmeSection";
 
@@ -21,6 +21,10 @@ const CollectionOverviewMain: React.FC<Props> = function ({ collection, setColle
 				/> */}
 			{/* <Editor collection={collection} /> */}
 			{/* </Section> */}
+
+			<Section title="Timeline">
+        <CollectionOverviewTimeline collection={collection} />
+			</Section>
 		</React.Fragment>
 	);
 };
