@@ -1,0 +1,33 @@
+.goto {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	font-size: 14px;
+	font-weight: 400;
+	opacity: 0.5;
+	padding: 10px;
+}
+.goto:hover {
+	text-decoration: underline;
+	opacity: 0.75;
+}
+.header {
+	display: flex;
+	align-items: center;
+	padding: 15px;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 28px;
+}
+.header:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+}
+.header img {
+	width: 30px;
+	margin-right: 10px;
+}
+.app-sub-sidebar li:before {
+	display: none;
+}
+.github-corner {
+	opacity: 0.6;
+}
