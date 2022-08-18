@@ -1,4 +1,4 @@
-# Distributed, Decentralized, Federated
+# Federation
 
 Much thought has been given to what systems should exist as such.
 

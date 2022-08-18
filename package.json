@@ -8,8 +8,9 @@
 		"analyze": "cross-env ANALYZE=true next build",
 		"build": "next build",
 		"dev": "next",
-		"docs": "docsify serve docs --port 4000",
-		"docs-vite": "vitepress dev docs",
+		"docs:dev": "vitepress dev docs",
+		"docs:build": "vitepress build docs",
+		"docs:serve": "vitepress serve docs",
 		"format": "prettier --write '*.{ts,tsx,js,jsx,scss,json}'",
 		"prebuild": "prisma generate",
 		"start": "NODE_ENV=production node server.js",
@@ -62,9 +63,7 @@
 		"react-markdown": "^8.0.0",
 		"react-timeago": "^7.1.0",
 		"superjson": "^1.7.5",
-		"uuid": "^8.3.1",
-		"vitepress": "^1.0.0-alpha.8",
-		"vue": "^3.2.37"
+		"uuid": "^8.3.1"
 	},
 	"devDependencies": {
 		"@types/cookie": "^0.5.1",
@@ -84,6 +83,8 @@
 		"prisma": "^3.6.0",
 		"ts-jest": "^28.0.2",
 		"typescript": "^4.4.2",
+		"vitepress": "^1.0.0-alpha.8",
+		"vue": "^3.2.37",
 		"yorkie": "^2.0.0"
 	},
 	"browser": {

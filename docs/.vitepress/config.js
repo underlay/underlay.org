@@ -15,7 +15,7 @@ export default {
 					{ text: "History", link: "/history" },
 					{ text: "Protocol", link: "/protocol" },
 					{ text: "Provenance", link: "/provenance" },
-					{ text: "Distributed, Decentralized, Federated", link: "/topology" },
+					{ text: "Federation", link: "/federation" },
 					{ text: "Alpha Testing", link: "/alpha" },
 				],
 			},
