@@ -16,3 +16,4 @@ A history of our thinking is captured in various RFCs that we've published:
 
 ## Shared knowledge graphs
 - Advocating for not one global, but many. With varying size, authority, trust. Built from common elements, with curational perspective and opinion. 
+
