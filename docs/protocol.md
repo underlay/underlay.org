@@ -144,7 +144,6 @@ You can implement reduction code for a variety of storage mediums. The 'default'
 -   Maybe json flat files are our canonical, and then we have a couple different databases (so we have baseline that's not dependent on db tech we choose).
 
 ---
-
 -   Inputs are Assertions
 -   EdgeDB? Just as the storage and to help migration
 
