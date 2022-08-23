@@ -1,15 +1,26 @@
 # Alpha Testing
 
-- Our prioiryt is to learn three things:
+We are rolling out an initial version of Underlay dubbed `build-target-1`. This build target focuses on providing enough structure to have a discussion around three topics:
 
-1. How do you want to define schemas?
+1. The definition and use of shared schemas
    - shared types?
    - 
-1. How do you want to upload data?
+2. The workflow and interfaces for adding data
    - Forms, web UI, API, collection transform
    - Collection transforms can be from another collection, or yourself
-2. How do you want to use data?
+3. The interfaces for using data stored in different collections How do you want to use data?
    - API, exports, queries, etc
 
-Join our slack group (?)
+
+## 1. Shared schemas
+
+## 2. Data workflows
+
+## 3. Data usage
+
+
+
+## Join the conversation
+
+Slack group?
 

@@ -22,3 +22,6 @@ Unsurprisingly, many people are interested in data about a common set of things.
 Underlay allows you to reference a type from another schema directly. This allows you to simply compose schemas from the best practices, tailored to your use case. We expect there to be certain communities and individuals who maintain collections with the sole purpose or providing common, standardized typed for common things.
 
 Beyond reduceing the cost of designing your schema, this also makes it trivial to interoperate with other collections that also use that type. It provides a path for the ecosystem to coalesce around agreements that both reduce the overhead and make interopability simple.
+
+## Migrating across schema changes
+In cases where a schema migration is possible, the most recent version of data is taken, mapped to a new schema, and issued as a new version. Future patch versions are reduced against that newly-migrated base version of the data, so there is never a case where you are reducing two assertions that have a different underlying schema.
