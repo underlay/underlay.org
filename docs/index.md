@@ -1,6 +1,6 @@
 # Underlay Docs
 
-Underlay ([underlay.org](https://www.underlay.org)) is a piece of digital infrastructure that facilitates collaborative creation, curation, and use of datasets. It is being developed by [Knowledge Futures Group](https://www.knowledgefutures.org).
+Underlay ([underlay.org](https://www.underlay.org)) is digital infrastructure that facilitates collaborative creation, curation, and use of datasets. It is being developed by [Knowledge Futures Group](https://www.knowledgefutures.org).
 
 These documents serve as the canonical ground-truth description of the project. We intend to use them to both describe the current state of the project and how it can be used, as well as to outline our larger vision for the work and what we hope to accomplish.
 

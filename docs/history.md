@@ -5,10 +5,11 @@ The ideas behind the Underlay were first discussed in conversations between Dann
 Over time, the project has considered various outputs (e.g. a standalone platform, an open-source CLI tool, a protocol) and built with the goal of various value propositions. As we've iterated on ideas, it has been challenging to communicate which notions are deprecated and which are active. The content on this documentation site can be understood as canonical. If it's not mentioned in the docs here, it is no longer an active line of research and development. We maintain this history page to provide additional narration and context to ideas we have explored in the past, but may not necessarily be included in our current approach.
 
 ## Catalysts
-There were several catalysts that led discussions about a new project called the Underlay (so termed by SJ).
+There were several catalysts that led discussions about a new project called the Underlay (credit to SJ for coining the name).
 
 - Danny's experience with founding [Metaweb](https://en.wikipedia.org/wiki/Metaweb) and their development (and eventual sale) of [Freebase](https://en.wikipedia.org/wiki/Freebase_(database)). Freebase was [shut down by Google in 2016](https://groups.google.com/g/freebase-discuss/c/WEnyO8f7xOQ), and Danny knew an open version of a global knowledge graph still possible and critical.
 - Travis and Thariq Shihipar had been developing early versions of [PubPub](https://www.pubpub.org) in 2015 and 2016. Initially, PubPub was both a frontend for fast iteration of scholarly articles, and a backend for long-term archival of such documents. Merging these two things created a very uncomfortable interface — one that was simultaneously trying to reduce friction to make quick, iterative changes while also notifying people that all changes would be permanently catalogued in a distributed database forever. Yikes. The archival layer of PubPub was broken off as it became clear there was value in having a separate system for long-term collaborative storage of persistent data.
+- SJ's experience and involvement with WikiData led to enthusiasm about the opportunities in this space and insight into what was still lacking.
 - As part of his PhD general exames, Travis built [DbDb](https://notes.knowledgefutures.org/pub/hevceylu). The idea behind DbDb was to allow users to publish not just datasets, but the lineage of how a dataset was processed and transformed over time, allowing alternative analyses to be 'forked' from any point in a datasets processing timeline.
 
 ## Support from Protocol Labs

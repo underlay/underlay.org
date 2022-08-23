@@ -1,11 +1,15 @@
 # Versioning
 
-- Strict versioning
-- Patches: 0.0.x, data change
-- Minor: 0.x.0, schema change with migrations
-- Major: x.0.0, schema change without migrations or forced to indicate breaking semantic updates.
+Collections are versioned with a strict numbering system. The system takes inspiration from [semver](https://semver.org), with a few key differences. 
 
+The primary difference is that collection versions are defined such that they have specific computational meaning:
 
+- **Patches: 0.0.x** Patch versions mean that the data has changed, but the schema is the same. Systems using a previous patch version can be updated to use the new version with no structural change.
+- **Minor: 0.x.0** Minor versions mean that there schema was changed, but it was changed in a way that can be computationally migrated. For example, a property name was updated from `naem` to `name`. This is a trivial migration, and systems using previous minor versions may require minor changes to accomodate the new version.
+- **Major: x.0.0** Major versions mean that the shcema was changed in a way that is not computationally trivial. Typically, systems using previous major versions will need to be structurally updated to accomodate the new version. In rare occassions, a major version can also be forced despite no changes to the schema or data to indicate a ne semantic meaning to the data. For example, some groups may want to issue a major change from `0.7.29` to `1.0.0` to indicate a dataset is out of a 'beta-testing' phase and is ready for production use.
 
-Schemas can be referenced by just major/minor
+These strict version definitions mean that the appropriate update to a version number can typically be inferred computationally (i.e. users typically won't need to manually specify the type of version increment). If we see that the data changed, but the schema remains the same, we know it is a patch version. This provides consumers of the data with a strong guarantee about the interopability of new versions with existing systems. 
+
+## Schema version reference
+Given that patch versions represent a data change without a schema change, we know that `2.1.18` has an identical schema to `2.1.19` and all `2.1.x` versions. As such, schemas can be referenced using just the major and minor version numbers. For example: `jordan/map-data@2.1`.
 

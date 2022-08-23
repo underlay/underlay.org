@@ -35,6 +35,7 @@ export default {
 					{ text: "Schemas", link: "/schemas" },
 					{ text: "Data", link: "/data" },
 					{ text: "Using Collections", link: "/using" },
+					{ text: "Discussions", link: "/discussions" },
 					{ text: "Incentives", link: "/incentives" },
 				],
 			},
