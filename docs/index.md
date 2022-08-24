@@ -15,7 +15,3 @@ While there are significant technical elements to the project, we are heavily fo
 
 ## Why is this work important?
 Knowledge is often exchanged in formats optimized for computers, and then used to render webpages, maps, diagrams, tables and text for human consumption. It is also used directly by machines to navigate vehicles, trade stocks, control appliances, design structures, formulate scientific hypotheses, order search results, and much more. But today, most of these machine-readable data sources are privately held and controlled, and the ones that do exist publicly are fragmented and don’t work well with each other. Indeed, at the moment it seems the only way to leverage the power of a large dataset is to control it privately and implement business operations around staffing its maintenance and usage for the purpose of private benefit. The goal of the Underlay is to improve the way that public data is created, curated, and used such that it can be shared and used for public benefit.
-
-
-### Find a spot for:
-- underlay.mit.edu content
