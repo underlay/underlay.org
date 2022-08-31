@@ -16,9 +16,10 @@ import styles from "./ProfileHeader.module.scss";
 
 type Props = {
 	type: "user" | "community";
-	mode: "overview" | "settings" | "people" | "discussions";
+	mode: "overview" | "settings" | "members" | "discussions";
 	name: string;
 	slug: string;
+	about?: string | null;
 	isOwner: boolean;
 	avatar?: string | null;
 	verifiedUrl?: string | null;
@@ -30,6 +31,7 @@ const ProfileHeader: React.FC<Props> = function ({
 	mode,
 	name,
 	slug,
+	about,
 	isOwner,
 	avatar,
 	verifiedUrl,
@@ -72,6 +74,10 @@ const ProfileHeader: React.FC<Props> = function ({
 								{location}
 							</span>
 						)}
+					</div>
+
+					<div className={styles.about}>
+						<span>{about}</span>
 					</div>
 				</div>
 			</div>

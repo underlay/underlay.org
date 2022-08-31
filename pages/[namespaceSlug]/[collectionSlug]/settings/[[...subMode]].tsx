@@ -1,14 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { CollectionHeader, Section, SideNav, ThreeColumnFrame } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
-import { FormGroup, InputGroup } from "@blueprintjs/core";
+import { Button, ButtonGroup, FormGroup, InputGroup, Intent } from "@blueprintjs/core";
+import { useRouter } from "next/router";
 
 const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "", subMode } = useLocationContext().query;
+	const [slugPrefix, setSlugPrefix] = useState(collection.slugPrefix);
+	const [description, setDescription] = useState(collection.description || "");
+	const [isPublic, setIsPublic] = useState(collection.isPublic);
 	const activeSubMode = subMode && subMode[0];
+
+	const [isUpdating, setIsUpdating] = useState(false);
+
+	const router = useRouter();
+
+	const saveEdits = async () => {
+		setIsUpdating(true);
+
+		await fetch("/api/collection", {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				collectionId: collection.id,
+				updates: { slugPrefix, description, isPublic },
+			}),
+		});
+
+		setIsUpdating(false);
+
+		if (collectionSlug !== `${slugPrefix}-${collection.slugSuffix}`) {
+			router.push(`/${namespaceSlug}/${slugPrefix}-${collection.slugSuffix}/settings`);
+		}
+	};
+
 	return (
 		<div>
 			<CollectionHeader mode="settings" collection={collection} />
@@ -43,14 +71,50 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 					<React.Fragment>
 						{!activeSubMode && (
 							<Section title="Collection Details">
-								<FormGroup label="Name" labelFor="name-input">
+								<FormGroup label="Collection slug" labelFor="slug-prefix-input">
 									<InputGroup
-										id="name-input"
+										id="slug-prefix-input"
 										required={true}
-										// value={name}
-										// onChange={(evt) => setName(evt.target.value)}
+										value={slugPrefix}
+										onChange={(evt) => setSlugPrefix(evt.target.value)}
 									/>
 								</FormGroup>
+								<FormGroup label="Collection slug" labelFor="description-input">
+									<InputGroup
+										id="description-input"
+										required={true}
+										value={description}
+										onChange={(evt) => setDescription(evt.target.value)}
+									/>
+								</FormGroup>
+								<FormGroup label="Privacy">
+									<ButtonGroup>
+										<Button
+											text="Public"
+											active={isPublic === true}
+											onClick={() => {
+												setIsPublic(true);
+											}}
+										/>
+										<Button
+											text="Private"
+											active={isPublic !== true}
+											onClick={() => {
+												setIsPublic(false);
+											}}
+										/>
+									</ButtonGroup>
+								</FormGroup>
+
+								<Button
+									text="Update collection"
+									intent={Intent.SUCCESS}
+									style={{ marginTop: "12px" }}
+									loading={isUpdating}
+									onClick={() => {
+										saveEdits();
+									}}
+								/>
 							</Section>
 						)}
 						{activeSubMode === "members" && (
