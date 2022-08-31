@@ -33,6 +33,7 @@ const UserOverview: React.FC<Props> = function ({ user }) {
 				mode="overview"
 				name={user.name}
 				slug={user.namespace.slug}
+				about={user.about}
 				isOwner={isProfileOwner}
 				avatar={user.avatar}
 			/>

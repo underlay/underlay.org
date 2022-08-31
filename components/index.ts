@@ -25,6 +25,7 @@ export { default as Footer } from "./Footer/Footer";
 export { default as Form } from "./Form/Form";
 export { default as Header } from "./Header/Header";
 export { default as Landing } from "./Landing/Landing";
+export { default as MemberList } from "./MemberList/MemberList";
 export { default as ProfileHeader } from "./ProfileHeader/ProfileHeader";
 export { default as RelationshipCard } from "./RelationshipCard/RelationshipCard";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";

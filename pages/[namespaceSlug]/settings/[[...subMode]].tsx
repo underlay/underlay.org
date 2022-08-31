@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GetServerSideProps } from "next";
-import { Button, FormGroup, InputGroup } from "@blueprintjs/core";
-import { ExtendedCommunity } from "pages/[namespaceSlug]";
+import { Intent, Button, FormGroup, InputGroup } from "@blueprintjs/core";
+import { ExtendedCommunity, ExtendedUser } from "pages/[namespaceSlug]";
 
 import {
 	ProfileHeader,
@@ -16,16 +16,31 @@ import { ProfilePageParams } from "utils/shared/types";
 import { getLoginId } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
 import { getNamespaceData } from "utils/server/queries";
+import { useRouter } from "next/router";
 
 type Props = {
 	slug: string;
 	community?: NonNullable<ExtendedCommunity>;
-	user?: any;
+	user?: NonNullable<ExtendedUser>;
 };
 
 const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
-	const [name, setName] = useState(user.name);
-	const [avatar, setAvatar] = useState<string | undefined>(user.avatar);
+	const identity = user || community;
+	const isUser = !!user;
+
+	if (!identity) {
+		return <div></div>;
+	}
+
+	const [name, setName] = useState(identity.name);
+	const [nameSlug, setNameSlug] = useState(identity.namespace.slug);
+	const [about, setAbout] = useState(identity.about!);
+	const [avatar, setAvatar] = useState<string | undefined>(identity.avatar!);
+
+	const [isUpdating, setIsUpdating] = useState(false);
+
+	const router = useRouter();
+
 	const { namespaceSlug = "", subMode } = useLocationContext().query;
 	const activeSubMode = subMode && subMode[0];
 	const loginData = useLoginContext();
@@ -36,13 +51,36 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 		  )
 		: !!(loginData && loginData.namespace.slug === namespaceSlug);
 
+	const saveEdits = async () => {
+		setIsUpdating(true);
+		if (isUser) {
+			await fetch("/api/user", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ id: identity.id, name, nameSlug, about, avatar }),
+			});
+		} else {
+			await fetch("/api/community", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ id: identity.id, name, nameSlug, about, avatar }),
+			});
+		}
+		setIsUpdating(false);
+
+		if (namespaceSlug !== nameSlug) {
+			router.push(`/${nameSlug}/settings`);
+		}
+	};
+
 	return (
 		<div>
 			<ProfileHeader
 				type={community ? "community" : "user"}
 				mode="settings"
-				name={community?.name || user?.name}
+				name={name}
 				slug={slug}
+				about={about}
 				isOwner={isOwner}
 				avatar={community?.avatar || user?.avatar}
 				verifiedUrl={community?.verifiedUrl}
@@ -85,6 +123,22 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 										onChange={(evt) => setName(evt.target.value)}
 									/>
 								</FormGroup>
+								<FormGroup label="Slug" labelFor="slug-input">
+									<InputGroup
+										id="slug-input"
+										required={true}
+										value={nameSlug}
+										onChange={(evt) => setNameSlug(evt.target.value)}
+									/>
+								</FormGroup>
+								<FormGroup label="About" labelFor="about-input">
+									<InputGroup
+										id="about-input"
+										required={true}
+										value={about}
+										onChange={(evt) => setAbout(evt.target.value)}
+									/>
+								</FormGroup>
 								<FormGroup label="Avatar" labelFor="avatar-input">
 									<div style={{ display: "flex", alignItems: "center" }}>
 										<div style={{ marginRight: "10px" }}>
@@ -106,9 +160,18 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 										)}
 									</div>
 								</FormGroup>
+								<Button
+									text="Update profile"
+									intent={Intent.SUCCESS}
+									style={{ marginTop: "12px" }}
+									loading={isUpdating}
+									onClick={() => {
+										saveEdits();
+									}}
+								/>
 							</Section>
 						)}
-						{activeSubMode === "account" && (
+						{isOwner && (
 							<Section title="User Account">
 								<div>Delete Account</div>
 							</Section>

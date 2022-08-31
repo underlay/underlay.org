@@ -1,0 +1,24 @@
+@import "pages/variables.scss";
+
+.table {
+	width: 100%;
+	margin: 40px 0px;
+	.header {
+		text-align: left;
+		padding-bottom: 5px;
+		margin-bottom: 5px;
+		border-bottom: 1px solid #ccc;
+	}
+	th {
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 14px;
+		color: #888;
+		letter-spacing: 1px;
+		margin-bottom: 15px;
+		position: relative;
+	}
+	td {
+		padding: 10px 0px;
+	}
+}

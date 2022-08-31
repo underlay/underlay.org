@@ -30,6 +30,7 @@ model User {
   email       String    @unique
   name        String
   avatar      String?
+  about       String?
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
@@ -50,6 +51,7 @@ model Community {
   namespaceId String    @unique @map(name: "namespace_id")
   name        String
   avatar      String?
+  about       String?
   description String?
   location    String?
   verifiedUrl String?
