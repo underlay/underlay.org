@@ -37,8 +37,8 @@ const Landing: React.FC<Props> = function () {
 			items: [
 				{ text: "Github", href: "https://github.com/underlay" },
 				{
-					text: "RFCs",
-					href: "https://github.com/underlay/overview/blob/master/community/RFCs.md",
+					text: "Docs",
+					href: "https://docs.underlay.org",
 				},
 				{ text: "Contact", href: "mailto:team@underlay.org" },
 			],

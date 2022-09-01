@@ -31,7 +31,7 @@ function MyApp({
 			<LoginContext.Provider value={loginData}>
 				<Head>
 					<title>Underlay</title>
-					<link rel="shortcut icon" href="/favicon.png" />
+					<link rel="shortcut icon" href="/favicon.svg" />
 					<meta name="viewport" content="initial-scale=1.0, width=device-width" />
 				</Head>
 				<div className="app">

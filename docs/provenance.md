@@ -1,0 +1,8 @@
+# Provenance
+Underlay colletions do not claim to be truth, but assertions of truths attributed to their source. For example, the assertion “Nur-Sultan is the capital of Kazakhstan,” might be linked to the provenance: “from Version 2011.1 of the UN Membership database...” This provenance would also describe when and how the database was extracted and recorded. 
+
+The provenance of an assertion is as critical to the social functioning of Underlay collection as the data itself. Provenance is the basis by which curation is made, errors are corrected, and bad-actors are filtered.
+
+Underlay works by allowing anyone to make assertions about the world, including false ones. Critically,  Underlay provides a method for identifying the source, or provenance, of these assertions. Unlike the explicit existence of a data file, knowledge is nuanced, dynamic, and open to qualitative judgment. As such, Underlay is designed as much around keeping track of who asserted a particular bit of knowledge as it is the knowledge itself.
+
+Knowledge in the Underlay is not assumed to be true because it has been asserted, but rather, is designed to be curated by an external group of people or algorithms that organize assertions into a trustworthy set (for any relevant definition of trustworthy). When querying data or building applications, users of Underlay collections are able to see exactly who asserted the information they’re relying on, allowing them to make informed judgements about the quality and veracity of the data they encounter and use.
