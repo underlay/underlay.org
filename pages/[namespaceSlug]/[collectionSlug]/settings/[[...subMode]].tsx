@@ -6,6 +6,7 @@ import { useLocationContext } from "utils/client/hooks";
 import { buildUrl } from "utils/shared/urls";
 import { Button, ButtonGroup, FormGroup, InputGroup, Intent } from "@blueprintjs/core";
 import { useRouter } from "next/router";
+import { slugifyString } from "utils/shared/strings";
 
 const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "", subMode } = useLocationContext().query;
@@ -26,7 +27,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				collectionId: collection.id,
-				updates: { slugPrefix, description, isPublic },
+				updates: { slugPrefix: slugifyString(slugPrefix), description, isPublic },
 			}),
 		});
 

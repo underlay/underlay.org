@@ -17,6 +17,7 @@ import { getLoginId } from "utils/server/auth/user";
 import { buildUrl } from "utils/shared/urls";
 import { getNamespaceData } from "utils/server/queries";
 import { useRouter } from "next/router";
+import { slugifyString } from "utils/shared/strings";
 
 type Props = {
 	slug: string;
@@ -53,22 +54,36 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 
 	const saveEdits = async () => {
 		setIsUpdating(true);
+
+		const slugifiedNameSlug = slugifyString(nameSlug);
 		if (isUser) {
 			await fetch("/api/user", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ id: identity.id, name, nameSlug, about, avatar }),
+				body: JSON.stringify({
+					id: identity.id,
+					name,
+					nameSlug: slugifiedNameSlug,
+					about,
+					avatar,
+				}),
 			});
 		} else {
 			await fetch("/api/community", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ id: identity.id, name, nameSlug, about, avatar }),
+				body: JSON.stringify({
+					id: identity.id,
+					name,
+					nameSlug: slugifiedNameSlug,
+					about,
+					avatar,
+				}),
 			});
 		}
 		setIsUpdating(false);
 
-		if (namespaceSlug !== nameSlug) {
+		if (namespaceSlug !== slugifiedNameSlug) {
 			router.push(`/${nameSlug}/settings`);
 		}
 	};
