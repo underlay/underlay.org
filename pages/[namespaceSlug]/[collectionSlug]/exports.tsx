@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { Button, Dialog, Intent } from "@blueprintjs/core";
 
-import { CollectionHeader, ThreeColumnFrame, ExportTable, ExportCreate } from "components";
+import {
+	CollectionHeader,
+	ThreeColumnFrame,
+	ExportTable,
+	ExportCreate,
+	SchemaViewer,
+} from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
 const CollectionExports: React.FC<CollectionProps> = function ({ collection: initCollection }) {
@@ -20,6 +26,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const [newExport, setNewExport] = useState(defaultNewExportState);
 	const [newExportInProgress, setNewExportInProgress] = useState(false);
 	const [newExportOpen, setNewExportOpen] = useState(false);
+	const [showMapping, setShowMapping] = useState(false);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const generateExport = async () => {
 		setIsGenerating(true);
@@ -35,7 +42,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 				versionId: newExport.versionId,
 				schemaId: collection.schemas[0].id,
 				collectionId: collection.id,
-        csvMainNode: newExport.csvMainNode
+				csvMainNode: newExport.csvMainNode,
 			}),
 		});
 		const newExportObject = await response.json();
@@ -59,6 +66,8 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	if (isGenerating) {
 		newButtonText = "Generating Export...";
 	}
+
+
 	return (
 		<div>
 			<CollectionHeader mode="exports" collection={collection} />
@@ -76,7 +85,11 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 								intent={newExportInProgress ? Intent.WARNING : undefined}
 							/>
 						</div>
-						<ExportTable collection={collection} setNewExportOpen={setNewExportOpen} />
+						<ExportTable
+							collection={collection}
+							setNewExportOpen={setNewExportOpen}
+							setShowMapping={setShowMapping}
+						/>
 						<Dialog
 							style={{ width: "80vw" }}
 							isOpen={newExportOpen}
@@ -91,6 +104,15 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 								generateExport={generateExport}
 								isGenerating={isGenerating}
 							/>
+						</Dialog>
+						<Dialog
+							style={{ width: "60vw", padding: '4px 24px' }}
+							isOpen={showMapping}
+							onClose={() => {
+								setShowMapping(false);
+							}}
+						>
+							<SchemaViewer collection={collection} setIsEditing={() => {}} />
 						</Dialog>
 					</div>
 				}
