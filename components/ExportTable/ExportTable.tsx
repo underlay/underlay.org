@@ -10,13 +10,13 @@ import { humanFileSize } from "utils/shared/filesize";
 
 type Props = {
 	setNewExportOpen: any;
-	setShowMapping: any;
+	setShowMappingIndex: any;
 };
 
 const ExportTable: React.FC<CollectionProps & Props> = function ({
 	collection,
 	setNewExportOpen,
-	setShowMapping,
+	setShowMappingIndex,
 }) {
 	const [selectedVersions, setSelectedVersions] = useState(
 		collection.exports.map((e) => {
@@ -59,7 +59,9 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({
 								<td>{exportItem.format}</td>
 								<td>{humanFileSize(exportSize)}</td>
 								<td>
-									<Button onClick={() => setShowMapping(true)}>Mapping</Button>
+									<Button onClick={() => setShowMappingIndex(exportItemI)}>
+										Mapping
+									</Button>
 								</td>
 								<td>{exportItem.isPublic ? "Public" : "Private"}</td>
 								<td>

@@ -1,0 +1,57 @@
+.mappingViewer {
+	padding: 12px;
+
+	.sectionHeader {
+		display: flex;
+		align-items: center;
+		margin-bottom: 15px;
+		&:not(:first-of-type) {
+			margin-top: 50px;
+		}
+	}
+	.number {
+		border: 1px solid black;
+		border-radius: 28px;
+		height: 28px;
+		width: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 15px;
+	}
+	.title {
+		font-weight: 600;
+		font-size: 14px;
+		position: relative;
+	}
+	.sectionContent {
+		margin-left: 43px;
+		&.sectionOne {
+			display: flex;
+			& > div {
+				margin-right: 50px;
+			}
+		}
+	}
+	.option {
+		margin-bottom: 0px;
+	}
+	.classRow {
+		display: flex;
+	}
+	.attrRow {
+		display: flex;
+		margin-left: 25px;
+	}
+	.schemaKey {
+		padding-right: 20px;
+		width: 200px;
+	}
+	.attrKey {
+		padding-right: 20px;
+		width: 175px;
+	}
+	.checkbox {
+		padding-right: 20px;
+	}
+}

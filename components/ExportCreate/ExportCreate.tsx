@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import { Button, Checkbox, HTMLSelect, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
 
-import { Section } from "components";
+import { ExportMappingViewer, Section } from "components";
 import { Schema } from "utils/shared/types";
 
 import styles from "./ExportCreate.module.scss";
@@ -317,138 +317,15 @@ const ExportCreate: React.FC<Props> = function ({
 						</Section>
 					</div>
 				)}
+
 				{newExport.format === "JSON" && newExport.mapping && (
 					<div>
-						<Section className={styles.option} title="JSON Key Mapping">
-							{schema.map((schemaClass) => {
-								const classIncluded = newExport.mapping[schemaClass.key]?.include;
-								return (
-									<div key={schemaClass.id} className={styles.mappingClass}>
-										<div className={styles.classRow}>
-											<div className={styles.schemaKey}>
-												{schemaClass.key}
-											</div>
-											<div className={styles.checkbox}>
-												<Checkbox
-													checked={classIncluded}
-													label="Include"
-													onChange={(evt) => {
-														const nextMapping = {
-															...newExport.mapping,
-														};
-														if (nextMapping[schemaClass.key]) {
-															nextMapping[schemaClass.key].include =
-																// @ts-ignore
-																evt.target.checked;
-														} else {
-															nextMapping[schemaClass.key] = {
-																// @ts-ignore
-																include: evt.target.checked,
-															};
-														}
-														setNewExport({
-															...newExport,
-															mapping: nextMapping,
-														});
-													}}
-												/>
-											</div>
-											{classIncluded && (
-												<InputGroup
-													className="narrow-line-input"
-													placeholder={`Rename...`}
-													type="text"
-													value={
-														newExport.mapping[schemaClass.key]?.rename
-													}
-													onChange={(evt) => {
-														const nextMapping = {
-															...newExport.mapping,
-														};
-														nextMapping[schemaClass.key].rename =
-															evt.target.value;
-														setNewExport({
-															...newExport,
-															mapping: nextMapping,
-														});
-													}}
-												/>
-											)}
-										</div>
-										{schemaClass?.attributes
-											.filter((a) => {
-												if (!schemaClass.isRelationship) {
-													return true;
-												}
-
-												return a.key !== "source" && a.key !== "target";
-											})
-											.map((attr) => {
-												const attrIncluded =
-													newExport.mapping[schemaClass.key]?.attributes[
-														attr.key
-													]?.include;
-												return (
-													<div key={attr.id} className={styles.attrRow}>
-														<div className={styles.attrKey}>
-															{attr.key}
-														</div>
-														<div className={styles.checkbox}>
-															<Checkbox
-																checked={attrIncluded}
-																disabled={!classIncluded}
-																label="Include"
-																onChange={(evt) => {
-																	// @ts-ignore
-																	const nextMapping = {
-																		...newExport.mapping,
-																	};
-
-																	nextMapping[
-																		schemaClass.key
-																	].attributes[
-																		attr.key
-																		// @ts-ignore
-																	].include = evt.target.checked;
-																	setNewExport({
-																		...newExport,
-																		mapping: nextMapping,
-																	});
-																}}
-															/>
-														</div>
-														{attrIncluded && classIncluded && (
-															<InputGroup
-																className="narrow-line-input"
-																placeholder={`Rename...`}
-																type="text"
-																value={
-																	newExport.mapping[
-																		schemaClass.key
-																	]?.attributes[attr.key].rename
-																}
-																onChange={(evt) => {
-																	const nextMapping = {
-																		...newExport.mapping,
-																	};
-																	nextMapping[
-																		schemaClass.key
-																	].attributes[attr.key].rename =
-																		evt.target.value;
-																	setNewExport({
-																		...newExport,
-																		mapping: nextMapping,
-																	});
-																}}
-															/>
-														)}
-													</div>
-												);
-											})}
-									</div>
-								);
-							})}
-						</Section>
+						<ExportMappingViewer
+							targetExport={newExport}
+							setNewExport={setNewExport}
+							collection={collection}
+							editable={true}
+						/>
 
 						<Section className={styles.option} title="Preview">
 							<pre>

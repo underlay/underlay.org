@@ -6,7 +6,7 @@ import {
 	ThreeColumnFrame,
 	ExportTable,
 	ExportCreate,
-	SchemaViewer,
+	ExportMappingViewer,
 } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
@@ -26,7 +26,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const [newExport, setNewExport] = useState(defaultNewExportState);
 	const [newExportInProgress, setNewExportInProgress] = useState(false);
 	const [newExportOpen, setNewExportOpen] = useState(false);
-	const [showMapping, setShowMapping] = useState(false);
+	const [showMappingIndex, setShowMappingIndex] = useState(-1);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const generateExport = async () => {
 		setIsGenerating(true);
@@ -67,7 +67,6 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 		newButtonText = "Generating Export...";
 	}
 
-
 	return (
 		<div>
 			<CollectionHeader mode="exports" collection={collection} />
@@ -88,7 +87,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 						<ExportTable
 							collection={collection}
 							setNewExportOpen={setNewExportOpen}
-							setShowMapping={setShowMapping}
+							setShowMappingIndex={setShowMappingIndex}
 						/>
 						<Dialog
 							style={{ width: "80vw" }}
@@ -106,13 +105,18 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 							/>
 						</Dialog>
 						<Dialog
-							style={{ width: "60vw", padding: '4px 24px' }}
-							isOpen={showMapping}
+							style={{ width: "60vw", padding: "4px 24px" }}
+							isOpen={showMappingIndex !== -1}
 							onClose={() => {
-								setShowMapping(false);
+								setShowMappingIndex(-1);
 							}}
 						>
-							<SchemaViewer collection={collection} setIsEditing={() => {}} />
+							<ExportMappingViewer
+								targetExport={collection.exports[showMappingIndex]}
+								setNewExport={() => {}}
+								collection={collection}
+								editable={false}
+							/>
 						</Dialog>
 					</div>
 				}
