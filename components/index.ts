@@ -20,6 +20,7 @@ export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as EntityCard } from "./EntityCard/EntityCard";
 export { default as EntityRelationships } from "./EntityCard/EntityRelationships";
 export { default as ExportCreate } from "./ExportCreate/ExportCreate";
+export { default as ExportMappingViewer } from "./ExportMappingViewer/ExportMappingViewer";
 export { default as ExportTable } from "./ExportTable/ExportTable";
 export { default as Footer } from "./Footer/Footer";
 export { default as Form } from "./Form/Form";
