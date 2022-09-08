@@ -27,6 +27,14 @@ const Header = () => {
 						large
 						minimal
 					/> */}
+					<AnchorButton
+						text="Docs"
+						href="https://docs.underlay.org"
+						target={"_blank"}
+						rel="noopener noreferrer"
+						large
+						minimal
+					/>
 					{!loginData && (
 						<React.Fragment>
 							<AnchorButton text="Login" href="/login" large minimal />
