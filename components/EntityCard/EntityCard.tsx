@@ -1,7 +1,6 @@
 import type { Entity, Class } from "utils/shared/types";
 import React, { useState } from "react";
 import { Button } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/popover2";
 
 import { CollectionProps } from "utils/server/collections";
 
@@ -39,11 +38,11 @@ const EntityCard: React.FC<Props> = function ({
 		});
 	}
 
-	function getNodeDisplay(id: string) {
+	function getEntityExpansion(id: string) {
 		const target = entityMap[id];
 
 		return (
-			<div className={styles.entityPopover}>
+			<div className={styles.entityExpansion}>
 				<span>
 					<b>{target.type}</b>
 				</span>
@@ -83,13 +82,9 @@ const EntityCard: React.FC<Props> = function ({
 											{entity[attribute]}
 										</a>
 									) : attribute === "source" ? (
-										<Popover2 content={getNodeDisplay(entity.source!)}>
-											<Button>Source</Button>
-										</Popover2>
+										getEntityExpansion(entity.source!)
 									) : attribute === "target" ? (
-										<Popover2 content={getNodeDisplay(entity.target!)}>
-											<Button>Target</Button>
-										</Popover2>
+										getEntityExpansion(entity.target!)
 									) : (
 										<span>{entity[attribute]}</span>
 									)}
