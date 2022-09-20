@@ -1,6 +1,7 @@
 import type { Entity, Class } from "utils/shared/types";
 import React, { useState } from "react";
 import { Button } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/popover2";
 
 import { CollectionProps } from "utils/server/collections";
 
@@ -11,15 +12,58 @@ interface Props {
 	collection: CollectionProps["collection"];
 	node: Class;
 	entity: Entity;
+	allEntities: any;
 	relationshipRendering: React.ReactElement;
 }
 
-const EntityCard: React.FC<Props> = function ({ collection, node, entity, relationshipRendering }) {
+const EntityCard: React.FC<Props> = function ({
+	collection,
+	node,
+	entity,
+	allEntities,
+	relationshipRendering,
+}) {
 	const [discussionOpen, setDiscussionsOpen] = useState(false);
 	const initDiscussionThreads = collection.discussionThreads.filter((thrd) => {
 		return thrd.entityId === entity._ulid;
 	});
 	const [discussionThreads, setDiscussionThreads] = useState(initDiscussionThreads);
+
+	const entityMap: { [k: string]: { entity: Entity; type: string } } = {};
+	for (let eKey in allEntities) {
+		allEntities[eKey].forEach((e: Entity) => {
+			entityMap[e._ulid] = {
+				entity: e,
+				type: eKey,
+			};
+		});
+	}
+
+	function getNodeDisplay(id: string) {
+		const target = entityMap[id];
+
+		return (
+			<div className={styles.entityPopover}>
+				<span>
+					<b>{target.type}</b>
+				</span>
+				<span></span>
+				{Object.keys(target.entity)
+					.filter((attr) => {
+						return attr !== "_ulid" && attr !== "_ulprov";
+					})
+					.map((attr) => {
+						return (
+							<>
+								<span>{attr}</span>
+								<span>{target.entity[attr]}</span>
+							</>
+						);
+					})}
+			</div>
+		);
+	}
+
 	return (
 		<div key={entity.id} className={styles.entityCard}>
 			<div className={styles.topRow}>
@@ -38,6 +82,14 @@ const EntityCard: React.FC<Props> = function ({ collection, node, entity, relati
 										<a target="_blank" href={entity[attribute]}>
 											{entity[attribute]}
 										</a>
+									) : attribute === "source" ? (
+										<Popover2 content={getNodeDisplay(entity.source!)}>
+											<Button>Source</Button>
+										</Popover2>
+									) : attribute === "target" ? (
+										<Popover2 content={getNodeDisplay(entity.target!)}>
+											<Button>Target</Button>
+										</Popover2>
 									) : (
 										<span>{entity[attribute]}</span>
 									)}
