@@ -45,7 +45,7 @@ const MembersOverview: React.FC<Props> = function ({ community }) {
 				location={community.location}
 			/>
 			<ThreeColumnFrame
-				content={<MemberList members={community.members}></MemberList>}
+				content={<MemberList community={community} members={community.members}></MemberList>}
 				sideContent={<div></div>}
 			/>
 		</div>

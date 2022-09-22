@@ -14,8 +14,7 @@
 
 .propertyWrapper {
 	display: flex;
-	align-items: flex-end;
-	margin-bottom: 20px;
+	align-items: flex-start;
 }
 .propertyHeader {
 	min-width: 175px;
@@ -24,5 +23,21 @@
 	display: flex;
 	.properties {
 		flex: 1 1 auto;
+
+		> div:not(:last-child) {
+			margin-bottom: 20px;
+		}
+	}
+}
+
+.entityExpansion {
+	display: grid;
+	grid-template-columns: minmax(40px, 1fr) minmax(40px, 1fr);
+	grid-template-rows: auto;
+	grid-template-areas: "key value";
+
+	span {
+		margin-right: 12px;
+		margin-bottom: 12px;
 	}
 }

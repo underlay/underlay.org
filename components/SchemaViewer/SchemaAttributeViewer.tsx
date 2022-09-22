@@ -1,7 +1,5 @@
 import type { Attribute, Class } from "utils/shared/types";
 
-import styles from "./SchemaAttributeViewer.module.scss";
-
 type Props = {
 	isFixed: boolean;
 	attribute: Attribute;
@@ -10,24 +8,24 @@ type Props = {
 
 const SchemaAttributeViewer: React.FC<Props> = function ({ isFixed, attribute, schemaNodes }) {
 	return (
-		<div className={styles.attribute}>
-			<div>{attribute.key}</div>
+		<>
+			<span>{attribute.key}</span>
 
 			{isFixed ? (
-				<div>
+				<span>
 					{schemaNodes.reduce((prev, sn) => {
 						if (sn.id === attribute.type) {
 							return sn.key || "";
 						}
 						return prev;
 					}, "")}
-				</div>
+				</span>
 			) : (
-				<div>{attribute.type}</div>
+				<span>{attribute.type}</span>
 			)}
-			{!attribute.isOptional && <div>Required</div>}
-			{attribute.isUID && <div>Unique Identifier</div>}
-		</div>
+			{!attribute.isOptional && <span>Required</span>}
+			{attribute.isUID && <span>Unique Identifier</span>}
+		</>
 	);
 };
 
