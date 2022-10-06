@@ -28,6 +28,7 @@ const CommunityOverview: React.FC<Props> = function ({ community }) {
 				mode="overview"
 				name={community.name}
 				slug={community.namespace.slug}
+				about={community.about}
 				isOwner={isCommunityOwner}
 				avatar={community.avatar}
 				verifiedUrl={community.verifiedUrl}

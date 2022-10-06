@@ -39,6 +39,7 @@ const MembersOverview: React.FC<Props> = function ({ community }) {
 				mode="members"
 				name={community.name}
 				slug={community.namespace.slug}
+				about={community.about}
 				isOwner={isCommunityOwner}
 				avatar={community.avatar}
 				verifiedUrl={community.verifiedUrl}
