@@ -77,17 +77,18 @@ model Member {
 }
 
 model Collection {
-  id          String    @id @default(uuid())
-  namespace   Namespace @relation(fields: [namespaceId], references: [id])
-  namespaceId String    @map(name: "namespace_id")
-  slugSuffix  String    @unique @map(name: "slug_suffix")
-  slugPrefix  String    @map(name: "slug_prefix")
-  description String?
-  isPublic    Boolean   @default(false) @map(name: "is_public")
-  readme      String?
-  labels      Json?
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  id               String    @id @default(uuid())
+  namespace        Namespace @relation(fields: [namespaceId], references: [id])
+  namespaceId      String    @map(name: "namespace_id")
+  slugSuffix       String    @unique @map(name: "slug_suffix")
+  slugPrefix       String    @map(name: "slug_prefix")
+  description      String?
+  isPublic         Boolean   @default(false) @map(name: "is_public")
+  readme           String?
+  labels           Json?
+  haveSchemaChange Boolean   @default(false) @map(name: "have_schema_change")
+  createdAt        DateTime  @default(now()) @map(name: "created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map(name: "updated_at")
 
   collaborators     Collaborator[]
   exports           Export[]
