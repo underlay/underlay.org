@@ -95,8 +95,105 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 			})
 		);
 	};
+
+	const diffSchema = (oldSchema: any, newSchema: any) => {
+		const addedAttrs: any[] = [];
+		const updatedAttrs: any[] = [];
+		const removedAttrs: any[] = [];
+
+		const addedNodes: any[] = [];
+		const updatedNodes: any[] = [];
+		const removedNodes: any[] = [];
+
+		newSchema.forEach((newNode: any) => {
+			const matchingOldNode = oldSchema.find((n: any) => n.id === newNode.id);
+			if (matchingOldNode) {
+				newNode.attributes.forEach((newNodeAttr: any) => {
+					const matchingOldNodeAttr = matchingOldNode.attributes.find(
+						(a: any) => a.id === newNodeAttr.id
+					);
+
+					if (!matchingOldNodeAttr) {
+						addedAttrs.push({
+							nodeKey: matchingOldNode.key,
+							nodeId: matchingOldNode.id,
+							attrKey: newNodeAttr.key,
+						});
+					}
+
+					if (matchingOldNodeAttr) {
+						let isEqualAttr = true;
+						for (let k in matchingOldNodeAttr) {
+							if (matchingOldNodeAttr[k] !== newNodeAttr[k]) {
+								isEqualAttr = false;
+							}
+						}
+
+						if (!isEqualAttr) {
+							updatedAttrs.push({
+								nodeKey: matchingOldNode.key,
+								nodeId: matchingOldNode.id,
+								oldAttrKey: matchingOldNodeAttr.key,
+								attrKey: newNodeAttr.key,
+							});
+						}
+					}
+				});
+
+				matchingOldNode.attributes.forEach((oldNodeAttr: any) => {
+					const matchingNewNodeAttr = newNode.attributes.find(
+						(a: any) => a.id === oldNodeAttr.id
+					);
+
+					if (!matchingNewNodeAttr) {
+						removedAttrs.push({
+							nodeKey: matchingOldNode.key,
+							nodeId: matchingOldNode.id,
+							attrKey: oldNodeAttr.key,
+						});
+					}
+				});
+			}
+		});
+
+		newSchema.forEach((newNode: any) => {
+			const matchingOldNode = oldSchema.find((n: any) => n.id === newNode.id);
+
+			if (!matchingOldNode) {
+				addedNodes.push(newNode);
+			}
+
+			if (matchingOldNode) {
+				if (matchingOldNode.key !== newNode.key) {
+					updatedNodes.push({
+						key: newNode.key,
+						oldNodeKey: matchingOldNode.key,
+					});
+				}
+			}
+		});
+
+		oldSchema.forEach((oldNode: any) => {
+			const matchingNewNode = newSchema.find((n: any) => n.id === oldNode.id);
+
+			if (!matchingNewNode) {
+				removedNodes.push(oldNode);
+			}
+		});
+
+		return {
+			addedAttrs,
+			updatedAttrs,
+			removedAttrs,
+			addedNodes,
+			updatedNodes,
+			removedNodes,
+		};
+	};
+
 	const handleSave = async () => {
 		setIsSaving(true);
+
 		const response = await fetch("/api/schema", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -105,10 +202,38 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 				schema: schema,
 			}),
 		});
-		const json = await response.json();
+		const schemaUpdateResJson = await response.json();
+
+		await fetch("/api/collection", {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				collectionId: collection.id,
+				updates: { haveSchemaChange: true },
+			}),
+		});
+
+		if (collection.schemas[0]) {
+			const schemaDiff = diffSchema(collection.schemas[0].content, schema);
+
+			await fetch("/api/schema/migration", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					collectionId: collection.id,
+					schema,
+					newSchemaId: schemaUpdateResJson.id,
+					schemaDiff,
+				}),
+			});
+		}
+
 		setCollection({
 			...collection,
-			schemas: json.version === "0.0" ? [json] : [json, ...collection.schemas],
+			schemas:
+				schemaUpdateResJson.version === "0.0"
+					? [schemaUpdateResJson]
+					: [schemaUpdateResJson, ...collection.schemas],
 		});
 		setIsSaving(false);
 		setCanSave(false);

@@ -14,11 +14,9 @@ import {
 	NonIdealState,
 } from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
-// import { uploadData as uploadDataToSupabase } from "utils/client/data";
 
 import styles from "./data.module.scss";
 import DataViewer from "components/DataViewer/DataViewer";
-// import { getNextVersion } from "utils/shared/version";
 import { convertToLocaleDateString } from "utils/shared/dates";
 import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
 import { Select } from "@blueprintjs/select";
@@ -95,6 +93,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 
 	const publishVersion = async () => {
 		setIsPublishing(true);
+
 		const response = await fetch("/api/version", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -103,9 +102,24 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			}),
 		});
 		const data = await response.json();
+
+		try {
+			await fetch("/api/collection", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					collectionId: collection.id,
+					updates: { haveSchemaChange: false },
+				}),
+			});
+		} catch (err) {
+			console.error(err);
+		}
+
 		setCollection({
 			...collection,
 			versions: [data, ...collection.versions],
+			haveSchemaChange: false,
 		});
 		setIsPublishing(false);
 		setActiveVersion(data);
@@ -124,6 +138,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		}
 		return false;
 	});
+
 	const availableVersionsToSelect = inputsSinceVersion.length
 		? [{ number: "Draft", id: "draft" }, ...collection.versions]
 		: collection.versions;
@@ -254,6 +269,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 																console.log(input);
 																return (
 																	<MenuItem
+																		key={input.id}
 																		text={
 																			<div>
 																				<div
@@ -332,6 +348,30 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 									</div>
 
 									<div className={styles.buttonGroup}>
+										<Popover2
+											interactionKind={"hover"}
+											content={
+												<div
+													style={{
+														padding: "8px 12px",
+														maxWidth: "400px",
+													}}
+												>
+													Schema has changed. Please re-upload data, map
+													it to the new schema and publish a new version.
+													<br />
+													<br />
+												</div>
+											}
+										>
+											<AnchorButton
+												hidden={!collection.haveSchemaChange}
+												outlined
+												text={"Schema Changed"}
+												intent={Intent.WARNING}
+												href={`/${namespaceSlug}/${collectionSlug}/schema`}
+											/>
+										</Popover2>
 										<Button
 											outlined
 											text={newButtonText}
