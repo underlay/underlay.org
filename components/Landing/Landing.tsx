@@ -16,20 +16,22 @@ const Landing: React.FC<Props> = function () {
 		{
 			title: "Featured Communities",
 			items: [
-				{ text: "Arcadia Science", href: "/arcadia" },
-				{ text: "CUNY", href: "/cuny" },
-				{ text: "NewsQ", href: "/newsq" },
+				{ text: "Coming soon...", href: "" },
+				// { text: "Arcadia Science", href: "/arcadia" },
+				// { text: "CUNY", href: "/cuny" },
+				// { text: "NewsQ", href: "/newsq" },
 			],
 		},
 		{
 			title: "Featured Collections",
 			items: [
-				{ text: "arcadia/proteins", href: "/arcadia/proteins" },
-				{ text: "newsq/full-source", href: "/newsq/full-source" },
-				{
-					text: "hh/reliable-vaccine-news-sources",
-					href: "/hh/reliable-vaccine-news-sources",
-				},
+				{ text: "Coming soon...", href: "" },
+				// { text: "arcadia/proteins", href: "/arcadia/proteins" },
+				// { text: "newsq/full-source", href: "/newsq/full-source" },
+				// {
+				// 	text: "hh/reliable-vaccine-news-sources",
+				// 	href: "/hh/reliable-vaccine-news-sources",
+				// },
 			],
 		},
 		{
@@ -81,10 +83,11 @@ const Landing: React.FC<Props> = function () {
 					</p>
 					<img className={styles.logo} src="/kfgIcon.svg" />
 					<p>
-						Underlay is a project of Knowledge Futures Group, a non-profit dedicated to
-						sustainable, equitable, effective public knowledge infrastructure. Support
-						KFG by{" "}
-						<a href="https://www.knowledgefutures.org/membership">becoming a member</a>.
+						Underlay is a project of{" "}
+						<a href="https://www.knowledgefutures.org">Knowledge Futures</a>, a
+						non-profit dedicated to sustainable, equitable, effective public knowledge
+						infrastructure. Learn how you can{" "}
+						<a href="https://www.knowledgefutures.org/membership">get involved</a>.
 					</p>
 				</div>
 				<div className={styles.links}>

@@ -38,7 +38,7 @@ const Header = () => {
 					{!loginData && (
 						<React.Fragment>
 							<AnchorButton text="Login" href="/login" large minimal />
-							<AnchorButton text="Sign up" href="/signup" large outlined />
+							{/* <AnchorButton text="Sign up" href="/signup" large outlined /> */}
 						</React.Fragment>
 					)}
 					{!!loginData && (
