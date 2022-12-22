@@ -112,6 +112,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 								collection={collection}
 								node={activeClass}
 								entity={entity}
+								allEntities={versionData}
 								relationshipRendering={relationshipRendering}
 							/>
 						);

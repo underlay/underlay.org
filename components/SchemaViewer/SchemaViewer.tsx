@@ -1,5 +1,4 @@
 import { Button } from "@blueprintjs/core";
-import { Tooltip2 } from "@blueprintjs/popover2";
 
 import { ThreeColumnFrame } from "components";
 import { CollectionProps } from "utils/server/collections";
@@ -27,22 +26,14 @@ const SchemaViewer: React.FC<Props> = function ({ collection, setIsEditing }) {
 		<ThreeColumnFrame
 			content={
 				<div className={styles.viewer}>
-					<Tooltip2
-						disabled={collection.versions.length === 0}
-						content={
-							"Editing the schema is disabled until data migrations are implemented"
-						}
+					<Button
 						className={styles.sticky}
-					>
-						<Button
-							icon="edit"
-							text={"Edit"}
-							onClick={() => {
-								setIsEditing(true);
-							}}
-							disabled={collection.versions.length > 0} // This is just until we have data-migration backend code in place.
-						/>
-					</Tooltip2>
+						icon="edit"
+						text={"Edit"}
+						onClick={() => {
+							setIsEditing(true);
+						}}
+					/>
 
 					{schema.map((schemaClass) => {
 						return (

@@ -44,9 +44,9 @@ const ExportTable: React.FC<CollectionProps & Props> = function ({
 						const selectedVersion = selectedVersions[exportItemI];
 						let exportSize = "N/A";
 						if (exportItem.exportVersions.length > 0) {
-							const lastVersion = exportItem.exportVersions
-								.map((v) => v.version.number)
-								.pop();
+							const lastVersion =
+								exportItem.exportVersions[exportItem.exportVersions.length - 1]
+									.version.number;
 							const targetExport = exportItem.exportVersions.find((v) => {
 								return v.version.number === lastVersion;
 							})!;

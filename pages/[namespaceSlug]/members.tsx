@@ -39,13 +39,14 @@ const MembersOverview: React.FC<Props> = function ({ community }) {
 				mode="members"
 				name={community.name}
 				slug={community.namespace.slug}
+				about={community.about}
 				isOwner={isCommunityOwner}
 				avatar={community.avatar}
 				verifiedUrl={community.verifiedUrl}
 				location={community.location}
 			/>
 			<ThreeColumnFrame
-				content={<MemberList members={community.members}></MemberList>}
+				content={<MemberList community={community} members={community.members}></MemberList>}
 				sideContent={<div></div>}
 			/>
 		</div>

@@ -9,6 +9,11 @@
 	}
 }
 .attributeWrapper {
+	display: grid;
+	grid-template-columns: minmax(40px, 1fr) minmax(40px, 1fr) minmax(10px, 1fr) 5fr;
+	grid-template-rows: auto;
+	grid-template-areas: "key type required uniqueid";
+
 	margin: 15px 0px;
 	margin-left: 25px;
 }
