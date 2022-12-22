@@ -1,6 +1,6 @@
 # History
 
-The ideas behind the Underlay were first discussed in conversations between Danny Hillis, SJ Klein, and Travis Rich in 2016. This page will share some specifics that have led to updates in our thinking and resulted in the project as it is today.
+The ideas behind Underlay were first discussed in conversations between Danny Hillis, SJ Klein, and Travis Rich in 2016. This page will share some specifics that have led to updates in our thinking and resulted in the project as it is today.
 
 Over time, the project has considered various outputs (e.g. a standalone platform, an open-source CLI tool, a protocol) and built with the goal of various value propositions. As we've iterated on ideas, it has been challenging to communicate which notions are deprecated and which are active. The content on this documentation site can be understood as canonical. If it's not mentioned in the docs here, it is no longer an active line of research and development. We maintain this history page to provide additional narration and context to ideas we have explored in the past, but may not necessarily be included in our current approach.
 
