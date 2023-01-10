@@ -78,7 +78,39 @@ export const processCsv = async (
 					records[entityKey].push(entities[entityKey]);
 				});
 			}
-			resolve(records);
+			/*
+				De-dupe records. Duplicate entities can be created if they are
+				listed on more than one row, because
+				they are related to many nodes.
+			*/
+			const uniqueRecords: any = {};
+			Object.keys(records).forEach((entityKey: string) => {
+				const allElements = records[entityKey];
+
+				const entityClass = schema.find((schemClass) => {
+					return schemClass.key === entityKey;
+				});
+				const uniqueAttr = entityClass?.attributes.find((attr) => {
+					return attr.isUID;
+				});
+				const uniqueAttrKey = uniqueAttr?.key;
+				if (!uniqueAttrKey) {
+					uniqueRecords[entityKey] = allElements;
+				} else {
+					const uniques: any = {};
+					const uniqueElements = allElements.filter((element: any) => {
+						const alreadySeen = uniques[element[uniqueAttrKey]];
+						if (alreadySeen) {
+							return false;
+						} else {
+							uniques[element[uniqueAttrKey]] = true;
+							return true;
+						}
+					});
+					uniqueRecords[entityKey] = uniqueElements;
+				}
+			});
+			resolve(uniqueRecords);
 		});
 	});
 };
