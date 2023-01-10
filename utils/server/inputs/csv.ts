@@ -50,9 +50,7 @@ export const processCsv = async (
 					const uniqueAttrKey = uniqueAttr?.key;
 					if (uniqueAttrKey) {
 						const alreadyExisting = records[entityKey].find((existingEntity: any) => {
-							return (
-								existingEntity[uniqueAttrKey] === entities[entityKey][uniqueAttrKey]
-							);
+							return existingEntity[uniqueAttrKey] === entity[uniqueAttrKey];
 						});
 						if (alreadyExisting) {
 							entities[entityKey]._ulid = alreadyExisting._ulid;
