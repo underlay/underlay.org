@@ -39,6 +39,14 @@ export const processCsv = async (
 				mapping.forEach((valueMap: { class: string; attr: string; csvHeader: string }) => {
 					entities[valueMap.class][valueMap.attr] = record[valueMap.csvHeader.trim()];
 				});
+
+				/* 
+					Some rows will have entities that have already been created by previous rows.
+					We de-dupe these at the end of the parser, but this is problematic for
+					relationship generation. We need to use a single _ulid, so that we don't remove
+					nodes that relationships point to during the de-duping. This next .map overwrites _ulids
+					for nodes that have been previously created, so that relationships are correctly created. 
+				*/
 				Object.keys(entities).map((entityKey) => {
 					const entity = entities[entityKey];
 					const entityClass = schema.find((schemClass) => {
@@ -98,7 +106,9 @@ export const processCsv = async (
 			/*
 				De-dupe records. Duplicate entities can be created if they are
 				listed on more than one row, because
-				they are related to many nodes.
+				they are related to many nodes. This can be simplified now that
+				we know duplicate elements will have a common _ulid. But was rushing
+				when implementing for sake of demoing.
 			*/
 			const uniqueRecords: any = {};
 			Object.keys(records).forEach((entityKey: string) => {
