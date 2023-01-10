@@ -32,13 +32,32 @@ export const processCsv = async (
 				const entities = mapping.reduce((prev: any, curr: { class: string }) => {
 					return { ...prev, [curr.class]: { _ulid: uuidv4(), _ulprov: inputObjectId } };
 				}, {});
-
 				/*
 					We iterate over the mapping again populate the stub entites with the
 					values from the record, taking only the fields specified in the mapping
 				*/
 				mapping.forEach((valueMap: { class: string; attr: string; csvHeader: string }) => {
 					entities[valueMap.class][valueMap.attr] = record[valueMap.csvHeader.trim()];
+				});
+				Object.keys(entities).map((entityKey) => {
+					const entity = entities[entityKey];
+					const entityClass = schema.find((schemClass) => {
+						return schemClass.key === entityKey;
+					});
+					const uniqueAttr = entityClass?.attributes.find((attr) => {
+						return attr.isUID;
+					});
+					const uniqueAttrKey = uniqueAttr?.key;
+					if (uniqueAttrKey) {
+						const alreadyExisting = records[entityKey].find((existingEntity: any) => {
+							return (
+								existingEntity[uniqueAttrKey] === entities[entityKey][uniqueAttrKey]
+							);
+						});
+						if (alreadyExisting) {
+							entities[entityKey]._ulid = alreadyExisting._ulid;
+						}
+					}
 				});
 
 				// Based on the schema, we need to figure out which entities are a relationship that needs to grab a value
