@@ -146,6 +146,7 @@ export const getCollectionData = async (collectionSlug: string) => {
 					sourceCsv: { include: { user: { include: { namespace: true } } } },
 					sourceApi: true,
 				},
+				take: 1,
 			},
 			collaborators: true,
 		},
