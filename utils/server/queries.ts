@@ -143,8 +143,11 @@ export const getCollectionData = async (collectionSlug: string) => {
 			inputs: {
 				orderBy: { createdAt: "desc" },
 				select: {
+					id: true,
+					reductionType: true,
 					sourceCsv: { include: { user: { include: { namespace: true } } } },
 					sourceApi: true,
+					createdAt: true,
 					outputData: false,
 				},
 			},
