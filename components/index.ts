@@ -30,6 +30,7 @@ export { default as MemberList } from "./MemberList/MemberList";
 export { default as ProfileHeader } from "./ProfileHeader/ProfileHeader";
 export { default as RelationshipCard } from "./RelationshipCard/RelationshipCard";
 export { default as SchemaEditor } from "./SchemaEditor/SchemaEditor";
+export { default as SchemaEditorDialog } from "./SchemaEditorDialog/SchemaEditorDialog";
 export { default as SchemaViewer } from "./SchemaViewer/SchemaViewer";
 export { default as ScopeNav } from "./ScopeNav/ScopeNav";
 export { default as SearchResultList } from "./SearchResultList/SearchResultList";

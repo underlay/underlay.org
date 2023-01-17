@@ -67,31 +67,35 @@ const EntityCard: React.FC<Props> = function ({
 		<div key={entity.id} className={styles.entityCard}>
 			<div className={styles.topRow}>
 				<div className={styles.properties}>
-					{Object.keys(entity).map((attribute) => {
-						if (attribute === "_ulid" || attribute === "_ulprov") {
-							return null;
-						}
+					{Object.keys(entity)
+						.filter((entityAttrKey) => {
+							return node.attributes.map((a) => a.key).includes(entityAttrKey);
+						})
+						.map((attribute) => {
+							if (attribute === "_ulid" || attribute === "_ulprov") {
+								return null;
+							}
 
-						const matchAttr = node.attributes.find((a) => a.key === attribute);
-						return (
-							<div key={entity._ulid + attribute}>
-								<div className={styles.propertyWrapper}>
-									<div className={styles.propertyHeader}>{attribute}:</div>
-									{matchAttr && matchAttr.type === "URL" ? (
-										<a target="_blank" href={entity[attribute]}>
-											{entity[attribute]}
-										</a>
-									) : attribute === "source" ? (
-										getEntityExpansion(entity.source!)
-									) : attribute === "target" ? (
-										getEntityExpansion(entity.target!)
-									) : (
-										<span>{entity[attribute]}</span>
-									)}
+							const matchAttr = node.attributes.find((a) => a.key === attribute);
+							return (
+								<div key={entity._ulid + attribute}>
+									<div className={styles.propertyWrapper}>
+										<div className={styles.propertyHeader}>{attribute}:</div>
+										{matchAttr && matchAttr.type === "URL" ? (
+											<a target="_blank" href={entity[attribute]}>
+												{entity[attribute]}
+											</a>
+										) : attribute === "source" ? (
+											getEntityExpansion(entity.source!)
+										) : attribute === "target" ? (
+											getEntityExpansion(entity.target!)
+										) : (
+											<span>{entity[attribute]}</span>
+										)}
+									</div>
 								</div>
-							</div>
-						);
-					})}
+							);
+						})}
 				</div>
 				<div>
 					<Button

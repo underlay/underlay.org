@@ -34,20 +34,20 @@ export const NodeOrRelationshipBlock: React.FC<Props> = function ({ node, onClic
 // let dataFetched = false;
 
 type DataViewerProps = {
-	// activeNodes: Class[];
 	activeVersionNumber: string;
 	collection: CollectionProps["collection"];
+	schema: Schema;
 	selectedClassKey: string;
 };
 
 const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	activeVersionNumber,
 	collection,
+	schema,
 	selectedClassKey,
 }) {
 	// const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 
-	const allNodes: Class[] = collection.schemas[0].content as Schema;
 	// const { nodes, relationships } = splitClasses(allNodes);
 	// const initNodes = allNodes.filter((n) => !n.isRelationship);
 	// const initRelationships: Class[] = allNodes.filter((n) => !!n.isRelationship);
@@ -73,7 +73,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 		}, 50);
 	}, [activeVersionNumber]);
 
-	const activeClass = allNodes.find((schemaClass) => {
+	const activeClass = schema.find((schemaClass) => {
 		return schemaClass.key === selectedClassKey;
 	});
 	if (!activeClass) {
