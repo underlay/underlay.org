@@ -21,8 +21,14 @@ import { Select } from "@blueprintjs/select";
 import { Version } from "@prisma/client";
 import { Popover2 } from "@blueprintjs/popover2";
 import classNames from "classnames";
+import { useRouter } from "next/router";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
+	const router = useRouter();
+	const refreshData = () => {
+		router.replace(router.asPath);
+	};
+
 	const { collectionSlug = "" } = useLocationContext().query;
 	const [newUpload, setNewUpload] = useState<
 		undefined | { file: File; mapping: Mapping; reductionType?: string }
@@ -91,6 +97,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			setNewUploadOpen(false);
 			setActiveVersion(undefined);
 			setNewUpload(undefined);
+			refreshData();
 		}
 	};
 
