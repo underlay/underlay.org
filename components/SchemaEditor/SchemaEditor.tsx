@@ -11,12 +11,20 @@ import styles from "./SchemaEditor.module.scss";
 
 type Props = {
 	collection: CollectionProps["collection"];
+	schema: Schema;
 	setCollection: any;
 	setIsEditing: any;
+	onSchemaChanged: (schema: Schema) => any;
 };
 
-const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, setIsEditing }) {
-	const [schema, setSchema] = useState<Schema>((collection.schemas[0]?.content as Schema) || []);
+const SchemaEditor: React.FC<Props> = function ({
+	collection,
+	schema: initSchema,
+	setCollection,
+	setIsEditing,
+	onSchemaChanged,
+}) {
+	const [schema, setSchema] = useState<Schema>(initSchema);
 	const [canSave, setCanSave] = useState<boolean>(false);
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const addNode = (addAtEnd: boolean) => {
@@ -238,6 +246,7 @@ const SchemaEditor: React.FC<Props> = function ({ collection, setCollection, set
 		setIsSaving(false);
 		setCanSave(false);
 		setIsEditing(false);
+		onSchemaChanged(schema);
 	};
 	const buttonRow = (addAtEnd: boolean) => {
 		const nodeFunc = () => {

@@ -37,10 +37,10 @@ export const collectionNavItems = [
 		slug: "overview",
 		title: "Overview",
 	},
-	{
-		slug: "schema",
-		title: "Schema",
-	},
+	// {
+	// 	slug: "schema",
+	// 	title: "Schema",
+	// },
 	{
 		slug: "data",
 		title: "Data",

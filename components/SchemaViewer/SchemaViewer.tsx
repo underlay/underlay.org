@@ -1,19 +1,17 @@
 import { Button } from "@blueprintjs/core";
 
 import { ThreeColumnFrame } from "components";
-import { CollectionProps } from "utils/server/collections";
 import { Class, Schema } from "utils/shared/types";
 
 import SchemaClassViewer from "./SchemaClassViewer";
 import styles from "./SchemaViewer.module.scss";
 
 type Props = {
-	collection: CollectionProps["collection"];
+	schema: Schema;
 	setIsEditing: (val: boolean) => void;
 };
 
-const SchemaViewer: React.FC<Props> = function ({ collection, setIsEditing }) {
-	const schema = collection.schemas[0].content as Schema;
+const SchemaViewer: React.FC<Props> = function ({ schema, setIsEditing }) {
 	const schemaNodes = schema
 		.filter((schemaClass: Class) => {
 			return !schemaClass.isRelationship;
