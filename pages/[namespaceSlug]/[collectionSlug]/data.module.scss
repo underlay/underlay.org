@@ -1,17 +1,28 @@
+.dataTopHeader {
+	margin-top: 24px;
+	margin-bottom: -18px;
+	display: flex;
+	justify-content: space-between;
+	font-size: 14px;
+}
+
 .frame {
 	& > div:first-child {
-		width: 150px;
-		margin-right: 25px;
-	}
-	.schema {
-		margin-top: 45px;
+		width: 250px;
 	}
 	.classRow {
 		margin-bottom: 5px;
 		justify-content: flex-start;
-		margin-left: -10px;
 		& > span:first-child {
 			margin-right: 5px;
+		}
+
+		&:hover {
+			background-color: rgba(143, 153, 168, 0.15);
+		}
+
+		&.activeNode {
+			background-color: rgba(143, 153, 168, 0.3);
 		}
 	}
 	.dataHeader {
@@ -42,4 +53,24 @@
 .inputDate {
 	opacity: 0.8;
 	font-size: 14px;
+}
+
+.section {
+	border-top: 1px solid #ccc;
+	padding-top: 1rem;
+	position: relative;
+	font-size: 14px;
+}
+
+.sectionButtons {
+	position: absolute;
+	top: 16px;
+	right: 0px;
+}
+
+.leftSection {
+	padding-right: 32px;
+}
+.rightSection {
+	padding-left: 16px;
 }

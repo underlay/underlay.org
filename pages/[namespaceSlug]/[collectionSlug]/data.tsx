@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 
 import { supabase } from "utils/client/supabase";
-import { CollectionHeader, DataUploadDialog, Section, ThreeColumnFrame } from "components";
+import {
+	CollectionHeader,
+	DataUploadDialog,
+	SchemaEditorDialog,
+	Section,
+	ThreeColumnFrame,
+} from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 import { useLocationContext } from "utils/client/hooks";
-import {
-	AnchorButton,
-	Button,
-	Dialog,
-	Intent,
-	Menu,
-	MenuItem,
-	NonIdealState,
-} from "@blueprintjs/core";
+import { Button, Dialog, Intent, Menu, MenuItem, NonIdealState } from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
 
 import styles from "./data.module.scss";
@@ -22,17 +20,28 @@ import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
 import { Select } from "@blueprintjs/select";
 import { Version } from "@prisma/client";
 import { Popover2 } from "@blueprintjs/popover2";
+import classNames from "classnames";
+import { useRouter } from "next/router";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
-	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
+	const router = useRouter();
+	const refreshData = () => {
+		router.replace(router.asPath);
+	};
+
+	const { collectionSlug = "" } = useLocationContext().query;
 	const [newUpload, setNewUpload] = useState<
 		undefined | { file: File; mapping: Mapping; reductionType?: string }
 	>(undefined);
 	const [collection, setCollection] = useState(initCollection);
 	const [newUploadInProgress, setNewUploadInProgress] = useState(false);
 	const [newUploadOpen, setNewUploadOpen] = useState(false);
+	const [schemaEditorOpen, setSchemaEditorOpen] = useState(false);
 	const [isPublishing, setIsPublishing] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+	const [schema, setSchema] = useState<undefined | Schema>(
+		(collection.schemas[0]?.content as Class[]) || undefined
+	);
 
 	let newButtonText = "Upload Data";
 	if (newUploadInProgress) {
@@ -88,6 +97,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			setNewUploadOpen(false);
 			setActiveVersion(undefined);
 			setNewUpload(undefined);
+			refreshData();
 		}
 	};
 
@@ -125,7 +135,6 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		setActiveVersion(data);
 	};
 
-	const schema = (collection.schemas[0]?.content as Class[]) || undefined;
 	const [selectedClassKey, setSelectedClassKey] = useState(schema ? schema[0].key : "");
 	const lastVersion = collection.versions[0];
 	const [activeVersion, setActiveVersion] = useState<undefined | Version>(lastVersion);
@@ -145,274 +154,269 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 	return (
 		<div>
 			<CollectionHeader mode="data" collection={collection} />
-			{!schema && <div>No schema yet</div>}
-			{schema && (
+			{
 				<React.Fragment>
+					<div className={styles.dataTopHeader}>
+						<Select
+							items={availableVersionsToSelect}
+							// @ts-ignore
+							itemRenderer={(item: Version, { handleClick, modifiers }) => {
+								if (!modifiers.matchesPredicate) {
+									return null;
+								}
+								const isSelected =
+									activeVersion?.number === item.number ||
+									(!activeVersion && item.number === "Draft");
+								return (
+									<MenuItem
+										className={isSelected ? "" : styles.menuItem}
+										active={modifiers.active}
+										key={item.id}
+										onClick={handleClick}
+										text={item.number}
+										icon={isSelected ? "tick" : undefined}
+									/>
+								);
+							}}
+							onItemSelect={(item) => {
+								const newValue = item.number === "Draft" ? undefined : item;
+								setActiveVersion(newValue as Version);
+							}}
+							filterable={false}
+							popoverProps={{
+								minimal: true,
+								modifiers: {
+									preventOverflow: { enabled: false },
+									flip: { enabled: false },
+								},
+							}}
+						>
+							<Button disabled={!schema} outlined rightIcon="caret-down">
+								{activeVersion && (
+									<React.Fragment>
+										Version {activeVersion.number} · Published{" "}
+										{convertToLocaleDateString(activeVersion.createdAt)}
+									</React.Fragment>
+								)}
+								{!activeVersion && (
+									<React.Fragment>
+										<div>Draft</div>
+									</React.Fragment>
+								)}
+							</Button>
+						</Select>
+
+						<Button
+							outlined
+							hidden={!!activeVersion}
+							small
+							text={"Publish New Version"}
+							disabled={!schema || inputsSinceVersion.length === 0}
+							onClick={publishVersion}
+							loading={isPublishing}
+						/>
+					</div>
 					<ThreeColumnFrame
 						className={styles.frame}
 						navContent={
 							<div className={styles.schema}>
-								<Section title="Nodes">
-									{schema
-										.filter((classElement) => {
-											return !classElement.isRelationship;
-										})
-										.map((classElement) => {
-											return (
-												<Button
-													key={classElement.id}
-													className={styles.classRow}
-													onClick={() => {
-														setSelectedClassKey(classElement.key);
-														// setActiveNodes([classElement]);
-													}}
-													minimal
-													fill
-													icon={"circle"}
-												>
-													{classElement.key}
-												</Button>
-											);
-										})}
-								</Section>
-								<Section title="Relationships">
-									{schema
-										.filter((classElement) => {
-											return classElement.isRelationship;
-										})
-										.map((classElement) => {
-											return (
-												<Button
-													key={classElement.id}
-													className={styles.classRow}
-													onClick={() => {
-														// setActiveNodes([classElement]);
-														setSelectedClassKey(classElement.key);
-													}}
-													minimal
-													fill
-													icon={"arrow-top-right"}
-												>
-													{classElement.key}
-												</Button>
-											);
-										})}
+								<Section title="Schema" className={styles.section}>
+									<div style={{ paddingRight: "1rem" }}>
+										{schema === undefined && (
+											<div style={{ marginBottom: "1rem" }}>
+												No schema yet
+											</div>
+										)}
+
+										<div className={styles.sectionButtons}>
+											<Button
+												outlined
+												small
+												icon={"edit"}
+												onClick={() => {
+													setSchemaEditorOpen(true);
+												}}
+											>
+												Edit
+											</Button>
+										</div>
+									</div>
+									{(schema || []).map((classElement) => {
+										return (
+											<Button
+												className={classNames([
+													styles.classRow,
+													{
+														[styles.activeNode]:
+															classElement.key === selectedClassKey,
+													},
+												])}
+												key={classElement.id}
+												onClick={() => {
+													setSelectedClassKey(classElement.key);
+												}}
+												minimal
+												fill
+												icon={
+													classElement.isRelationship
+														? "arrow-top-right"
+														: "circle"
+												}
+											>
+												{classElement.key}
+											</Button>
+										);
+									})}
 								</Section>
 							</div>
 						}
 						content={
 							<div>
-								<div className={styles.dataHeader}>
-									<div className={styles.buttonGroup}>
-										<Select
-											items={availableVersionsToSelect}
-											// @ts-ignore
-											itemRenderer={(
-												item: Version,
-												{ handleClick, modifiers }
-											) => {
-												if (!modifiers.matchesPredicate) {
-													return null;
-												}
-												const isSelected =
-													activeVersion?.number === item.number ||
-													(!activeVersion && item.number === "Draft");
-												return (
-													<MenuItem
-														className={
-															isSelected ? "" : styles.menuItem
-														}
-														active={modifiers.active}
-														key={item.id}
-														onClick={handleClick}
-														text={item.number}
-														icon={isSelected ? "tick" : undefined}
-													/>
-												);
-											}}
-											onItemSelect={(item) => {
-												const newValue =
-													item.number === "Draft" ? undefined : item;
-												setActiveVersion(newValue as Version);
-											}}
-											filterable={false}
-											popoverProps={{
-												minimal: true,
-												modifiers: {
-													preventOverflow: { enabled: false },
-													flip: { enabled: false },
-												},
-											}}
-										>
-											<Button outlined rightIcon="caret-down">
-												{activeVersion && (
+								<Section
+									title="Data"
+									className={classNames([styles.section, styles.rightSection])}
+								>
+									<div className={styles.dataHeader}>
+										<div className={styles.sectionButtons}>
+											<div className={styles.buttonGroup}>
+												{!activeVersion && !!inputsSinceVersion.length && (
 													<React.Fragment>
-														Version {activeVersion.number} · Published{" "}
-														{convertToLocaleDateString(
-															activeVersion.createdAt
-														)}
-													</React.Fragment>
-												)}
-												{!activeVersion && (
-													<React.Fragment>
-														<div>Draft</div>
-													</React.Fragment>
-												)}
-											</Button>
-										</Select>
-										{!activeVersion && !!inputsSinceVersion.length && (
-											<React.Fragment>
-												<Popover2
-													content={
-														<Menu>
-															{inputsSinceVersion.map((input) => {
-																console.log(input);
-																return (
-																	<MenuItem
-																		key={input.id}
-																		text={
-																			<div>
-																				<div
-																					className={
-																						styles.inputDate
+														<Popover2
+															content={
+																<Menu>
+																	{inputsSinceVersion.map(
+																		(input) => {
+																			return (
+																				<MenuItem
+																					key={input.id}
+																					text={
+																						<div>
+																							<div
+																								className={
+																									styles.inputDate
+																								}
+																							>
+																								{convertToLocaleDateString(
+																									input.createdAt
+																								)}
+																							</div>
+																							<div>
+																								{
+																									input
+																										.sourceCsv
+																										?.user
+																										.name
+																								}{" "}
+																								uploaded
+																								a{" "}
+																								<a
+																									href={
+																										input
+																											.sourceCsv
+																											?.fileUri
+																									}
+																								>
+																									CSV
+																									file
+																								</a>{" "}
+																								to{" "}
+																								{
+																									input.reductionType
+																								}
+																								.
+																							</div>
+																						</div>
 																					}
-																				>
-																					{convertToLocaleDateString(
-																						input.createdAt
-																					)}
-																				</div>
-																				<div>
-																					{
-																						input
-																							.sourceCsv
-																							?.user
-																							.name
-																					}{" "}
-																					uploaded a{" "}
-																					<a
-																						href={
-																							input
-																								.sourceCsv
-																								?.fileUri
-																						}
-																					>
-																						CSV file
-																					</a>{" "}
-																					to{" "}
-																					{
-																						input.reductionType
-																					}
-																					.
-																				</div>
-																			</div>
+																				/>
+																			);
 																		}
-																	/>
-																);
-															})}
-														</Menu>
-													}
-													minimal
-													placement="bottom-start"
-												>
-													<Button
-														outlined
-														text={`${inputsSinceVersion.length} Update${
-															inputsSinceVersion.length !== 1
-																? "s"
-																: ""
-														}`}
-														rightIcon="caret-down"
-													/>
-												</Popover2>
+																	)}
+																</Menu>
+															}
+															minimal
+															placement="bottom-start"
+														>
+															<Button
+																outlined
+																text={`${
+																	inputsSinceVersion.length
+																} Update${
+																	inputsSinceVersion.length !== 1
+																		? "s"
+																		: ""
+																}`}
+																rightIcon="caret-down"
+															/>
+														</Popover2>
+														{/* <Button
+															text={"Publish new version"}
+															onClick={publishVersion}
+															loading={isPublishing}
+														/> */}
+													</React.Fragment>
+												)}
+												{activeVersion && !!inputsSinceVersion.length && (
+													<div>
+														<Button
+															text={`${
+																inputsSinceVersion.length
+															} Update${
+																inputsSinceVersion.length !== 1
+																	? "s"
+																	: ""
+															} on Draft`}
+															outlined
+															intent={Intent.WARNING}
+															onClick={() => {
+																setActiveVersion(undefined);
+															}}
+														/>
+													</div>
+												)}
+
 												<Button
-													text={"Publish new version"}
-													onClick={publishVersion}
-													loading={isPublishing}
-												/>
-											</React.Fragment>
-										)}
-										{activeVersion && !!inputsSinceVersion.length && (
-											<div>
-												<Button
-													text={`${inputsSinceVersion.length} Update${
-														inputsSinceVersion.length !== 1 ? "s" : ""
-													} on Draft`}
+													disabled={!schema}
 													outlined
-													intent={Intent.WARNING}
-													onClick={() => {
-														setActiveVersion(undefined);
-													}}
-												/>
-											</div>
-										)}
-									</div>
-
-									<div className={styles.buttonGroup}>
-										<Popover2
-											interactionKind={"hover"}
-											content={
-												<div
-													style={{
-														padding: "8px 12px",
-														maxWidth: "400px",
-													}}
-												>
-													Schema has changed. Please re-upload data, map
-													it to the new schema and publish a new version.
-													<br />
-													<br />
-												</div>
-											}
-										>
-											<AnchorButton
-												hidden={!collection.haveSchemaChange}
-												outlined
-												text={"Schema Changed"}
-												intent={Intent.WARNING}
-												href={`/${namespaceSlug}/${collectionSlug}/schema`}
-											/>
-										</Popover2>
-										<Button
-											outlined
-											text={newButtonText}
-											onClick={() => {
-												setNewUploadOpen(true);
-											}}
-											intent={
-												newUploadInProgress ? Intent.WARNING : undefined
-											}
-										/>
-										<AnchorButton
-											outlined
-											text={"Export Data"}
-											href={`/${namespaceSlug}/${collectionSlug}/exports`}
-										/>
-									</div>
-								</div>
-								<div className={styles.dataFrame}>
-									<DataViewer
-										activeVersionNumber={activeVersion?.number || "draft"}
-										collection={collection}
-										selectedClassKey={selectedClassKey}
-									/>
-
-									{!collection.inputs && (
-										<NonIdealState
-											className={styles.emptyState}
-											title="No Data Yet"
-											icon="widget"
-											action={
-												<Button
+													text={newButtonText}
 													onClick={() => {
 														setNewUploadOpen(true);
 													}}
-												>
-													Upload Data from File
-												</Button>
-											}
+													intent={
+														newUploadInProgress
+															? Intent.WARNING
+															: undefined
+													}
+												/>
+											</div>
+										</div>
+									</div>
+
+									<div className={styles.dataFrame}>
+										<DataViewer
+											activeVersionNumber={activeVersion?.number || "draft"}
+											collection={collection}
+											schema={schema || []}
+											selectedClassKey={selectedClassKey}
 										/>
-									)}
-								</div>
+
+										{!collection.inputs && (
+											<NonIdealState
+												className={styles.emptyState}
+												title="No Data Yet"
+												icon="widget"
+												action={
+													<Button
+														onClick={() => {
+															setNewUploadOpen(true);
+														}}
+													>
+														Upload Data from File
+													</Button>
+												}
+											/>
+										)}
+									</div>
+								</Section>
 							</div>
 						}
 					/>
@@ -426,14 +430,30 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 						<DataUploadDialog
 							newUpload={newUpload}
 							setNewUpload={wrappedSetNewUpload}
-							schema={collection.schemas[0].content as Schema}
+							schema={schema || []}
 							uploadData={uploadData}
 							isUploading={isUploading}
 							collection={collection}
 						/>
 					</Dialog>
+
+					<Dialog
+						style={{ width: "80vw" }}
+						isOpen={schemaEditorOpen}
+						onClose={() => {
+							setSchemaEditorOpen(false);
+						}}
+					>
+						<SchemaEditorDialog
+							collection={collection}
+							schema={schema || []}
+							onSchemaChanged={(schema) => {
+								setSchema(schema);
+							}}
+						/>
+					</Dialog>
 				</React.Fragment>
-			)}
+			}
 		</div>
 	);
 };
