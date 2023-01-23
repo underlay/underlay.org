@@ -61,7 +61,7 @@ export const generateExportVersionJson = async (
 					return;
 				}
 				const mappingAttr = mapping[versionDataKey].attributes[attr];
-				if (!mappingAttr.include) {
+				if (!mappingAttr || !mappingAttr.include) {
 					return;
 				}
 				const nextEntityAttrKey = mappingAttr.rename || attr;

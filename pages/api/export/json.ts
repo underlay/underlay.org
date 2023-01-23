@@ -52,6 +52,7 @@ export default nextConnect<NextApiRequest, NextApiResponse>().post(async (req, r
 			exportId: exportObject.id,
 		},
 	});
+
 	const populatedExport = await prisma.export.findUnique({
 		where: {
 			id: exportObject.id,

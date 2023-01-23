@@ -22,6 +22,7 @@ import { Version } from "@prisma/client";
 import { Popover2 } from "@blueprintjs/popover2";
 import classNames from "classnames";
 import { useRouter } from "next/router";
+import { schemaToMapping } from "utils/shared/schema";
 
 const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
 	const router = useRouter();
@@ -111,7 +112,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 				collectionId: collection.id,
 			}),
 		});
-		const data = await response.json();
+		const newVersionData = await response.json();
 
 		try {
 			await fetch("/api/collection", {
@@ -126,13 +127,35 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 			console.error(err);
 		}
 
+		/**
+		 * Create a default download object for each version published
+		 */
+		try {
+			const postData = {
+				name: `_default_${newVersionData.number}`,
+				format: "JSON",
+				isPublic: true,
+				mapping: schemaToMapping(schema!),
+				versionId: newVersionData.id,
+				schemaId: collection.schemas[0].id,
+				collectionId: collection.id,
+			};
+			await fetch("/api/export/json", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(postData),
+			});
+		} catch (err) {
+			console.error(err);
+		}
+
 		setCollection({
 			...collection,
-			versions: [data, ...collection.versions],
+			versions: [newVersionData, ...collection.versions],
 			haveSchemaChange: false,
 		});
 		setIsPublishing(false);
-		setActiveVersion(data);
+		setActiveVersion(newVersionData);
 	};
 
 	const [selectedClassKey, setSelectedClassKey] = useState(schema ? schema[0].key : "");
@@ -348,11 +371,6 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 																rightIcon="caret-down"
 															/>
 														</Popover2>
-														{/* <Button
-															text={"Publish new version"}
-															onClick={publishVersion}
-															loading={isPublishing}
-														/> */}
 													</React.Fragment>
 												)}
 												{activeVersion && !!inputsSinceVersion.length && (

@@ -8,6 +8,7 @@ import { Schema } from "utils/shared/types";
 import styles from "./ExportCreate.module.scss";
 import { Version } from "@prisma/client";
 import { Select } from "@blueprintjs/select";
+import { schemaToMapping } from "utils/shared/schema";
 
 type Props = {
 	newExport: any;
@@ -31,21 +32,7 @@ const ExportCreate: React.FC<Props> = function ({
 
 	useEffect(() => {
 		if (!newExport.mapping) {
-			const mapping: { [key: string]: any } = {};
-			schema.forEach((schemaClass) => {
-				const classMap = {
-					include: true,
-					rename: "",
-					attributes: {} as { [key: string]: any },
-				};
-				schemaClass.attributes.forEach((attr) => {
-					classMap.attributes[attr.key] = {
-						include: true,
-						rename: "",
-					};
-				});
-				mapping[schemaClass.key] = classMap;
-			});
+			const mapping = schemaToMapping(schema);
 			setNewExport({
 				...newExport,
 				versionId: activeVersion.id,

@@ -15,12 +15,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 	}
 
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
-	const downloadButtonText =
-		collection.exports.length === 0
-			? "Create export"
-			: collection.exports.length === 1
-			? `View 1 export`
-			: `View ${collection.exports.length} exports`;
+	const downloadButtonText = `Download latest JSON`;
 
 	const latestVersion = collection.versions
 		.map((v) => v.number)
@@ -38,7 +33,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 			<Section title="Download" className={styles.large}>
 				<AnchorButton
 					outlined
-					href={`/${namespaceSlug}/${collectionSlug}/exports`}
+					href={`/api/${namespaceSlug}/${collectionSlug}/download`}
 					text={downloadButtonText}
 				/>
 			</Section>
