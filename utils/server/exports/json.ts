@@ -5,7 +5,8 @@ export const generateExportVersionJson = async (
 	versionId: string,
 	collectionSlugSuffix: string,
 	exportSlug: string,
-	mapping: { [key: string]: any }
+	mapping: { [key: string]: any },
+	includeMetadata: boolean = true
 ) => {
 	// generateExportVersionJson(inputDataUrl, mapping)
 	// - get input file as json
@@ -54,11 +55,13 @@ export const generateExportVersionJson = async (
 		versionData[versionDataKey].map((entity: any) => {
 			const nextEntity: { [key: string]: any } = {};
 			Object.keys(entity).forEach((attr) => {
-				const autoIncludeKeys = ["_ulid", "_ulprov"];
-				if (autoIncludeKeys.includes(attr)) {
-					/* If it's ulid or ulprov */
-					nextEntity[attr] = entity[attr];
-					return;
+				if (includeMetadata) {
+					const autoIncludeKeys = ["_ulid", "_ulprov"];
+					if (autoIncludeKeys.includes(attr)) {
+						/* If it's ulid or ulprov */
+						nextEntity[attr] = entity[attr];
+						return;
+					}
 				}
 				const mappingAttr = mapping[versionDataKey].attributes[attr];
 				if (!mappingAttr || !mappingAttr.include) {

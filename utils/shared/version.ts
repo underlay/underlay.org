@@ -77,3 +77,15 @@ export const getLargerVersion = (foo: string, bar: string) => {
 	}
 	return foo;
 };
+
+export const versionSorter = (foo: string, bar: string) => {
+	if (foo === bar) {
+		return 0;
+	}
+
+	if (getLargerVersion(foo, bar) === foo) {
+		return 1;
+	} else {
+		return -1;
+	}
+};
