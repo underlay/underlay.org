@@ -9,6 +9,8 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 
 	const namespaceSlug = req.query.namespaceSlug as string;
 	const collectionSlug = req.query.collectionSlug as string;
+	const versionNumber = req.query.version as string;
+	const dontIncludeMetadata = (req.query.includeMetadata as string) === "false";
 
 	const colSlugSuffix = collectionSlug.split("-").pop();
 
@@ -35,26 +37,23 @@ export default nextConnect<NextApiRequest, NextApiResponse>().get(async (req, re
 			return res.status(400).json({ ok: false });
 		}
 
-		const targetExport = collection.exports.sort((a, b) => {
-			return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-		})[collection.exports.length - 1];
+		const targetExportName = dontIncludeMetadata
+			? `_default_nomd_${versionNumber}`
+			: `_default_${versionNumber}`;
+
+		const targetExport = collection.exports.find((e) => e.name === targetExportName);
 		if (!targetExport) {
-			return res.status(400).json({ ok: false });
+			return res.status(404);
 		}
 
-		const sortedExportVersions = targetExport.exportVersions
-			.sort((a, b) => {
-				if (a.version.number > b.version.number) {
-					return 1;
-				}
-				if (a.version.number < b.version.number) {
-					return -1;
-				}
-				return 0;
-			})
-			.reverse();
+		const targetVersion = targetExport.exportVersions.find((v) => {
+			return v.version.number === versionNumber;
+		});
+		if (!targetVersion) {
+			return res.status(404);
+		}
 
-		const fileName = sortedExportVersions[0].fileUri;
+		const fileName = targetVersion.fileUri;
 
 		const { data, error } = await supabase.storage.from("data").download(fileName);
 		if (error || !data) {
