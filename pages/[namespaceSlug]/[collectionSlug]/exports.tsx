@@ -31,6 +31,7 @@ const CollectionExports: React.FC<CollectionProps> = function ({ collection: ini
 	const generateExport = async () => {
 		setIsGenerating(true);
 		const reqUrl = newExport.format === "JSON" ? "/api/export/json" : "/api/export/csv";
+
 		const response = await fetch(reqUrl, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },

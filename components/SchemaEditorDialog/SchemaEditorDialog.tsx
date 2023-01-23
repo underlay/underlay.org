@@ -7,17 +7,21 @@ import type { Schema } from "utils/shared/types";
 import styles from "./SchemaEditorDialog.module.scss";
 
 type Props = {
-	onSchemaChanged: (schema: Schema) => any;
 	schema: Schema;
+	onSchemaChanged: (schema: Schema) => any;
+	isEditingWhenOpen?: boolean;
 };
 
 const SchemaEditorDialog: React.FC<Props & CollectionProps> = function ({
 	collection: initCollection,
 	schema,
 	onSchemaChanged,
+	isEditingWhenOpen = true,
 }) {
 	const [collection, setCollection] = useState<CollectionProps["collection"]>(initCollection);
-	const [isEditing, setIsEditing] = useState<boolean>(!collection.inputs.length);
+	const [isEditing, setIsEditing] = useState<boolean>(
+		isEditingWhenOpen || !collection.inputs.length
+	);
 
 	return (
 		<div className={styles.editorFrame}>

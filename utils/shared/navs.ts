@@ -37,10 +37,6 @@ export const collectionNavItems = [
 		slug: "overview",
 		title: "Overview",
 	},
-	// {
-	// 	slug: "schema",
-	// 	title: "Schema",
-	// },
 	{
 		slug: "data",
 		title: "Data",
@@ -48,10 +44,6 @@ export const collectionNavItems = [
 	{
 		slug: "discussions",
 		title: "Discussions",
-	},
-	{
-		slug: "exports",
-		title: "Exports",
 	},
 	{
 		slug: "settings",
