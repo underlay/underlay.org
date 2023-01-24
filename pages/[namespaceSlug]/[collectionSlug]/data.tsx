@@ -128,11 +128,11 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 		}
 
 		/**
-		 * Create a default download object for each version published
+		 * Create two default download objects for each version published
+		 * One with metadata such as `_ulid`, one without
 		 */
 		try {
-			const postData = {
-				name: `_default_${newVersionData.number}`,
+			const basePostData = {
 				format: "JSON",
 				isPublic: true,
 				mapping: schemaToMapping(schema!),
@@ -140,10 +140,30 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 				schemaId: collection.schemas[0].id,
 				collectionId: collection.id,
 			};
+			const regularExportData = Object.assign(
+				{
+					name: `_default_${newVersionData.number}`,
+					includeMetadata: true,
+				},
+				basePostData
+			);
+			const noMetadataExportData = Object.assign(
+				{
+					name: `_default_nomd_${newVersionData.number}`,
+					includeMetadata: false,
+				},
+				basePostData
+			);
+
 			await fetch("/api/export/json", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(postData),
+				body: JSON.stringify(regularExportData),
+			});
+			await fetch("/api/export/json", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(noMetadataExportData),
 			});
 		} catch (err) {
 			console.error(err);

@@ -13,3 +13,26 @@
 		margin-right: 1em;
 	}
 }
+
+.subsection {
+	margin-top: 1rem;
+	font-size: 13px;
+	color: #888;
+
+	a[role="button"] {
+		font-size: 13px;
+	}
+
+	.option {
+		margin-bottom: 0.5rem;
+	}
+}
+
+.minimalMenu {
+	min-width: unset;
+}
+.minimalMenu li {
+	min-width: unset;
+	font-size: 12px;
+	padding: 2px;
+}
