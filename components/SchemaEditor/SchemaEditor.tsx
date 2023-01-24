@@ -8,6 +8,7 @@ import { CollectionProps } from "utils/server/collections";
 
 import SchemaClassEditor from "./SchemaClassEditor";
 import styles from "./SchemaEditor.module.scss";
+import { ErrorToaster } from "utils/client/toaster";
 
 type Props = {
 	collection: CollectionProps["collection"];
@@ -280,7 +281,18 @@ const SchemaEditor: React.FC<Props> = function ({
 						intent={Intent.SUCCESS}
 						text={canSave ? "Save Schema" : "Schema Saved"}
 						loading={isSaving}
-						onClick={handleSave}
+						// onClick={handleSave}
+						onClick={() => {
+							if (isSchemaValid(schema)) {
+								handleSave();
+							} else {
+								ErrorToaster.show({
+									message:
+										"Cannot save. Please check if any Nodes or Attributes have empty or invalid names.",
+									intent: "danger",
+								});
+							}
+						}}
 					/>
 					<Button
 						className={styles.sticky}
@@ -309,5 +321,21 @@ const SchemaEditor: React.FC<Props> = function ({
 		/>
 	);
 };
+
+function isSchemaValid(schema: Schema) {
+	for (const cls of schema) {
+		if (cls.key === "") {
+			return false;
+		}
+
+		for (const attr of cls.attributes) {
+			if (attr.key === "") {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
 
 export default SchemaEditor;
