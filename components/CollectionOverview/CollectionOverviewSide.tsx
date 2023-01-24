@@ -27,20 +27,6 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 	const { namespaceSlug = "", collectionSlug = "" } = useLocationContext().query;
 	const downloadButtonText = `Download JSON`;
 
-	const menuOptions = collection.versions
-		.map((v) => v.number)
-		.sort(versionSorter)
-		.reverse()
-		.map((v) => {
-			return (
-				<MenuItem
-					textClassName={styles.minimalMenuItem}
-					text={v}
-					onClick={() => setTargetVersion(v)}
-				/>
-			);
-		});
-
 	return (
 		<div className={styles.side}>
 			<Section title="Version" className={styles.small}>
@@ -61,7 +47,23 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 						<span>Version:</span>
 						<Popover2
 							placement="bottom"
-							content={<Menu className={styles.minimalMenu}>{menuOptions}</Menu>}
+							content={
+								<Menu className={styles.minimalMenu}>
+									{collection.versions
+										.map((v) => v.number)
+										.sort(versionSorter)
+										.reverse()
+										.map((v) => {
+											return (
+												<MenuItem
+													textClassName={styles.minimalMenuItem}
+													text={v}
+													onClick={() => setTargetVersion(v)}
+												/>
+											);
+										})}
+								</Menu>
+							}
 						>
 							<AnchorButton
 								style={{ marginLeft: ".5rem" }}
