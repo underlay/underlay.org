@@ -10,17 +10,22 @@ const CollectionOverviewTimeline: React.FC<CollectionProps> = function ({ collec
 
 	timelineItems.push([collection.createdAt, <span>Collection created</span>, "created"]);
 
+	const colFullSlug = `/${collection.namespace.slug}/${collection.slugPrefix}-${collection.slugSuffix}`;
+
 	collection.versions.forEach((v) =>
 		timelineItems.push([
 			v.createdAt,
 			<span>
-				Version <span>{v.number}</span> published
+				Version{" "}
+				<a href={`/api${colFullSlug}/download?version=${v.number}&includeMetadata=true`}>
+					{v.number}
+				</a>{" "}
+				published
 			</span>,
 			"publish",
 		])
 	);
 
-	const colFullSlug = `/${collection.namespace.slug}/${collection.slugPrefix}-${collection.slugSuffix}`;
 	collection.discussionThreads.forEach((dt) => {
 		timelineItems.push([
 			dt.createdAt,
