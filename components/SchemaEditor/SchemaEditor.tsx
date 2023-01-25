@@ -286,7 +286,7 @@ const SchemaEditor: React.FC<Props> = function ({
 							if (isSchemaValid(schema)) {
 								handleSave();
 							} else {
-								ErrorToaster.show({
+								ErrorToaster?.show({
 									message:
 										"Cannot save. Please check if any Nodes or Attributes have empty or invalid names.",
 									intent: "danger",
