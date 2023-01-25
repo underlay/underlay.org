@@ -57,6 +57,7 @@ const CollectionOverviewSide: React.FC<CollectionProps> = function ({ collection
 											return (
 												<MenuItem
 													textClassName={styles.minimalMenuItem}
+													key={v}
 													text={v}
 													onClick={() => setTargetVersion(v)}
 												/>
