@@ -8,6 +8,8 @@ import { Button, ButtonGroup, FormGroup, InputGroup, Intent } from "@blueprintjs
 import { useRouter } from "next/router";
 import { slugifyString } from "utils/shared/strings";
 
+import styles from "./collectionSettings.module.scss";
+
 const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) {
 	const { namespaceSlug = "", collectionSlug = "", subMode } = useLocationContext().query;
 	const [slugPrefix, setSlugPrefix] = useState(collection.slugPrefix);
@@ -71,7 +73,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 				content={
 					<React.Fragment>
 						{!activeSubMode && (
-							<Section title="Collection Details">
+							<Section title="Collection Details" className={styles.rightSection}>
 								<FormGroup label="Collection slug" labelFor="slug-prefix-input">
 									<InputGroup
 										id="slug-prefix-input"
