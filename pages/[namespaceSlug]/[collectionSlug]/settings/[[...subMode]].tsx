@@ -10,8 +10,9 @@ import { slugifyString } from "utils/shared/strings";
 
 import styles from "./collectionSettings.module.scss";
 
-const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) {
+const CollectionSettings: React.FC<CollectionProps> = function ({ collection, isOwner }) {
 	const { namespaceSlug = "", collectionSlug = "", subMode } = useLocationContext().query;
+
 	const [slugPrefix, setSlugPrefix] = useState(collection.slugPrefix);
 	const [description, setDescription] = useState(collection.description || "");
 	const [isPublic, setIsPublic] = useState(collection.isPublic);
@@ -30,6 +31,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 			body: JSON.stringify({
 				collectionId: collection.id,
 				updates: { slugPrefix: slugifyString(slugPrefix), description, isPublic },
+				namespaceSlug: collection.namespace.slug,
 			}),
 		});
 
@@ -80,6 +82,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 										required={true}
 										value={slugPrefix}
 										onChange={(evt) => setSlugPrefix(evt.target.value)}
+										disabled={!isOwner}
 									/>
 								</FormGroup>
 								<FormGroup label="Collection slug" labelFor="description-input">
@@ -88,6 +91,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 										required={true}
 										value={description}
 										onChange={(evt) => setDescription(evt.target.value)}
+										disabled={!isOwner}
 									/>
 								</FormGroup>
 								<FormGroup label="Privacy">
@@ -98,6 +102,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 											onClick={() => {
 												setIsPublic(true);
 											}}
+											disabled={!isOwner && isPublic === false}
 										/>
 										<Button
 											text="Private"
@@ -105,6 +110,7 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 											onClick={() => {
 												setIsPublic(false);
 											}}
+											disabled={!isOwner && isPublic === true}
 										/>
 									</ButtonGroup>
 								</FormGroup>
@@ -117,11 +123,12 @@ const CollectionSettings: React.FC<CollectionProps> = function ({ collection }) 
 									onClick={() => {
 										saveEdits();
 									}}
+									disabled={!isOwner}
 								/>
 							</Section>
 						)}
 						{activeSubMode === "members" && (
-							<Section title="Collection Members">
+							<Section title="Collection Members" className={styles.rightSection}>
 								<div>Manage Members here</div>
 							</Section>
 						)}

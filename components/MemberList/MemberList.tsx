@@ -75,7 +75,7 @@ const MemberList: React.FC<Props> = function ({ community, members }) {
 						<th className={styles.header}>Name</th>
 						<th className={styles.header}>About</th>
 						<th className={styles.header}>Permission</th>
-						{isCommunityOwner && <th className={styles.header}>Delete Member</th>}
+						{isCommunityOwner && <th className={styles.header}>Delete</th>}
 					</tr>
 				</thead>
 				<tbody>

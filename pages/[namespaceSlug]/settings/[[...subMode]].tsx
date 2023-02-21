@@ -19,6 +19,8 @@ import { getNamespaceData } from "utils/server/queries";
 import { useRouter } from "next/router";
 import { slugifyString } from "utils/shared/strings";
 
+import styles from "./userSettings.module.scss";
+
 type Props = {
 	slug: string;
 	community?: NonNullable<ExtendedCommunity>;
@@ -129,7 +131,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 				content={
 					<React.Fragment>
 						{!activeSubMode && (
-							<Section title="Public Profile">
+							<Section title="Public Profile" className={styles.rightSection}>
 								<FormGroup label="Name" labelFor="name-input">
 									<InputGroup
 										id="name-input"
@@ -187,7 +189,7 @@ const UserSettings: React.FC<Props> = function ({ slug, community, user }) {
 							</Section>
 						)}
 						{isOwner && (
-							<Section title="User Account">
+							<Section title="User Account" className={styles.rightSection}>
 								<div>Delete Account</div>
 							</Section>
 						)}

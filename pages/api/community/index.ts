@@ -41,6 +41,11 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 		}
 
 		const { id, name, about, nameSlug, avatar } = req.body;
+		const isOwner = loginId === id;
+
+		if (!isOwner) {
+			return res.status(403).json({ ok: false });
+		}
 
 		await prisma.community.update({
 			where: {
