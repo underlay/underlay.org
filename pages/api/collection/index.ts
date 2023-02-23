@@ -4,6 +4,7 @@ import prisma from "prisma/db";
 
 import { generateRandomString, slugifyString } from "utils/shared/strings";
 import { getLoginId } from "utils/server/auth/user";
+import { getNamespaceData } from "utils/server/queries";
 
 export default nextConnect<NextApiRequest, NextApiResponse>()
 	.post(async (req, res) => {
@@ -12,8 +13,8 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 			return res.status(403).json({ ok: false });
 		}
 
-		// TODO: Make sure loginId has permissions for associated namespaceId
 		const { namespaceId, name, description, isPublic } = req.body;
+
 		const newSlugPrefix = slugifyString(name);
 		const newSlugSuffix = generateRandomString(10);
 		const newCollection = await prisma.collection.create({
@@ -38,8 +39,17 @@ export default nextConnect<NextApiRequest, NextApiResponse>()
 			return res.status(403).json({ ok: false });
 		}
 
-		const { collectionId, updates } = req.body;
-		// TODO: Make sure loginId has permissions for associated namespaceId
+		const { collectionId, updates, namespaceSlug } = req.body;
+		const namespaceData = await getNamespaceData(namespaceSlug);
+
+		const isOwner =
+			namespaceData?.user?.id === loginId ||
+			namespaceData?.community?.members.map((m) => m.userId).includes(loginId);
+
+		if (!isOwner) {
+			return res.status(403).json({ ok: false });
+		}
+
 		await prisma.collection.update({
 			where: {
 				id: collectionId,

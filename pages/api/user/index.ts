@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import prisma from "prisma/db";
 
-// import { generateRandomString, slugifyString } from "utils/shared/strings";
 import { getLoginId } from "utils/server/auth/user";
 
 export default nextConnect<NextApiRequest, NextApiResponse>().put(async (req, res) => {

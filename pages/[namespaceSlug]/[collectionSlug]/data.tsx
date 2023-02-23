@@ -13,7 +13,6 @@ import { useLocationContext } from "utils/client/hooks";
 import { Button, Dialog, Intent, Menu, MenuItem, NonIdealState } from "@blueprintjs/core";
 import { Class, Mapping, Schema } from "utils/shared/types";
 
-import styles from "./data.module.scss";
 import DataViewer from "components/DataViewer/DataViewer";
 import { convertToLocaleDateString } from "utils/shared/dates";
 import { getSlugSuffix, generateRandomString } from "utils/shared/strings";
@@ -24,7 +23,12 @@ import classNames from "classnames";
 import { useRouter } from "next/router";
 import { schemaToMapping } from "utils/shared/schema";
 
-const CollectionData: React.FC<CollectionProps> = function ({ collection: initCollection }) {
+import styles from "./data.module.scss";
+
+const CollectionData: React.FC<CollectionProps> = function ({
+	collection: initCollection,
+	isOwner,
+}) {
 	const router = useRouter();
 	const refreshData = () => {
 		router.replace(router.asPath);
@@ -121,6 +125,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 				body: JSON.stringify({
 					collectionId: collection.id,
 					updates: { haveSchemaChange: false },
+					namespaceSlug: collection.namespace.slug,
 				}),
 			});
 		} catch (err) {
@@ -279,6 +284,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 												onClick={() => {
 													setSchemaEditorOpen(true);
 												}}
+												hidden={!isOwner}
 											>
 												Edit
 											</Button>
@@ -424,6 +430,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 															? Intent.WARNING
 															: undefined
 													}
+													hidden={!isOwner}
 												/>
 											</div>
 										</div>
@@ -447,6 +454,7 @@ const CollectionData: React.FC<CollectionProps> = function ({ collection: initCo
 														onClick={() => {
 															setNewUploadOpen(true);
 														}}
+														hidden={!isOwner}
 													>
 														Upload Data from File
 													</Button>

@@ -219,6 +219,7 @@ const SchemaEditor: React.FC<Props> = function ({
 			body: JSON.stringify({
 				collectionId: collection.id,
 				updates: { haveSchemaChange: true },
+				namespaceSlug: collection.namespace.slug,
 			}),
 		});
 

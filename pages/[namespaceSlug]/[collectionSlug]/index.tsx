@@ -8,7 +8,10 @@ import {
 } from "components";
 import { getCollectionProps, CollectionProps } from "utils/server/collections";
 
-const CollectionOverview: React.FC<CollectionProps> = function ({ collection: initCollection }) {
+const CollectionOverview: React.FC<CollectionProps> = function ({
+	collection: initCollection,
+	isOwner,
+}) {
 	const [collection, setCollection] = useState(initCollection);
 
 	return (
@@ -16,7 +19,11 @@ const CollectionOverview: React.FC<CollectionProps> = function ({ collection: in
 			<CollectionHeader mode="overview" collection={collection} />
 			<ThreeColumnFrame
 				content={
-					<CollectionOverviewMain collection={collection} setCollection={setCollection} />
+					<CollectionOverviewMain
+						collection={collection}
+						setCollection={setCollection}
+						isOwner={isOwner}
+					/>
 				}
 				sideContent={<CollectionOverviewSide collection={collection} />}
 			/>
