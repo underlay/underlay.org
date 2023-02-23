@@ -18,10 +18,10 @@ const MemberList: React.FC<Props> = function ({ community, members }) {
 	};
 
 	const loginData = useLoginContext();
-	const isCommunityOwner = !!(
-		loginData &&
-		community.members.some((m) => m.permission === "owner" && m.userId === loginData.id)
-	);
+	const communityOwnerIds = community.members
+		.filter((m) => m.permission === "owner")
+		.map((m) => m.userId);
+	const isCommunityOwner = !!(loginData && communityOwnerIds.includes(loginData.id));
 
 	const [isAddingMember, setIsAddingMember] = useState(false);
 	const [isUpdatingMembership, setIsUpdatingMembership] = useState(false);
@@ -37,6 +37,7 @@ const MemberList: React.FC<Props> = function ({ community, members }) {
 			body: JSON.stringify({
 				action: "ADD",
 				communityId: community.id,
+				communityOwnerIds,
 				memberId: userIdToAdd,
 			}),
 		});
@@ -56,6 +57,7 @@ const MemberList: React.FC<Props> = function ({ community, members }) {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				action: "REMOVE",
+				communityOwnerIds,
 				membershipId,
 			}),
 		});

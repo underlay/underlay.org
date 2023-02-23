@@ -10,7 +10,11 @@ export default nextConnect<NextApiRequest, NextApiResponse>().put(async (req, re
 		return res.status(403).json({ ok: false });
 	}
 
-	const { action, communityId, memberId, membershipId } = req.body;
+	const { action, communityId, communityOwnerIds, memberId, membershipId } = req.body;
+
+	if (!communityOwnerIds.includes(loginId)) {
+		return res.status(403).json({ ok: false });
+	}
 
 	if (action === "ADD") {
 		const user = await prisma.user.findFirst({
