@@ -81,7 +81,12 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 	}
 
 	// @ts-ignore
-	const activeEntities = versionData[selectedClassKey] || [];
+	let activeEntities = versionData[selectedClassKey] || [];
+	let activeClassMessage = `${activeClass.key} (${activeEntities.length} entries)`;
+	if (activeEntities.length > 100) {
+		activeClassMessage = `${activeClass.key} (${activeEntities.length} entries, showing the first 100)`;
+		activeEntities = activeEntities.slice(0, 100);
+	}
 
 	return (
 		<div className={styles.dataViewer}>
@@ -100,7 +105,7 @@ const DataViewer: React.FC<DataViewerProps & CollectionProps> = function ({
 								minimal
 								icon={activeClass.isRelationship ? "arrow-top-right" : "circle"}
 							>
-								{activeClass.key}
+								{activeClassMessage}
 							</Button>
 						</div>
 					)}
