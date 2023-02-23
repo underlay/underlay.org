@@ -31,6 +31,11 @@ export const getCollectionProps: GetServerSideProps<CollectionProps, CollectionP
 	if (!collection) {
 		return { notFound: true };
 	}
+
+	if (!collection.isPublic && !isOwner) {
+		return { notFound: true };
+	}
+
 	const properRoute = `/${collection.namespace.slug}/${makeSlug(
 		collection.slugPrefix,
 		collection.slugSuffix
