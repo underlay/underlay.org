@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { Section, EmptyState } from "components";
 import { CollectionProps } from "utils/server/collections";
@@ -71,7 +72,9 @@ const Readme: React.FC<Props> = function ({ collection, setCollection, isOwner }
 				</React.Fragment>
 			}
 		>
-			{!isEditing && readme && <ReactMarkdown children={readme} />}
+			{!isEditing && readme && (
+				<ReactMarkdown children={readme} remarkPlugins={[remarkGfm]} />
+			)}
 			{!isEditing && !readme && (
 				<EmptyState
 					title="No Readme Yet"
