@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { Section, EmptyState } from "components";
 import { CollectionProps } from "utils/server/collections";
@@ -11,7 +12,7 @@ type Props = CollectionProps & {
 	setCollection: ({}) => {};
 };
 
-const Readme: React.FC<Props> = function ({ collection, setCollection }) {
+const Readme: React.FC<Props> = function ({ collection, setCollection, isOwner }) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [readme, setReadme] = useState(collection.readme);
 	const [isSaving, setIsSaving] = useState(false);
@@ -21,7 +22,11 @@ const Readme: React.FC<Props> = function ({ collection, setCollection }) {
 		await fetch("/api/collection", {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ collectionId: collection.id, updates: { readme } }),
+			body: JSON.stringify({
+				collectionId: collection.id,
+				updates: { readme },
+				namespaceSlug: collection.namespace.slug,
+			}),
 		});
 		setCollection({ ...collection, readme });
 		setIsEditing(false);
@@ -54,19 +59,27 @@ const Readme: React.FC<Props> = function ({ collection, setCollection }) {
 						</React.Fragment>
 					)}
 					{!isEditing && readme && (
-						<Button outlined small icon={"edit"} onClick={() => setIsEditing(true)}>
+						<Button
+							outlined
+							small
+							icon={"edit"}
+							onClick={() => setIsEditing(true)}
+							hidden={!isOwner}
+						>
 							Edit Readme
 						</Button>
 					)}
 				</React.Fragment>
 			}
 		>
-			{!isEditing && readme && <ReactMarkdown children={readme} />}
+			{!isEditing && readme && (
+				<ReactMarkdown children={readme} remarkPlugins={[remarkGfm]} />
+			)}
 			{!isEditing && !readme && (
 				<EmptyState
 					title="No Readme Yet"
 					action={
-						<Button icon={"edit"} onClick={() => setIsEditing(true)}>
+						<Button icon={"edit"} onClick={() => setIsEditing(true)} hidden={!isOwner}>
 							Add Readme
 						</Button>
 					}

@@ -32,7 +32,7 @@ const SideGettingStarted: React.FC<CollectionProps> = function ({ collection }) 
 		{
 			title: "Define a Schema",
 			description: "Schemas communicate the shape and structure of your data",
-			link: `/${namespaceSlug}/${collectionSlug}/schema`,
+			link: `/${namespaceSlug}/${collectionSlug}/data`,
 			completed: !!collection.schemas.length,
 		},
 		{
