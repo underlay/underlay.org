@@ -1,6 +1,6 @@
 # Incentives
 
-A key to Underlay's success is being able to provide incentives for creating, curatoring, and using collections. Currently, the incentives to create and maintain a public dataset are underwhelming when compared to the cost of actually doing so. There are a few key features we think can improve the situation:
+A key to Underlay's success is being able to provide incentives for creating, curating, and using collections. Currently, the incentives to create and maintain a public dataset are underwhelming when compared to the cost of actually doing so. There are a few key features we think can improve the situation.
 
 ## Incentivizing useful datasets.
 A common practice when publishing a public dataset is to simply upload a flat file to a data server. This server can then give you a download count to suggest how useful people find the dataset to be. We think we can do better with a few key features:
