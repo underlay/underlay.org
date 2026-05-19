@@ -1,3 +1,5 @@
+> Deprecated in favor of our new repo at https://github.com/knowledgefutures/underlay/
+
 # Underlay
 
 ## To Install
