@@ -1,7 +1,7 @@
 # Using Collections
 Our intent is to make it quick and simple to use existing Underlay collections. There will likely be several iterations on designing the best approach for achieving this. 
 
-There are a number of important elements that a user of data may want to customize for thier use case:
+There are a number of important elements that a user of data may want to customize for their use case:
 
 - Shape of the output data (e.g. how the data is nested and which fields are included)
 - Key names of output data (e.g. to align with production systems)
@@ -18,14 +18,14 @@ At present, exports are generated as static, cached files. The files can either 
 
 Export files can specify a mapping that allows users to choose which fields they want included in their exported file, as well as rename those fields to align with their use case.
 
-At present, there is no way to filter data from an export beyond including or excluded a specific class or attribute. 
+At present, there is no way to filter data from an export beyond including or excluding a specific class or attribute. 
 
 ## Future Approach: Queries
 
-An improved interface for exports would be to allow users to generate a query whose result is cached and storage. The output result may be similar to static cached files (e.g. a JSON file or CSV file), but they would have more granular control over which data is included in these output files. 
+An improved interface for exports would be to allow users to generate a query whose result is cached and stored. The output result may be similar to static cached files (e.g. a JSON file or CSV file), but they would have more granular control over which data is included in these output files. 
 
 ## Future Approach: Hosted instances
 
-One future interface we intend to implement is the ability to quickly stand up a private, hosted database that is populated with the collection's data or a queried subset of the data. This hosted instance would be production-grade and could be immediately used in a production environment. Settings on whether the content of the hosted instance is automaticall incremented as new collection versions are published would be configurable. 
+One future interface we intend to implement is the ability to quickly stand up a private, hosted database that is populated with the collection's data or a queried subset of the data. This hosted instance would be production-grade and could be immediately used in a production environment. Settings on whether the content of the hosted instance is automatically incremented as new collection versions are published would be configurable. 
 
-This would give users a simple way to take existing collections and using them in production environments quickly, and with low maintenance overhead.
+This would give users a simple way to take existing collections and use them in production environments quickly, and with low maintenance overhead.

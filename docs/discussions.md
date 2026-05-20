@@ -6,7 +6,7 @@ Discussions are implemented by automatically adding a `Discussion` type to the c
 
 ## Discussion UI
 
-- Discussions can be created from the discussion tab
-  - [Show image]
+- Discussions can be created from the discussion tab.
+  <!-- - [Show image] -->
 - Discussions can be created from the data viewer to scope it to a specific data point.
-  - [Show image]
+  <!-- - [Show image] -->

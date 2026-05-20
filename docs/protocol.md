@@ -8,7 +8,7 @@ Our current answer is that the purpose of the Underlay is to make public data mo
 
 With that in mind, it is often easier to identify what parts of that problem Underlay does _not_ address. For example, we are not trying to increase query-speed of data (i.e. we're not a database), and we're not trying to improve transfer sizes (i.e. we're not a compression algorithm).
 
-In fact, nearly all of the technical components that one typically thinks of when considering public datasets have already been considered and addressed by past efforts around the Semantic Web, RDF, and modern efforts on IPFS, IPLD, Dat, and other open data projects. However, despite the technical expertise brought to these projects, the reality of public data still leaves us wanting. As such, we identify that a missing piece we can address is the social dynamics of using public data. Our approach is to identify simple, well-established technical components that can serve as the basis for facilitating more effective, equitable, and sustainble processes.
+In fact, nearly all of the technical components that one typically thinks of when considering public datasets have already been considered and addressed by past efforts around the Semantic Web, RDF, and modern efforts on IPFS, IPLD, Dat, and other open data projects. However, despite the technical expertise brought to these projects, the reality of public data still leaves us wanting. As such, we identify that a missing piece we can address is the social dynamics of using public data. Our approach is to identify simple, well-established technical components that can serve as the basis for facilitating more effective, equitable, and sustainable processes.
 
 The Underlay is premised on the idea that a knowledge graph can be constructed from a series of distributed transactions called assertions. Multiple assertions are combined through a process called reduction and can be curated into useful groupings using collections.
 
@@ -25,7 +25,7 @@ A toy example of an assertion is simply something like
 }
 ```
 
-In english: 'Jude says that Rosalind Franklin was born in 1920'.
+In English: 'Jude says that Rosalind Franklin was born in 1920'.
 
 ## Reduction
 
